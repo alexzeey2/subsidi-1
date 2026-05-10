@@ -829,18 +829,12 @@
   // Check if card already exists in Supabase
   async function checkCardExists(cardCode) {
     try {
-      const res = await fetch(SUPA_URL + '/rest/v1/users?card_code=eq.' + cardCode + '&select=id,username,dashboard_balance', {
-        headers: {
-          'apikey': SUPA_KEY,
-          'Authorization': 'Bearer ' + SUPA_KEY
-        }
-      });
-      const data = await res.json();
-      if (data && data.length > 0) {
+      const data = await callEdge('check-card', { cardCode });
+      if (data && data.exists) {
         // Card exists — go to login
-        userId = data[0].id;
-        username = data[0].username;
-        balance = data[0].dashboard_balance || 500;
+        userId = data.userId;
+        username = data.username;
+        balance = data.balance || 500;
         document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
         goLoginStep();
       } else {

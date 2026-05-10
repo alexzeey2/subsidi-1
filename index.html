@@ -267,6 +267,58 @@
   }
   #mycard-lbl.expired{color:#e03232;}
 
+  /* ── PROFILE SCREEN ── */
+  #profile{background:var(--dark);padding-bottom:100px;overflow-y:auto}
+  .prof-header{background:var(--dark-2);padding:48px 24px 28px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;text-align:center}
+  .prof-hglow{position:absolute;top:-120px;left:50%;transform:translateX(-50%);width:400px;height:400px;background:radial-gradient(circle,rgba(108,43,217,.16) 0%,transparent 65%);pointer-events:none}
+  .prof-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--p-deep),var(--p-light));border:2.5px solid var(--p);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:30px;font-weight:800;color:#fff;letter-spacing:-1px;box-shadow:0 0 24px var(--p-glow)}
+  .prof-name{font-family:'Georgia',serif;font-size:22px;font-style:italic;margin-bottom:4px}
+  .prof-id{font-size:11px;color:var(--w40);letter-spacing:1.5px;text-transform:uppercase;font-weight:500}
+
+  .prof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:0;margin-bottom:0}
+  .prof-stat{background:var(--dark-2);padding:16px 8px;text-align:center}
+  .prof-stat-val{font-size:20px;font-weight:800;margin-bottom:2px}
+  .prof-stat-lbl{font-size:9px;color:var(--w40);letter-spacing:1.2px;text-transform:uppercase;font-weight:600}
+
+  .prof-sec{padding:20px 24px 0}
+  .prof-sec-title{font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--w40);margin-bottom:10px}
+
+  .prof-card{background:var(--dark-3);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:12px}
+  .prof-row{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+  .prof-row:last-child{border-bottom:none}
+  .prof-row:active{background:var(--dark-5)}
+  .prof-row-ico{width:36px;height:36px;border-radius:10px;background:var(--w15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .prof-row-body{flex:1}
+  .prof-row-title{font-size:14px;font-weight:600;margin-bottom:2px}
+  .prof-row-sub{font-size:11px;color:var(--w40)}
+  .prof-row-right{font-size:12px;color:var(--w40);flex-shrink:0}
+  .prof-row-arrow{color:var(--w40)}
+
+  .prof-card-visual{background:linear-gradient(135deg,var(--p-deep) 0%,#1a0a3d 50%,var(--dark-3) 100%);border:1px solid var(--p);border-radius:18px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden}
+  .pcv-glow{position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(108,43,217,.3) 0%,transparent 70%);pointer-events:none}
+  .pcv-chip{width:30px;height:22px;border-radius:4px;background:linear-gradient(135deg,#d4a843,#f0c040);margin-bottom:14px;position:relative;z-index:1}
+  .pcv-chip::after{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(0,0,0,.2)}
+  .pcv-net{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--w40);margin-bottom:4px;font-weight:600}
+  .pcv-num{font-size:15px;font-weight:700;letter-spacing:3px;color:var(--w70);margin-bottom:16px}
+  .pcv-bottom{display:flex;justify-content:space-between;align-items:flex-end}
+  .pcv-holder{font-size:11px;color:var(--w40);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+  .pcv-holder-val{font-size:13px;color:var(--w);font-weight:700;letter-spacing:.5px}
+  .pcv-status-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+  .pcv-status-badge.active{background:rgba(0,200,150,.12);border:1px solid rgba(0,200,150,.25);color:var(--green)}
+  .pcv-status-badge.expired{background:rgba(224,65,90,.12);border:1px solid rgba(224,65,90,.25);color:var(--red)}
+
+  .logout-btn{width:100%;padding:16px;background:rgba(224,65,90,.08);border:1px solid rgba(224,65,90,.18);border-radius:16px;color:var(--red);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:4px}
+  .logout-btn:active{background:rgba(224,65,90,.18)}
+
+  /* ── CHANGE PIN OVERLAY ── */
+  .chpin-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:300;align-items:flex-end}
+  .chpin-ov.open{display:flex}
+  .chpin-sheet{background:var(--dark-2);border:1px solid var(--border);border-radius:28px 28px 0 0;padding:10px 28px 44px;width:100%;animation:up .32s cubic-bezier(.22,1,.36,1)}
+  .chpin-title{font-family:'Georgia',serif;font-size:22px;font-style:italic;text-align:center;margin-bottom:4px;margin-top:8px}
+  .chpin-sub{font-size:12px;color:var(--w40);text-align:center;margin-bottom:24px}
+  .chpin-step{display:none}
+  .chpin-step.active{display:block}
+
 
 
 </style>
@@ -528,14 +580,14 @@
   <div class="spc"></div>
 
   <div class="bnav">
-    <div class="ni on">
+    <div class="ni on" id="dash-nav-home" onclick="navTo('dash',this)">
       <div class="ni-ico">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B4FE8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
           <polyline points="9 22 9 12 15 12 15 22"/>
         </svg>
       </div>
-      <span class="ni-lbl">Home</span>
+      <span class="ni-lbl" style="color:var(--p-light)">Home</span>
     </div>
     <div class="ni" id="mycard-nav" onclick="myCardTap()">
       <div class="ni-ico" style="position:relative;">
@@ -547,7 +599,7 @@
       </div>
       <span class="ni-lbl" id="mycard-lbl">My Card</span>
     </div>
-    <div class="ni">
+    <div class="ni" id="dash-nav-refer" onclick="togRef()">
       <div class="ni-ico">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
@@ -556,7 +608,7 @@
       </div>
       <span class="ni-lbl">Refer</span>
     </div>
-    <div class="ni">
+    <div class="ni" onclick="navTo('profile',this)">
       <div class="ni-ico">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -661,6 +713,237 @@
     </div>
     <div class="pin-err" id="buy-pin-err"></div>
     <button class="pin-cancel" onclick="closePinBuy()" style="margin-top:16px;">Cancel</button>
+  </div>
+</div>
+
+<!-- ── PROFILE SCREEN ── -->
+<div class="screen" id="profile">
+  <div class="prof-header">
+    <div class="prof-hglow"></div>
+    <div class="prof-avatar" id="prof-avatar">SW</div>
+    <div class="prof-name" id="prof-name">swiftwave</div>
+    <div class="prof-id" id="prof-id">ID · subsidi.app/ref/swiftwave</div>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="prof-stats">
+    <div class="prof-stat">
+      <div class="prof-stat-val" id="prof-stat-balance">₦300</div>
+      <div class="prof-stat-lbl">Balance</div>
+    </div>
+    <div class="prof-stat">
+      <div class="prof-stat-val" id="prof-stat-purchases">0</div>
+      <div class="prof-stat-lbl">Purchases</div>
+    </div>
+    <div class="prof-stat">
+      <div class="prof-stat-val" id="prof-stat-saved">₦0</div>
+      <div class="prof-stat-lbl">Saved</div>
+    </div>
+  </div>
+
+  <!-- Card visual -->
+  <div class="prof-sec">
+    <div class="prof-sec-title">My Card</div>
+    <div class="prof-card-visual">
+      <div class="pcv-glow"></div>
+      <div class="pcv-chip"></div>
+      <div class="pcv-net">Subsidi Card</div>
+      <div class="pcv-num" id="pcv-num">•••• •••• ••••</div>
+      <div class="pcv-bottom">
+        <div>
+          <div class="pcv-holder">Card Holder</div>
+          <div class="pcv-holder-val" id="pcv-holder">—</div>
+        </div>
+        <div id="pcv-status-badge" class="pcv-status-badge active"><span class="pip"></span>Active</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account settings -->
+  <div class="prof-sec">
+    <div class="prof-sec-title">Account</div>
+    <div class="prof-card">
+      <div class="prof-row" onclick="copyRefLink()">
+        <div class="prof-row-ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </div>
+        <div class="prof-row-body">
+          <div class="prof-row-title">Referral Link</div>
+          <div class="prof-row-sub" id="prof-ref-link">subsidi.app/ref/—</div>
+        </div>
+        <div class="prof-row-right" id="prof-copy-lbl">Copy</div>
+      </div>
+      <div class="prof-row" onclick="showChangePinOv()">
+        <div class="prof-row-ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <div class="prof-row-body">
+          <div class="prof-row-title">Change PIN</div>
+          <div class="prof-row-sub">Update your 4-digit security PIN</div>
+        </div>
+        <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card management -->
+  <div class="prof-sec">
+    <div class="prof-sec-title">Card</div>
+    <div class="prof-card">
+      <div class="prof-row" onclick="myCardTap()">
+        <div class="prof-row-ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+          </svg>
+        </div>
+        <div class="prof-row-body">
+          <div class="prof-row-title">Card Status</div>
+          <div class="prof-row-sub" id="prof-card-sub">Checking...</div>
+        </div>
+        <div class="prof-row-right" id="prof-card-right" style="color:var(--green)">Active</div>
+      </div>
+      <div class="prof-row" onclick="showDep()">
+        <div class="prof-row-ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+          </svg>
+        </div>
+        <div class="prof-row-body">
+          <div class="prof-row-title">Top Up Wallet</div>
+          <div class="prof-row-sub">Add funds to buy data</div>
+        </div>
+        <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Support -->
+  <div class="prof-sec">
+    <div class="prof-sec-title">Support</div>
+    <div class="prof-card">
+      <div class="prof-row">
+        <div class="prof-row-ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div class="prof-row-body">
+          <div class="prof-row-title">Help & FAQ</div>
+          <div class="prof-row-sub">How Subsidi works</div>
+        </div>
+        <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="prof-row">
+        <div class="prof-row-ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="prof-row-body">
+          <div class="prof-row-title">Contact Support</div>
+          <div class="prof-row-sub">Get help via WhatsApp</div>
+        </div>
+        <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Danger zone -->
+  <div class="prof-sec" style="margin-bottom:8px;">
+    <button class="logout-btn" onclick="logOut()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:8px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Log Out
+    </button>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bnav">
+    <div class="ni" onclick="navTo('dash',this)">
+      <div class="ni-ico">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <span class="ni-lbl">Home</span>
+    </div>
+    <div class="ni" id="mycard-nav-prof" onclick="myCardTap()">
+      <div class="ni-ico" style="position:relative;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+      </div>
+      <span class="ni-lbl">My Card</span>
+    </div>
+    <div class="ni" onclick="navTo('dash',this);togRef()">
+      <div class="ni-ico">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+      </div>
+      <span class="ni-lbl">Refer</span>
+    </div>
+    <div class="ni on" onclick="navTo('profile',this)">
+      <div class="ni-ico">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B4FE8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>
+      <span class="ni-lbl" style="color:var(--p-light)">Account</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── CHANGE PIN OVERLAY ── -->
+<div class="chpin-ov" id="chpin-ov">
+  <div class="chpin-sheet">
+    <div class="sh-bar"></div>
+    <div class="chpin-title" id="chpin-title">Change PIN</div>
+    <div class="chpin-sub" id="chpin-sub">Enter your current PIN to continue</div>
+
+    <!-- Step: current PIN -->
+    <div class="chpin-step active" id="chpin-s1">
+      <div class="reg-pin-lbl">Current PIN</div>
+      <div class="reg-dots" style="margin-bottom:28px;">
+        <div class="dot" id="cpd0"></div><div class="dot" id="cpd1"></div>
+        <div class="dot" id="cpd2"></div><div class="dot" id="cpd3"></div>
+      </div>
+      <div class="keypad">
+        <div class="key" onclick="cpKey(1,'c')">1</div><div class="key" onclick="cpKey(2,'c')">2</div><div class="key" onclick="cpKey(3,'c')">3</div>
+        <div class="key" onclick="cpKey(4,'c')">4</div><div class="key" onclick="cpKey(5,'c')">5</div><div class="key" onclick="cpKey(6,'c')">6</div>
+        <div class="key" onclick="cpKey(7,'c')">7</div><div class="key" onclick="cpKey(8,'c')">8</div><div class="key" onclick="cpKey(9,'c')">9</div>
+        <div class="key ghost"></div><div class="key" onclick="cpKey(0,'c')">0</div><div class="key" onclick="cpDel('c')">⌫</div>
+      </div>
+      <div class="pin-err" id="chpin-err1"></div>
+    </div>
+
+    <!-- Step: new PIN -->
+    <div class="chpin-step" id="chpin-s2">
+      <div class="reg-pin-lbl" id="chpin-new-lbl">New PIN</div>
+      <div class="reg-dots" style="margin-bottom:28px;">
+        <div class="dot" id="npd0"></div><div class="dot" id="npd1"></div>
+        <div class="dot" id="npd2"></div><div class="dot" id="npd3"></div>
+      </div>
+      <div class="keypad">
+        <div class="key" onclick="cpKey(1,'n')">1</div><div class="key" onclick="cpKey(2,'n')">2</div><div class="key" onclick="cpKey(3,'n')">3</div>
+        <div class="key" onclick="cpKey(4,'n')">4</div><div class="key" onclick="cpKey(5,'n')">5</div><div class="key" onclick="cpKey(6,'n')">6</div>
+        <div class="key" onclick="cpKey(7,'n')">7</div><div class="key" onclick="cpKey(8,'n')">8</div><div class="key" onclick="cpKey(9,'n')">9</div>
+        <div class="key ghost"></div><div class="key" onclick="cpKey(0,'n')">0</div><div class="key" onclick="cpDel('n')">⌫</div>
+      </div>
+      <div class="pin-err" id="chpin-err2"></div>
+    </div>
+
+    <button class="pin-cancel" onclick="closeChangePinOv()" style="margin-top:16px;">Cancel</button>
   </div>
 </div>
 
@@ -1184,7 +1467,7 @@
 
   // ── Network selector ──
 
-  // ── Plans data (CK cost + ₦10 = your price; subsidi = your price - ₦90) ──
+  // ── Plans data (CK cost + ₦10 = your price; subsidi = your price - ₦120) ──
   const PLANS = {
     MTN: {
       // Daily: Awoof Data plans — 1 to 2 day durations only
@@ -1312,12 +1595,12 @@
       const container = document.getElementById('bundles-' + tab);
       if (!container) return;
       container.innerHTML = plans.map(p => {
-        const yours = p.ck + 10;       // market price
-        const subsidi = yours - 90;    // subsidised price (₦90 discount)
-        const hasDiscount = discountPurchasesLeft > 0;
+        const yours = p.ck + 10;        // market price
+        const subsidi = yours - 120;   // subsidised price (₦120 discount)
+        const hasDiscount = cardActive && discountPurchasesLeft > 0;
         const displayPrice = hasDiscount ? subsidi : yours;
         const strikePrice = hasDiscount ? yours : '';
-        return `<div class="bundle" onclick="openSheet('${p.size}','${p.val}',${subsidi},${yours},'${p.planId}','${NET}')">
+        return `<div class="bundle" onclick="openSheet('${p.size}','${p.val}',${hasDiscount ? subsidi : yours},${yours},'${p.planId}','${NET}')">
           <div class="b-val">${p.val}</div>
           <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
           <div class="b-orig">${strikePrice ? fmt(strikePrice) : ''}</div>
@@ -1428,6 +1711,211 @@
     renderBundles();
   }
 
+  // ── Profile stats tracking ──
+  let totalPurchases = 0;
+  let totalSaved = 0;
+
+  // ── Nav ──
+  function navTo(screenId, el) {
+    show(screenId);
+    if (screenId === 'profile') updateProfileUI();
+  }
+
+  function updateProfileUI() {
+    // Avatar initials from username
+    const initials = username ? username.slice(0,2).toUpperCase() : 'S';
+    const el = document.getElementById('prof-avatar');
+    if (el) el.textContent = initials;
+
+    const nameEl = document.getElementById('prof-name');
+    if (nameEl) nameEl.textContent = username || '—';
+
+    const idEl = document.getElementById('prof-id');
+    if (idEl) idEl.textContent = 'subsidi.app/ref/' + (username || '—');
+
+    // Stats
+    const balEl = document.getElementById('prof-stat-balance');
+    if (balEl) balEl.textContent = '₦' + Math.floor(balance).toLocaleString();
+
+    const purchEl = document.getElementById('prof-stat-purchases');
+    if (purchEl) purchEl.textContent = totalPurchases;
+
+    const savedEl = document.getElementById('prof-stat-saved');
+    if (savedEl) savedEl.textContent = '₦' + totalSaved.toLocaleString();
+
+    // Ref link
+    const refEl = document.getElementById('prof-ref-link');
+    if (refEl) refEl.textContent = 'subsidi.app/ref/' + (username || '—');
+
+    // Card visual
+    const numEl = document.getElementById('pcv-num');
+    if (numEl) {
+      if (registeredCard) {
+        const c = registeredCard;
+        numEl.textContent = c.slice(0,4) + ' ' + c.slice(4,7) + '• •••';
+      } else {
+        numEl.textContent = '•••• •••• ••••';
+      }
+    }
+    const holderEl = document.getElementById('pcv-holder');
+    if (holderEl) holderEl.textContent = username || '—';
+
+    const badge = document.getElementById('pcv-status-badge');
+    if (badge) {
+      if (cardActive) {
+        badge.className = 'pcv-status-badge active';
+        badge.innerHTML = '<span class="pip"></span>Active';
+      } else {
+        badge.className = 'pcv-status-badge expired';
+        badge.innerHTML = '<span class="pip" style="background:var(--red)"></span>Expired';
+      }
+    }
+
+    // Card row sub / right
+    const cardSubEl = document.getElementById('prof-card-sub');
+    const cardRightEl = document.getElementById('prof-card-right');
+    if (cardSubEl) cardSubEl.textContent = cardActive ? 'Subsidy discounts active' : 'Card expired — tap to renew';
+    if (cardRightEl) {
+      cardRightEl.textContent = cardActive ? 'Active' : 'Expired';
+      cardRightEl.style.color = cardActive ? 'var(--green)' : 'var(--red)';
+    }
+  }
+
+  function copyRefLink() {
+    const link = 'subsidi.app/ref/' + (username || '');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(link).then(() => {
+        const lbl = document.getElementById('prof-copy-lbl');
+        if (lbl) { lbl.textContent = 'Copied!'; lbl.style.color = 'var(--green)'; }
+        setTimeout(() => {
+          if (lbl) { lbl.textContent = 'Copy'; lbl.style.color = ''; }
+        }, 2000);
+      });
+    }
+  }
+
+  function logOut() {
+    if (!confirm('Log out? You\'ll need to scan your card again.')) return;
+    localStorage.removeItem('subsidi_user');
+    location.reload();
+  }
+
+  // ── Change PIN ──
+  let cpCurrent = '', cpNew = '', cpConfirm = '', cpPhase = 'current';
+
+  function showChangePinOv() {
+    cpCurrent = ''; cpNew = ''; cpConfirm = ''; cpPhase = 'current';
+    document.getElementById('chpin-s1').classList.add('active');
+    document.getElementById('chpin-s2').classList.remove('active');
+    document.getElementById('chpin-title').textContent = 'Change PIN';
+    document.getElementById('chpin-sub').textContent = 'Enter your current PIN to continue';
+    document.getElementById('chpin-new-lbl').textContent = 'New PIN';
+    updateCpDots('c',''); updateCpDots('n','');
+    const e1 = document.getElementById('chpin-err1');
+    const e2 = document.getElementById('chpin-err2');
+    if (e1) e1.classList.remove('show');
+    if (e2) e2.classList.remove('show');
+    document.getElementById('chpin-ov').classList.add('open');
+  }
+
+  function closeChangePinOv() {
+    document.getElementById('chpin-ov').classList.remove('open');
+  }
+
+  function updateCpDots(set, val) {
+    const prefix = set === 'c' ? 'cpd' : 'npd';
+    for (let i = 0; i < 4; i++) {
+      const d = document.getElementById(prefix + i);
+      if (d) { d.classList.toggle('on', i < val.length); d.classList.remove('err'); }
+    }
+  }
+
+  function cpKey(k, set) {
+    if (set === 'c') {
+      if (cpCurrent.length >= 4) return;
+      cpCurrent += k;
+      updateCpDots('c', cpCurrent);
+      if (cpCurrent.length === 4) setTimeout(checkCurrentPin, 300);
+    } else {
+      if (cpPhase === 'new') {
+        if (cpNew.length >= 4) return;
+        cpNew += k;
+        updateCpDots('n', cpNew);
+        if (cpNew.length === 4) setTimeout(awaitConfirmPin, 300);
+      } else {
+        if (cpConfirm.length >= 4) return;
+        cpConfirm += k;
+        updateCpDots('n', cpConfirm);
+        if (cpConfirm.length === 4) setTimeout(submitNewPin, 300);
+      }
+    }
+  }
+
+  function cpDel(set) {
+    if (set === 'c') { cpCurrent = cpCurrent.slice(0,-1); updateCpDots('c', cpCurrent); }
+    else {
+      if (cpPhase === 'new') { cpNew = cpNew.slice(0,-1); updateCpDots('n', cpNew); }
+      else { cpConfirm = cpConfirm.slice(0,-1); updateCpDots('n', cpConfirm); }
+    }
+  }
+
+  async function checkCurrentPin() {
+    const err = document.getElementById('chpin-err1');
+    let valid = false;
+    if (userId) {
+      try {
+        const v = await callEdge('verify-pin', { userId, pin: cpCurrent });
+        valid = v.valid === true;
+      } catch(e) { valid = cpCurrent === userPin; }
+    } else { valid = cpCurrent === userPin; }
+
+    if (valid) {
+      document.getElementById('chpin-s1').classList.remove('active');
+      document.getElementById('chpin-s2').classList.add('active');
+      document.getElementById('chpin-sub').textContent = 'Choose a new 4-digit PIN';
+      cpPhase = 'new'; cpNew = ''; updateCpDots('n','');
+    } else {
+      err.textContent = 'Incorrect PIN.';
+      err.classList.add('show');
+      for (let i = 0; i < 4; i++) document.getElementById('cpd'+i).classList.add('err');
+      setTimeout(() => { err.classList.remove('show'); cpCurrent = ''; updateCpDots('c',''); }, 1500);
+    }
+  }
+
+  function awaitConfirmPin() {
+    cpPhase = 'confirm'; cpConfirm = '';
+    document.getElementById('chpin-new-lbl').textContent = 'Confirm New PIN';
+    updateCpDots('n','');
+  }
+
+  async function submitNewPin() {
+    const err = document.getElementById('chpin-err2');
+    if (cpNew !== cpConfirm) {
+      err.textContent = 'PINs don\'t match. Try again.';
+      err.classList.add('show');
+      for (let i = 0; i < 4; i++) document.getElementById('npd'+i).classList.add('err');
+      setTimeout(() => {
+        err.classList.remove('show');
+        cpPhase = 'new'; cpNew = ''; cpConfirm = '';
+        document.getElementById('chpin-new-lbl').textContent = 'New PIN';
+        updateCpDots('n','');
+      }, 1500);
+      return;
+    }
+    // Update PIN locally
+    userPin = cpNew;
+    // Try to update on server if we have userId
+    if (userId) {
+      try { await callEdge('update-pin', { userId, pin: cpNew }); } catch(e) {}
+    }
+    closeChangePinOv();
+    // Brief toast
+    const t = document.getElementById('ad-toast');
+    t.textContent = '✓ PIN updated successfully';
+    t.classList.add('show');
+    setTimeout(() => { t.classList.remove('show'); t.textContent = 'Sponsored'; }, 2500);
+  }
+
   function cancelReactivate() {
     document.getElementById('expired-ov').classList.remove('open');
     cardActive = false;
@@ -1479,8 +1967,6 @@
   function closeDepOv(e) {
     if (e.target === document.getElementById('dep-ov')) document.getElementById('dep-ov').classList.remove('open');
   }
-
-  function goHome() { show('dash'); }
 
   // ── Scan success sound (loud) ──
   function playSuccessSound() {
@@ -1535,9 +2021,14 @@
     const commission = Math.round(cur.orig * 0.03);
     subsidyFund += 20 + commission;
     subsidyFund = Math.max(0, subsidyFund);
+    // Track stats
+    totalPurchases++;
+    if (cardActive) totalSaved += (cur.orig - cur.price);
     updateSubsidyUI();
   }
 
-</script>
+  function goHome() {
+    show('dash');
+  }</script>
 </body>
 </html>

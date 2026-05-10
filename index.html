@@ -1366,27 +1366,18 @@
   
   // ── Card expiry ──
   function startCardTimer() {
-    // If card already expired, show subsidy prices for 30s then switch to market price
-    if (!cardActive) {
-      // Show subsidy prices during 30s grace
-      cardActive = true;
-      renderBundles();
-      const wrapGrace = document.getElementById('subsidy-bar-wrap');
-      if (wrapGrace) wrapGrace.style.display = '';
-      cardActive = false; // restore immediately — glow keeps running, prices are temporarily subsidi
+    // Always start with a 30s countdown regardless of card state
+    // During 30s: show everything as active (subsidy prices, bar visible, no glow)
+    cardActive = true;
+    renderBundles();
+    const wrapInit = document.getElementById('subsidy-bar-wrap');
+    if (wrapInit) wrapInit.style.display = '';
+    updateCardGlow(); // no glow during 30s (cardActive=true)
 
-      // After 30s: switch prices, hide bar, START glow, show modal
-      setTimeout(() => {
-        const wrap2 = document.getElementById('subsidy-bar-wrap');
-        if (wrap2) wrap2.style.display = 'none';
-        renderBundles(); // cardActive=false so market prices show
-        updateCardGlow(); // start the expired glow now
-        showExpiredModal();
-      }, 30000);
-      return;
-    }
-    cardTimer = setTimeout(() => {
+    // After 30s: expire the card, switch everything
+    setTimeout(() => {
       cardActive = false;
+      // Persist to localStorage
       const saved = localStorage.getItem('subsidi_user');
       if (saved) {
         const u = JSON.parse(saved);
@@ -1395,10 +1386,10 @@
       }
       const wrap = document.getElementById('subsidy-bar-wrap');
       if (wrap) wrap.style.display = 'none';
-      updateCardGlow();
-      renderBundles();
+      updateCardGlow(); // now glow starts
+      renderBundles();  // prices switch to market price
       showExpiredModal();
-    }, 28 * 24 * 60 * 60 * 1000);
+    }, 30000);
   }
 
   function badgeTap() { if (!cardActive) showExpiredModal(); }

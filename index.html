@@ -276,6 +276,33 @@
       <div class="pin-err" id="reg-pin-err"></div>
     </div>
 
+    <div class="reg-step" id="reg-step-4">
+      <div class="reg-title">Welcome back</div>
+      <div class="reg-sub">This card is already registered. Enter your PIN to continue.</div>
+      <div class="reg-pin-lbl" id="login-pin-lbl">Enter PIN</div>
+      <div class="reg-dots" id="login-pin-dots">
+        <div class="dot" id="lpd0"></div>
+        <div class="dot" id="lpd1"></div>
+        <div class="dot" id="lpd2"></div>
+        <div class="dot" id="lpd3"></div>
+      </div>
+      <div class="keypad">
+        <div class="key" onclick="loginPinKey('1')">1</div>
+        <div class="key" onclick="loginPinKey('2')">2</div>
+        <div class="key" onclick="loginPinKey('3')">3</div>
+        <div class="key" onclick="loginPinKey('4')">4</div>
+        <div class="key" onclick="loginPinKey('5')">5</div>
+        <div class="key" onclick="loginPinKey('6')">6</div>
+        <div class="key" onclick="loginPinKey('7')">7</div>
+        <div class="key" onclick="loginPinKey('8')">8</div>
+        <div class="key" onclick="loginPinKey('9')">9</div>
+        <div class="key ghost"></div>
+        <div class="key" onclick="loginPinKey('0')">0</div>
+        <div class="key" onclick="loginPinDel()">⌫</div>
+      </div>
+      <div class="pin-err" id="login-pin-err"></div>
+    </div>
+
   </div>
 </div>
 
@@ -689,6 +716,7 @@
 
   // ── Buy PIN state ──
   let buyPinEntry = '';
+  let loginPinEntry = '';
 
   // ── Balance ──
   function updateBalance(amount) {
@@ -785,10 +813,8 @@
         clearTimeout(regScanLoop);
         registeredCard = code.data;
         cardSecret = extractSecret(code.data);
-        username = generateUsername(code.data);
-        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
-        document.getElementById('reg-scan-status').textContent = '✓ Card linked!';
-        setTimeout(goRegStep3, 600);
+        document.getElementById('reg-scan-status').textContent = '✓ Card scanned! Checking...';
+        checkCardExists(code.data);
         return;
       }
     }
@@ -800,6 +826,43 @@
   }
 
   // ── Registration Step 3: Set PIN ──
+  // Check if card already exists in Supabase
+  async function checkCardExists(cardCode) {
+    try {
+      const res = await fetch(SUPA_URL + '/rest/v1/users?card_code=eq.' + cardCode + '&select=id,username,dashboard_balance', {
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY
+        }
+      });
+      const data = await res.json();
+      if (data && data.length > 0) {
+        // Card exists — go to login
+        userId = data[0].id;
+        username = data[0].username;
+        balance = data[0].dashboard_balance || 500;
+        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        goLoginStep();
+      } else {
+        // New card — go to PIN creation
+        username = generateUsername(cardCode);
+        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        goRegStep3();
+      }
+    } catch (e) {
+      // Fallback to registration if check fails
+      username = generateUsername(cardCode);
+      goRegStep3();
+    }
+  }
+
+  function goLoginStep() {
+    loginPinEntry = '';
+    document.getElementById('reg-step-2').classList.remove('active');
+    document.getElementById('reg-step-4').classList.add('active');
+    updateLoginPinDots('');
+  }
+
   function goRegStep3() {
     regPinEntry = ''; regPinConfirm = ''; regPinStage = 'enter';
     document.getElementById('reg-step-2').classList.remove('active');
@@ -915,6 +978,65 @@
     document.getElementById('dprice').textContent = '₦' + actualPrice.toLocaleString();
     document.getElementById('phinput').value = '';
     document.getElementById('ov').classList.add('open');
+  }
+
+  // ── Login PIN (returning card owner) ──
+  function updateLoginPinDots(val) {
+    for (let i = 0; i < 4; i++) {
+      const d = document.getElementById('lpd' + i);
+      d.classList.toggle('on', i < val.length);
+      d.classList.remove('err');
+    }
+  }
+
+  function loginPinKey(k) {
+    if (loginPinEntry.length >= 4) return;
+    loginPinEntry += k;
+    updateLoginPinDots(loginPinEntry);
+    if (loginPinEntry.length === 4) setTimeout(checkLoginPin, 300);
+  }
+
+  function loginPinDel() {
+    loginPinEntry = loginPinEntry.slice(0, -1);
+    updateLoginPinDots(loginPinEntry);
+  }
+
+  async function checkLoginPin() {
+    const err = document.getElementById('login-pin-err');
+    try {
+      err.textContent = 'Verifying...';
+      err.classList.add('show');
+      const vData = await callEdge('verify-pin', { userId, pin: loginPinEntry });
+      err.classList.remove('show');
+
+      if (vData.valid) {
+        userPin = loginPinEntry;
+        // Save to localStorage
+        localStorage.setItem('subsidi_user', JSON.stringify({
+          userId, username, balance, cardCode: registeredCard
+        }));
+        // Update balance display
+        const whole = Math.floor(balance).toLocaleString();
+        const dec = (balance % 1).toFixed(2).slice(1);
+        document.getElementById('bal-display').innerHTML =
+          '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + (balance % 1).toFixed(2).slice(1) + '</span>';
+        show('dash');
+        startCardTimer();
+      } else {
+        err.textContent = 'Incorrect PIN. Try again.';
+        err.classList.add('show');
+        for (let i = 0; i < 4; i++) document.getElementById('lpd' + i).classList.add('err');
+        setTimeout(() => {
+          err.classList.remove('show');
+          loginPinEntry = '';
+          updateLoginPinDots('');
+        }, 1500);
+      }
+    } catch (e) {
+      err.textContent = 'Connection error. Try again.';
+      err.classList.add('show');
+      setTimeout(() => { err.classList.remove('show'); loginPinEntry = ''; updateLoginPinDots(''); }, 2000);
+    }
   }
 
   function updateBuyPinDots(val) {

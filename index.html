@@ -1210,13 +1210,15 @@
       const container = document.getElementById('bundles-' + tab);
       if (!container) return;
       container.innerHTML = plans.map(p => {
-        const yours = p.ck + 10;
-        const subsidi = yours - 90;
+        const yours = p.ck + 10;       // market price (card expired)
+        const subsidi = yours - 90;    // subsidised price (card active)
+        const displayPrice = cardActive ? subsidi : yours;
+        const strikePrice = cardActive ? yours : '';
         return `<div class="bundle" onclick="openSheet('${p.size}','${p.val}',${subsidi},${yours},'${p.planId}','${NET}')">
           <div class="b-val">${p.val}</div>
           <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
-          <div class="b-orig">${fmt(yours)}</div>
-          <div class="b-price">${fmt(subsidi)}</div>
+          <div class="b-orig">${strikePrice ? fmt(strikePrice) : ''}</div>
+          <div class="b-price">${fmt(displayPrice)}</div>
           <div class="b-btn">${cardActive ? 'Best Price' : 'Market Price'}</div>
         </div>`;
       }).join('');

@@ -1263,6 +1263,7 @@
   function startCardTimer() {
     cardTimer = setTimeout(() => {
       cardActive = false;
+      renderBundles();
       showExpiredModal();
     }, 28 * 24 * 60 * 60 * 1000);
   }
@@ -1283,12 +1284,7 @@
     badge.style.borderColor = 'rgba(0,200,150,.18)';
     badge.style.color = 'var(--green)';
     badge.style.cursor = 'default';
-    document.querySelectorAll('.b-btn').forEach(b => b.textContent = 'Best Price');
-    document.querySelectorAll('.bundle').forEach(bundle => {
-      const oc = bundle.getAttribute('onclick') || '';
-      const m = oc.match(/,(\d+),(\d+)\)/);
-      if (m) { const el = bundle.querySelector('.b-price'); if (el) el.textContent = '₦' + parseInt(m[1]).toLocaleString(); }
-    });
+    renderBundles();
   }
 
   function cancelReactivate() {
@@ -1300,12 +1296,7 @@
     badge.style.borderColor = 'rgba(224,65,90,0.18)';
     badge.style.color = 'var(--red)';
     badge.style.cursor = 'pointer';
-    document.querySelectorAll('.bundle').forEach(bundle => {
-      const oc = bundle.getAttribute('onclick') || '';
-      const m = oc.match(/,(\d+),(\d+)\)/);
-      if (m) { const el = bundle.querySelector('.b-price'); if (el) el.textContent = '₦' + parseInt(m[2]).toLocaleString(); }
-    });
-    document.querySelectorAll('.b-btn').forEach(b => b.textContent = 'Market Price');
+    renderBundles();
   }
 
   // ── Deposit ──

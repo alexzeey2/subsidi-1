@@ -934,7 +934,18 @@
       });
 
       if (data.error) {
-        showErr(err2, data.error);
+        const pinErr = document.getElementById('reg-pin-err');
+        showErr(pinErr, data.error === 'Card already registered'
+          ? 'This card is already registered. Scan again to log in.'
+          : data.error);
+        // Reset so they can try scanning again
+        regPinEntry = ''; regPinConfirm = ''; regPinStage = 'enter';
+        setTimeout(() => {
+          document.getElementById('reg-step-3').classList.remove('active');
+          document.getElementById('reg-step-2').classList.add('active');
+          document.getElementById('reg-scan-status').textContent = 'Scan your card again';
+          startRegScan();
+        }, 2500);
         return;
       }
 

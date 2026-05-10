@@ -942,7 +942,7 @@
       // Store userId and username from Supabase
       userId = data.userId;
       username = data.username;
-      balance = 500;
+      balance = 300;
       document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
 
     } catch (e) {
@@ -956,6 +956,8 @@
     }));
 
     show('dash');
+    updateSubsidyUI();
+    updateCardGlow();
     startCardTimer();
     setTimeout(() => {
       const t = document.getElementById('ad-toast');
@@ -1336,6 +1338,7 @@
   function startCardTimer() {
     cardTimer = setTimeout(() => {
       cardActive = false;
+      updateCardGlow();
       renderBundles();
       showExpiredModal();
     }, 28 * 24 * 60 * 60 * 1000);

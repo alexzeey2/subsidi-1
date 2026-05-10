@@ -723,7 +723,26 @@
   }
 
   // ── Registration QR Scanner — auto-starts on page load ──
-  window.addEventListener("load", () => { startRegScan(); });
+  window.addEventListener("load", () => {
+    const saved = localStorage.getItem('subsidi_user');
+    if (saved) {
+      const u = JSON.parse(saved);
+      userId = u.userId;
+      username = u.username;
+      balance = u.balance || 500;
+      registeredCard = u.cardCode || null;
+      // Update balance display
+      const whole = Math.floor(balance).toLocaleString();
+      const dec = (balance % 1).toFixed(2).slice(1);
+      document.getElementById('bal-display').innerHTML =
+        '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+      document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+      show('dash');
+      startCardTimer();
+    } else {
+      startRegScan();
+    }
+  });
 
   async function startRegScan() {
     try {
@@ -873,6 +892,11 @@
       console.warn('Registration edge function failed, proceeding offline:', e);
     }
 
+    // Save user to localStorage so app remembers after refresh
+    localStorage.setItem('subsidi_user', JSON.stringify({
+      userId, username, balance, cardCode: registeredCard
+    }));
+
     show('dash');
     startCardTimer();
     setTimeout(() => {
@@ -964,6 +988,13 @@
           const dec = (balance % 1).toFixed(2).slice(1);
           document.getElementById('bal-display').innerHTML =
             '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+          // Persist updated balance
+          const saved = localStorage.getItem('subsidi_user');
+          if (saved) {
+            const u = JSON.parse(saved);
+            u.balance = balance;
+            localStorage.setItem('subsidi_user', JSON.stringify(u));
+          }
 
         } catch (e) {
           // Fallback: deduct locally

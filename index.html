@@ -761,10 +761,27 @@
         '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
       document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
       show('dash');
-      renderBundles();
-      updateSubsidyUI();
-      updateCardGlow();
-      startCardTimer();
+      if (!cardActive) {
+        // Temporarily show as active for 30s so user can see the app first
+        cardActive = true;
+        renderBundles();
+        updateSubsidyUI();
+        updateCardGlow();
+        // After 30s, flip to expired state
+        setTimeout(() => {
+          cardActive = false;
+          const w = document.getElementById('subsidy-bar-wrap');
+          if (w) w.style.display = 'none';
+          renderBundles();
+          updateCardGlow();
+          showExpiredModal();
+        }, 30000);
+      } else {
+        renderBundles();
+        updateSubsidyUI();
+        updateCardGlow();
+        startCardTimer();
+      }
     } else {
       startRegScan();
     }
@@ -1296,7 +1313,7 @@
       if (!container) return;
       container.innerHTML = plans.map(p => {
         const yours = p.ck + 10;       // market price
-        const subsidi = yours - 140;   // subsidised price (₦140 discount)
+        const subsidi = yours - 90;    // subsidised price (₦90 discount)
         const hasDiscount = discountPurchasesLeft > 0;
         const displayPrice = hasDiscount ? subsidi : yours;
         const strikePrice = hasDiscount ? yours : '';
@@ -1349,14 +1366,27 @@
   
   // ── Card expiry ──
   function startCardTimer() {
-    // If card already expired, show modal after 30s delay (not instantly)
+    // If card already expired, show subsidy prices for 30s then switch to market price
     if (!cardActive) {
-      setTimeout(() => showExpiredModal(), 30000);
+      // Show subsidy prices during 30s grace
+      cardActive = true;
+      renderBundles();
+      const wrapGrace = document.getElementById('subsidy-bar-wrap');
+      if (wrapGrace) wrapGrace.style.display = '';
+      cardActive = false; // restore immediately — glow keeps running, prices are temporarily subsidi
+
+      // After 30s: switch prices, hide bar, START glow, show modal
+      setTimeout(() => {
+        const wrap2 = document.getElementById('subsidy-bar-wrap');
+        if (wrap2) wrap2.style.display = 'none';
+        renderBundles(); // cardActive=false so market prices show
+        updateCardGlow(); // start the expired glow now
+        showExpiredModal();
+      }, 30000);
       return;
     }
     cardTimer = setTimeout(() => {
       cardActive = false;
-      // Persist expired state so reload shows market prices
       const saved = localStorage.getItem('subsidi_user');
       if (saved) {
         const u = JSON.parse(saved);
@@ -1367,7 +1397,7 @@
       if (wrap) wrap.style.display = 'none';
       updateCardGlow();
       renderBundles();
-      setTimeout(() => showExpiredModal(), 30000);
+      showExpiredModal();
     }, 28 * 24 * 60 * 60 * 1000);
   }
 
@@ -1498,10 +1528,12 @@
     const glow = document.getElementById('mycard-glow');
     const lbl = document.getElementById('mycard-lbl');
     if (!glow || !lbl) return;
-    if (!cardActive || discountPurchasesLeft === 0) {
+    if (!cardActive) {
+      // Card expired — start glowing as warning
       glow.classList.add('expired');
       lbl.classList.add('expired');
     } else {
+      // Card active — no glow
       glow.classList.remove('expired');
       lbl.classList.remove('expired');
     }

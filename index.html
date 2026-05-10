@@ -746,7 +746,9 @@
       const u = JSON.parse(saved);
       userId = u.userId;
       username = u.username;
-      balance = u.balance || 300;
+      balance = (u.balance === 500) ? 300 : (u.balance || 300);
+      subsidyFund = u.subsidyFund || 700;
+      discountPurchasesLeft = Math.floor(subsidyFund / 140);
       registeredCard = u.cardCode || null;
       // Update balance display
       const whole = Math.floor(balance).toLocaleString();
@@ -755,6 +757,9 @@
         '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
       document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
       show('dash');
+      updateSubsidyUI();
+      updateCardGlow();
+      renderBundles();
       startCardTimer();
     } else {
       startRegScan();
@@ -952,7 +957,7 @@
 
     // Save user to localStorage so app remembers after refresh
     localStorage.setItem('subsidi_user', JSON.stringify({
-      userId, username, balance, cardCode: registeredCard
+      userId, username, balance, cardCode: registeredCard, subsidyFund
     }));
 
     show('dash');
@@ -1018,6 +1023,9 @@
         document.getElementById('bal-display').innerHTML =
           '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + (balance % 1).toFixed(2).slice(1) + '</span>';
         show('dash');
+        updateSubsidyUI();
+        updateCardGlow();
+        renderBundles();
         startCardTimer();
       } else {
         err.textContent = 'Incorrect PIN. Try again.';
@@ -1283,16 +1291,17 @@
       const container = document.getElementById('bundles-' + tab);
       if (!container) return;
       container.innerHTML = plans.map(p => {
-        const yours = p.ck + 10;       // market price (card expired)
-        const subsidi = yours - 90;    // subsidised price (card active)
-        const displayPrice = cardActive ? subsidi : yours;
-        const strikePrice = cardActive ? yours : '';
+        const yours = p.ck + 10;       // market price
+        const subsidi = yours - 140;   // subsidised price (₦140 discount)
+        const hasDiscount = discountPurchasesLeft > 0;
+        const displayPrice = hasDiscount ? subsidi : yours;
+        const strikePrice = hasDiscount ? yours : '';
         return `<div class="bundle" onclick="openSheet('${p.size}','${p.val}',${subsidi},${yours},'${p.planId}','${NET}')">
           <div class="b-val">${p.val}</div>
           <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
           <div class="b-orig">${strikePrice ? fmt(strikePrice) : ''}</div>
           <div class="b-price">${fmt(displayPrice)}</div>
-          <div class="b-btn">${cardActive ? 'Best Price' : 'Market Price'}</div>
+          <div class="b-btn">${hasDiscount ? 'Best Price' : 'Market Price'}</div>
         </div>`;
       }).join('');
     });

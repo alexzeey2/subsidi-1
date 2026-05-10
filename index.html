@@ -750,6 +750,10 @@
       subsidyFund = u.subsidyFund || 700;
       discountPurchasesLeft = Math.floor(subsidyFund / 140);
       registeredCard = u.cardCode || null;
+      cardActive = u.cardActive !== undefined ? u.cardActive : true;
+      // Hide subsidy bar immediately if card is expired
+      const wrap = document.getElementById('subsidy-bar-wrap');
+      if (wrap) wrap.style.display = cardActive ? '' : 'none';
       // Update balance display
       const whole = Math.floor(balance).toLocaleString();
       const dec = (balance % 1).toFixed(2).slice(1);
@@ -1347,6 +1351,8 @@
   function startCardTimer() {
     cardTimer = setTimeout(() => {
       cardActive = false;
+      const wrap = document.getElementById('subsidy-bar-wrap');
+      if (wrap) wrap.style.display = 'none';
       updateCardGlow();
       renderBundles();
       showExpiredModal();
@@ -1368,6 +1374,8 @@
     updateBalance(650);
     cardActive = true;
     document.getElementById('expired-ov').classList.remove('open');
+    const wrap = document.getElementById('subsidy-bar-wrap');
+    if (wrap) wrap.style.display = '';
     subsidyFund += 350;
     discountPurchasesLeft = Math.floor(subsidyFund / 140);
     updateSubsidyUI();
@@ -1383,6 +1391,8 @@
   function cancelReactivate() {
     document.getElementById('expired-ov').classList.remove('open');
     cardActive = false;
+    const wrap = document.getElementById('subsidy-bar-wrap');
+    if (wrap) wrap.style.display = 'none';
     const badge = document.getElementById('card-badge');
     badge.innerHTML = '<span class="pip" style="background:var(--red)"></span>Card Expired — Tap to reactivate';
     badge.style.background = 'rgba(224,65,90,0.08)';
@@ -1452,8 +1462,10 @@
     const pct = Math.min(100, (subsidyFund / 700) * 100);
     const fill = document.getElementById('subsidy-bar-fill');
     const text = document.getElementById('subsidy-bar-text');
+    const wrap = document.getElementById('subsidy-bar-wrap');
     if (fill) fill.style.width = pct + '%';
     if (text) text.textContent = purchases + ' discount purchase' + (purchases !== 1 ? 's' : '') + ' left';
+    if (wrap) wrap.style.display = cardActive ? '' : 'none';
     updateCardGlow();
   }
 

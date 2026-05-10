@@ -655,6 +655,20 @@
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
   // ── State ──
+  // ── Supabase config ──
+  const SUPA_URL = 'https://taesbjxhllruvmueeete.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhZXNianhobGxydXZtdWVlZXRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzE4NTcsImV4cCI6MjA5MzgwNzg1N30.ygRn0k2o8WncP0YUbpUdc5Mevdz9NqckNsf-KNCR5L4';
+  let userId = null;
+
+  async function callEdge(fnName, body) {
+    const res = await fetch(SUPA_URL + '/functions/v1/' + fnName, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY },
+      body: JSON.stringify(body)
+    });
+    return res.json();
+  }
+
   let NET = 'MTN', cur = {};
   let balance = 500;
   let cardActive = true;
@@ -832,7 +846,33 @@
     finishReg();
   }
 
-  function finishReg() {
+  async function finishReg() {
+    // Show loading state
+    const statusEl = document.getElementById('reg-scan-status');
+    const err2 = document.getElementById('reg-err-2');
+
+    try {
+      const data = await callEdge('register', {
+        cardCode: registeredCard,
+        pin: userPin
+      });
+
+      if (data.error) {
+        showErr(err2, data.error);
+        return;
+      }
+
+      // Store userId and username from Supabase
+      userId = data.userId;
+      username = data.username;
+      balance = 500;
+      document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+
+    } catch (e) {
+      // If edge function fails, still proceed (offline fallback)
+      console.warn('Registration edge function failed, proceeding offline:', e);
+    }
+
     show('dash');
     startCardTimer();
     setTimeout(() => {
@@ -873,17 +913,71 @@
     updateBuyPinDots(buyPinEntry);
   }
 
-  function checkBuyPin() {
-    if (buyPinEntry === userPin) {
+  async function checkBuyPin() {
+    const err = document.getElementById('buy-pin-err');
+    const ph2 = document.getElementById('phinput').value || 'your number';
+
+    // If we have a userId, verify PIN server-side; otherwise fallback to local check
+    let pinValid = false;
+    if (userId) {
+      try {
+        err.textContent = 'Verifying...';
+        err.classList.add('show');
+        const vData = await callEdge('verify-pin', { userId, pin: buyPinEntry });
+        err.classList.remove('show');
+        pinValid = vData.valid === true;
+      } catch (e) {
+        err.classList.remove('show');
+        // Fallback to local PIN check
+        pinValid = buyPinEntry === userPin;
+      }
+    } else {
+      pinValid = buyPinEntry === userPin;
+    }
+
+    if (pinValid) {
       document.getElementById('pin-buy-ov').classList.remove('open');
       document.getElementById('ov').classList.remove('open');
-      const ph2 = document.getElementById('phinput').value || 'your number';
-      updateBalance(cur.price);
+
+      // If we have userId, call purchase-data edge function
+      if (userId) {
+        try {
+          err.textContent = '';
+          const pData = await callEdge('buy-data', {
+            userId,
+            phoneNumber: ph2,
+            network: NET,
+            dataPlan: cur.size,
+            amount: cur.price,
+            origPrice: cur.orig
+          });
+
+          if (pData.error) {
+            // Show error on success screen or alert
+            alert(pData.error);
+            return;
+          }
+
+          // Update local balance from server response
+          balance = pData.newBalance;
+          const whole = Math.floor(balance).toLocaleString();
+          const dec = (balance % 1).toFixed(2).slice(1);
+          document.getElementById('bal-display').innerHTML =
+            '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+
+        } catch (e) {
+          // Fallback: deduct locally
+          updateBalance(cur.price);
+        }
+      } else {
+        updateBalance(cur.price);
+      }
+
       document.getElementById('sbody').textContent = cur.size + ' delivered to ' + ph2;
       document.getElementById('samt').textContent = '₦' + cur.price.toLocaleString() + ' deducted';
       show('success');
+
     } else {
-      const err = document.getElementById('buy-pin-err');
       err.textContent = 'Incorrect PIN. Try again.';
       err.classList.add('show');
       for (let i = 0; i < 4; i++) document.getElementById('bpd' + i).classList.add('err');

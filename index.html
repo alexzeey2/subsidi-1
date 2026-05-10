@@ -210,7 +210,7 @@
 
   .spc{height:28px}
   /* ── Subsidy bar ── */
-  .subsidy-bar-wrap{margin:16px 20px 0;padding-bottom:4px;}
+  .subsidy-bar-wrap{margin:16px 0 0;padding-bottom:4px;}
   .subsidy-bar-track{
     position:relative;height:36px;border-radius:18px;
     background:rgba(255,255,255,0.08);
@@ -537,7 +537,7 @@
       </div>
       <span class="ni-lbl">Home</span>
     </div>
-    <div class="ni" id="mycard-nav" onclick="show('account-screen')">
+    <div class="ni" id="mycard-nav" onclick="myCardTap()">
       <div class="ni-ico" style="position:relative;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="mycard-icon">
           <rect x="2" y="5" width="20" height="14" rx="2"/>
@@ -590,7 +590,7 @@
     </div>
     <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;margin-bottom:8px;">Card Expired</div>
     <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Your Subsidi card has expired.</div>
-    <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:28px;">₦200 will be deducted from your wallet to reactivate your card.</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:28px;">₦650 to renew your card and unlock 2 discount purchases.</div>
     <div style="display:flex;gap:10px;">
       <button onclick="cancelReactivate()" style="flex:1;padding:16px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:rgba(255,255,255,0.5);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>
       <button onclick="reactivateCard()" style="flex:1;padding:16px;background:var(--p);border:none;border-radius:14px;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Ok, Reactivate</button>
@@ -746,7 +746,7 @@
       const u = JSON.parse(saved);
       userId = u.userId;
       username = u.username;
-      balance = u.balance || 500;
+      balance = u.balance || 300;
       registeredCard = u.cardCode || null;
       // Update balance display
       const whole = Math.floor(balance).toLocaleString();
@@ -802,6 +802,7 @@
         clearTimeout(regScanLoop);
         registeredCard = code.data;
         cardSecret = extractSecret(code.data);
+        playSuccessSound();
         document.getElementById('reg-scan-status').textContent = '✓ Card scanned! Checking...';
         checkCardExists(code.data);
         return;
@@ -823,7 +824,7 @@
         // Card exists — go to login
         userId = data.userId;
         username = data.username;
-        balance = data.balance || 500;
+        balance = data.balance || 300;
         document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
         goLoginStep();
       } else {
@@ -1342,14 +1343,22 @@
 
   function badgeTap() { if (!cardActive) showExpiredModal(); }
 
+  function myCardTap() {
+    // Always show the card status sheet
+    document.getElementById('expired-ov').classList.add('open');
+  }
+
   function showExpiredModal() {
     document.getElementById('expired-ov').classList.add('open');
   }
 
   function reactivateCard() {
-    updateBalance(200);
+    updateBalance(650);
     cardActive = true;
     document.getElementById('expired-ov').classList.remove('open');
+    subsidyFund += 350;
+    discountPurchasesLeft = Math.floor(subsidyFund / 140);
+    updateSubsidyUI();
     const badge = document.getElementById('card-badge');
     badge.innerHTML = '<span class="pip"></span>Card Active';
     badge.style.background = 'var(--gbg)';
@@ -1416,10 +1425,12 @@
     oscillator.frequency.setValueAtTime(880, ctx.currentTime);
     oscillator.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
     oscillator.frequency.setValueAtTime(1320, ctx.currentTime + 0.2);
-    gainNode.gain.setValueAtTime(2.5, ctx.currentTime);
+    gainNode.gain.setValueAtTime(5.0, ctx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
     oscillator.start(ctx.currentTime);
     oscillator.stop(ctx.currentTime + 0.5);
+    // Vibrate for extra impact
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
   }
 
   // ── Subsidy UI ──

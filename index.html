@@ -740,7 +740,6 @@
 
   // ── Registration QR Scanner — auto-starts on page load ──
   window.addEventListener("load", () => {
-    renderBundles();
     const saved = localStorage.getItem('subsidi_user');
     if (saved) {
       const u = JSON.parse(saved);
@@ -750,6 +749,7 @@
       subsidyFund = u.subsidyFund || 700;
       discountPurchasesLeft = Math.floor(subsidyFund / 140);
       registeredCard = u.cardCode || null;
+      // Restore card state BEFORE rendering bundles
       cardActive = u.cardActive !== undefined ? u.cardActive : true;
       // Hide subsidy bar immediately if card is expired
       const wrap = document.getElementById('subsidy-bar-wrap');
@@ -761,9 +761,9 @@
         '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
       document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
       show('dash');
+      renderBundles();
       updateSubsidyUI();
       updateCardGlow();
-      renderBundles();
       startCardTimer();
     } else {
       startRegScan();
@@ -1349,13 +1349,25 @@
   
   // ── Card expiry ──
   function startCardTimer() {
+    // If card already expired, show modal after 30s delay (not instantly)
+    if (!cardActive) {
+      setTimeout(() => showExpiredModal(), 30000);
+      return;
+    }
     cardTimer = setTimeout(() => {
       cardActive = false;
+      // Persist expired state so reload shows market prices
+      const saved = localStorage.getItem('subsidi_user');
+      if (saved) {
+        const u = JSON.parse(saved);
+        u.cardActive = false;
+        localStorage.setItem('subsidi_user', JSON.stringify(u));
+      }
       const wrap = document.getElementById('subsidy-bar-wrap');
       if (wrap) wrap.style.display = 'none';
       updateCardGlow();
       renderBundles();
-      showExpiredModal();
+      setTimeout(() => showExpiredModal(), 30000);
     }, 28 * 24 * 60 * 60 * 1000);
   }
 
@@ -1373,6 +1385,13 @@
   function reactivateCard() {
     updateBalance(650);
     cardActive = true;
+    // Persist active state
+    const savedR = localStorage.getItem('subsidi_user');
+    if (savedR) {
+      const uR = JSON.parse(savedR);
+      uR.cardActive = true;
+      localStorage.setItem('subsidi_user', JSON.stringify(uR));
+    }
     document.getElementById('expired-ov').classList.remove('open');
     const wrap = document.getElementById('subsidy-bar-wrap');
     if (wrap) wrap.style.display = '';
@@ -1391,6 +1410,12 @@
   function cancelReactivate() {
     document.getElementById('expired-ov').classList.remove('open');
     cardActive = false;
+    const savedC = localStorage.getItem('subsidi_user');
+    if (savedC) {
+      const uC = JSON.parse(savedC);
+      uC.cardActive = false;
+      localStorage.setItem('subsidi_user', JSON.stringify(uC));
+    }
     const wrap = document.getElementById('subsidy-bar-wrap');
     if (wrap) wrap.style.display = 'none';
     const badge = document.getElementById('card-badge');

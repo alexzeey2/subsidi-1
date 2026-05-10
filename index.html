@@ -209,6 +209,64 @@
   .dep-opt.sel{background:var(--p-subtle);border-color:var(--p);color:var(--p-light)}
 
   .spc{height:28px}
+  /* ── Subsidy bar ── */
+  .subsidy-bar-wrap{margin:16px 20px 0;padding-bottom:4px;}
+  .subsidy-bar-track{
+    position:relative;height:36px;border-radius:18px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.1);
+    overflow:hidden;
+  }
+  .subsidy-bar-fill{
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,#1a9e3f,#2ecc71);
+    border-radius:18px;
+    width:100%;
+    transition:width 1.2s cubic-bezier(.4,0,.2,1);
+    transform-origin:left;
+  }
+  .subsidy-water{
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,
+      transparent 0%,
+      rgba(255,255,255,0.15) 30%,
+      rgba(255,255,255,0.25) 50%,
+      rgba(255,255,255,0.15) 70%,
+      transparent 100%);
+    animation:waterflow 2s linear infinite;
+    border-radius:18px;
+  }
+  @keyframes waterflow{
+    from{transform:translateX(-100%);}
+    to{transform:translateX(100%);}
+  }
+  .subsidy-bar-text{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:800;color:#0a3d1f;
+    letter-spacing:.3px;z-index:2;
+    text-shadow:0 1px 2px rgba(255,255,255,0.3);
+  }
+
+  /* ── My Card nav glow ── */
+  .mycard-glow{
+    position:absolute;inset:-4px;
+    border-radius:50%;
+    background:rgba(224,50,50,0);
+    box-shadow:none;
+    transition:all .3s;
+  }
+  .mycard-glow.expired{
+    background:rgba(224,50,50,0.2);
+    box-shadow:0 0 12px 4px rgba(224,50,50,0.6);
+    animation:cardglow 1.2s ease-in-out infinite alternate;
+  }
+  @keyframes cardglow{
+    from{box-shadow:0 0 8px 2px rgba(224,50,50,0.4);}
+    to{box-shadow:0 0 18px 6px rgba(224,50,50,0.9);}
+  }
+  #mycard-lbl.expired{color:#e03232;}
+
 
 
 </style>
@@ -324,8 +382,15 @@
     </div>
 
     <div class="bal-lbl">Wallet Balance</div>
-    <div class="bal-amt" id="bal-display"><span class="bal-cur">₦</span>500<span class="bal-dec">.00</span></div>
-    <div class="badge" id="card-badge" onclick="badgeTap()"><span class="pip"></span>Card Active</div>
+    <div class="bal-amt" id="bal-display"><span class="bal-cur">₦</span>300<span class="bal-dec">.00</span></div>
+    <!-- Subsidy bar -->
+    <div class="subsidy-bar-wrap" id="subsidy-bar-wrap">
+      <div class="subsidy-bar-track">
+        <div class="subsidy-bar-fill" id="subsidy-bar-fill"></div>
+        <div class="subsidy-bar-text" id="subsidy-bar-text">5 discount purchases left</div>
+        <div class="subsidy-water" id="subsidy-water"></div>
+      </div>
+    </div>
   </div>
 
   <div class="actions">
@@ -472,14 +537,15 @@
       </div>
       <span class="ni-lbl">Home</span>
     </div>
-    <div class="ni">
-      <div class="ni-ico">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="3" width="20" height="14" rx="2"/>
-          <line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+    <div class="ni" id="mycard-nav" onclick="show('account-screen')">
+      <div class="ni-ico" style="position:relative;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="mycard-icon">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <line x1="2" y1="10" x2="22" y2="10"/>
         </svg>
+        <div class="mycard-glow" id="mycard-glow"></div>
       </div>
-      <span class="ni-lbl">History</span>
+      <span class="ni-lbl" id="mycard-lbl">My Card</span>
     </div>
     <div class="ni">
       <div class="ni-ico">
@@ -616,13 +682,16 @@
   }
 
   let NET = 'MTN', cur = {};
-  let balance = 500;
+  let balance = 300;
   let cardActive = true;
   let cardTimer = null;
   let registeredCard = null;
   let cardSecret = null;
   let userPin = null;
   let username = '';
+  let subsidyFund = 700;
+  let discountPurchasesLeft = 5;
+  let renewDays = 28;
 
   // ── QR Scanner state (registration only) ──
   let regStream = null;
@@ -1052,6 +1121,7 @@
       } else {
         updateBalance(cur.price);
       }
+      applySubsidyPurchase();
 
       document.getElementById('sbody').textContent = cur.size + ' delivered to ' + ph2;
       document.getElementById('samt').textContent = '₦' + cur.price.toLocaleString() + ' deducted';
@@ -1334,6 +1404,57 @@
   }
 
   function goHome() { show('dash'); }
+
+  // ── Scan success sound (loud) ──
+  function playSuccessSound() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+    oscillator.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+    oscillator.frequency.setValueAtTime(1320, ctx.currentTime + 0.2);
+    gainNode.gain.setValueAtTime(2.5, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + 0.5);
+  }
+
+  // ── Subsidy UI ──
+  function updateSubsidyUI() {
+    const purchases = Math.floor(subsidyFund / 140);
+    discountPurchasesLeft = purchases;
+    const pct = Math.min(100, (subsidyFund / 700) * 100);
+    const fill = document.getElementById('subsidy-bar-fill');
+    const text = document.getElementById('subsidy-bar-text');
+    if (fill) fill.style.width = pct + '%';
+    if (text) text.textContent = purchases + ' discount purchase' + (purchases !== 1 ? 's' : '') + ' left';
+    updateCardGlow();
+  }
+
+  function updateCardGlow() {
+    const glow = document.getElementById('mycard-glow');
+    const lbl = document.getElementById('mycard-lbl');
+    if (!glow || !lbl) return;
+    if (!cardActive || discountPurchasesLeft === 0) {
+      glow.classList.add('expired');
+      lbl.classList.add('expired');
+    } else {
+      glow.classList.remove('expired');
+      lbl.classList.remove('expired');
+    }
+  }
+
+  function applySubsidyPurchase() {
+    subsidyFund -= 120;
+    const commission = Math.round(cur.orig * 0.03);
+    subsidyFund += 20 + commission;
+    subsidyFund = Math.max(0, subsidyFund);
+    updateSubsidyUI();
+  }
+
 </script>
 </body>
 </html>

@@ -376,96 +376,15 @@
     </div>
 
     <!-- DAILY -->
-    <div id="tab-daily" class="plantab">
-      <div class="bundles">
-        <div class="bundle" onclick="openSheet('100 MB','1 day',50,80)">
-          <div class="b-val">1 Day</div><div class="b-size">100<span class="b-unit">MB</span></div>
-          <div class="b-orig">₦80</div><div class="b-price">₦50</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('200 MB','1 day',85,120)">
-          <div class="b-val">1 Day</div><div class="b-size">200<span class="b-unit">MB</span></div>
-          <div class="b-orig">₦120</div><div class="b-price">₦85</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('500 MB','1 day',150,200)">
-          <div class="b-val">1 Day</div><div class="b-size">500<span class="b-unit">MB</span></div>
-          <div class="b-orig">₦200</div><div class="b-price">₦150</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('1 GB','1 day',250,320)">
-          <div class="b-val">1 Day</div><div class="b-size">1<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦320</div><div class="b-price">₦250</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('2 GB','1 day',400,500)">
-          <div class="b-val">1 Day</div><div class="b-size">2<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦500</div><div class="b-price">₦400</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('3 GB','1 day',550,700)">
-          <div class="b-val">1 Day</div><div class="b-size">3<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦700</div><div class="b-price">₦550</div><div class="b-btn">Best Price</div>
-        </div>
-      </div>
-    </div>
+    <div id="tab-daily" class="plantab"><div class="bundles" id="bundles-daily"></div></div>
 
     <!-- WEEKLY -->
-    <div id="tab-weekly" class="plantab" style="display:none">
-      <div class="bundles">
-        <div class="bundle" onclick="openSheet('500 MB','7 days',200,250)">
-          <div class="b-val">7 Days</div><div class="b-size">500<span class="b-unit">MB</span></div>
-          <div class="b-orig">₦250</div><div class="b-price">₦200</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('1 GB','7 days',285,350)">
-          <div class="b-val">7 Days</div><div class="b-size">1<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦350</div><div class="b-price">₦285</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('2 GB','7 days',500,650)">
-          <div class="b-val">7 Days</div><div class="b-size">2<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦650</div><div class="b-price">₦500</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('3 GB','7 days',820,1000)">
-          <div class="b-val">7 Days</div><div class="b-size">3<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦1,000</div><div class="b-price">₦820</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('5 GB','7 days',1100,1400)">
-          <div class="b-val">7 Days</div><div class="b-size">5<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦1,400</div><div class="b-price">₦1,100</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('10 GB','7 days',1900,2400)">
-          <div class="b-val">7 Days</div><div class="b-size">10<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦2,400</div><div class="b-price">₦1,900</div><div class="b-btn">Best Price</div>
-        </div>
-      </div>
-    </div>
+    <div id="tab-weekly" class="plantab" style="display:none"><div class="bundles" id="bundles-weekly"></div></div>
 
     <!-- MONTHLY -->
-    <div id="tab-monthly" class="plantab" style="display:none">
-      <div class="bundles">
-        <div class="bundle" onclick="openSheet('1 GB','30 days',390,480)">
-          <div class="b-val">30 Days</div><div class="b-size">1<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦480</div><div class="b-price">₦390</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('2 GB','30 days',700,900)">
-          <div class="b-val">30 Days</div><div class="b-size">2<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦900</div><div class="b-price">₦700</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('5 GB','30 days',1500,1900)">
-          <div class="b-val">30 Days</div><div class="b-size">5<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦1,900</div><div class="b-price">₦1,500</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('10 GB','30 days',2600,3200)">
-          <div class="b-val">30 Days</div><div class="b-size">10<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦3,200</div><div class="b-price">₦2,600</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('15 GB','30 days',2900,3600)">
-          <div class="b-val">30 Days</div><div class="b-size">15<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦3,600</div><div class="b-price">₦2,900</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('20 GB','30 days',3400,4200)">
-          <div class="b-val">30 Days</div><div class="b-size">20<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦4,200</div><div class="b-price">₦3,400</div><div class="b-btn">Best Price</div>
-        </div>
-      </div>
-    </div>
+    <div id="tab-monthly" class="plantab" style="display:none"><div class="bundles" id="bundles-monthly"></div></div>
 
-    <!-- SOCIAL -->
+        <!-- SOCIAL -->
     <div id="tab-social" class="plantab" style="display:none">
       <div class="bundles">
         <div class="bundle" onclick="openSheet('WhatsApp 1GB','7 days',150,200)">
@@ -752,6 +671,7 @@
 
   // ── Registration QR Scanner — auto-starts on page load ──
   window.addEventListener("load", () => {
+    renderBundles();
     const saved = localStorage.getItem('subsidi_user');
     if (saved) {
       const u = JSON.parse(saved);
@@ -975,11 +895,11 @@
   }
 
   // ── Buy: open buy sheet directly ──
-  function openSheet(size, val, price, orig) {
+  function openSheet(size, val, price, orig, planId, planNetwork) {
     const actualPrice = cardActive ? price : orig;
-    cur = { size, val, price: actualPrice, orig };
+    cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
-    document.getElementById('shsub').textContent = NET + ' · ' + val;
+    document.getElementById('shsub').textContent = (planNetwork || NET) + ' · ' + val;
     document.getElementById('dprice').textContent = '₦' + actualPrice.toLocaleString();
     document.getElementById('phinput').value = '';
     document.getElementById('ov').classList.add('open');
@@ -1097,7 +1017,8 @@
           const pData = await callEdge('buy-data', {
             userId,
             phoneNumber: ph2,
-            network: NET,
+            network: cur.planNetwork || NET,
+            planId: cur.planId,
             dataPlan: cur.size,
             amount: cur.price,
             origPrice: cur.orig
@@ -1116,7 +1037,8 @@
           document.getElementById('bal-display').innerHTML =
             '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
           // Persist updated balance
-          const saved = localStorage.getItem('subsidi_user');
+          renderBundles();
+    const saved = localStorage.getItem('subsidi_user');
           if (saved) {
             const u = JSON.parse(saved);
             u.balance = balance;
@@ -1159,9 +1081,152 @@
   }
 
   // ── Network selector ──
+
+  // ── Plans data (CK cost + ₦10 = your price; subsidi = your price - ₦90) ──
+  const PLANS = {
+    MTN: {
+      // Daily: Awoof Data plans — 1 to 2 day durations only
+      daily: [
+        { size:'230MB', val:'1 Day',  planId:'200.01',  ck:200  },
+        { size:'500MB', val:'1 Day',  planId:'350.01',  ck:350  },
+        { size:'1GB',   val:'1 Day',  planId:'500.01',  ck:500  },
+        { size:'2.5GB', val:'1 Day',  planId:'750.01',  ck:750  },
+        { size:'2.5GB', val:'2 Days', planId:'900.01',  ck:900  },
+        { size:'3.2GB', val:'2 Days', planId:'1000.01', ck:1000 },
+      ],
+      // Weekly: Direct Data — 7 day plans only
+      weekly: [
+        { size:'500MB', val:'7 Days', planId:'500.02',  ck:500  },
+        { size:'1GB',   val:'7 Days', planId:'800.01',  ck:800  },
+        { size:'1.5GB', val:'7 Days', planId:'1000.03', ck:1000 },
+        { size:'3.5GB', val:'7 Days', planId:'1500.03', ck:1500 },
+        { size:'6GB',   val:'7 Days', planId:'2500.01', ck:2500 },
+        { size:'11GB',  val:'7 Days', planId:'3500.01', ck:3500 },
+      ],
+      // Monthly: Direct Data — 30 day plans only
+      monthly: [
+        { size:'2GB',   val:'30 Days', planId:'1500.02', ck:1500 },
+        { size:'3.5GB', val:'30 Days', planId:'2500.02', ck:2500 },
+        { size:'7GB',   val:'30 Days', planId:'3500.02', ck:3500 },
+        { size:'10GB',  val:'30 Days', planId:'4500.01', ck:4500 },
+        { size:'12.5GB',val:'30 Days', planId:'5500.01', ck:5500 },
+        { size:'20GB',  val:'30 Days', planId:'7500.01', ck:7500 },
+      ]
+    },
+    Airtel: {
+      // Daily: Awoof Data — 1 to 2 day durations only
+      daily: [
+        { size:'1GB',   val:'1 Day',  planId:'499.91',  ck:500  },
+        { size:'1.5GB', val:'2 Days', planId:'599.91',  ck:600  },
+        { size:'2GB',   val:'2 Days', planId:'749.91',  ck:750  },
+        { size:'3GB',   val:'2 Days', planId:'999.91',  ck:1000 },
+        { size:'5GB',   val:'2 Days', planId:'1499.91', ck:1500 },
+        { size:'500MB', val:'7 Days', planId:'499.92',  ck:500  },
+      ],
+      // Weekly: Direct Data — 7 day plans only
+      weekly: [
+        { size:'500MB', val:'7 Days', planId:'499.92',  ck:500  },
+        { size:'1GB',   val:'7 Days', planId:'799.91',  ck:800  },
+        { size:'1.5GB', val:'7 Days', planId:'999.92',  ck:1000 },
+        { size:'3.5GB', val:'7 Days', planId:'1499.92', ck:1500 },
+        { size:'6GB',   val:'7 Days', planId:'2499.91', ck:2500 },
+        { size:'10GB',  val:'7 Days', planId:'2999.91', ck:3000 },
+      ],
+      // Monthly: Direct Data — 30 day plans only
+      monthly: [
+        { size:'2GB',  val:'30 Days', planId:'1499.93', ck:1500 },
+        { size:'3GB',  val:'30 Days', planId:'1999.91', ck:2000 },
+        { size:'4GB',  val:'30 Days', planId:'2499.92', ck:2500 },
+        { size:'8GB',  val:'30 Days', planId:'2999.92', ck:3000 },
+        { size:'10GB', val:'30 Days', planId:'3999.91', ck:4000 },
+        { size:'13GB', val:'30 Days', planId:'4999.92', ck:5000 },
+      ]
+    },
+    Glo: {
+      // Daily: Awoof Data (short duration) + SME 3-day plans
+      daily: [
+        { size:'260MB', val:'2 Days', planId:'200.01',  ck:200  },
+        { size:'2GB',   val:'1 Day',  planId:'500.02',  ck:500  },
+        { size:'1GB',   val:'3 Days', planId:'1000.11', ck:282  },
+        { size:'3GB',   val:'3 Days', planId:'3000.11', ck:846  },
+        { size:'5GB',   val:'3 Days', planId:'5000.11', ck:1410 },
+        { size:'1.5GB', val:'14 Days',planId:'500.01',  ck:500  },
+      ],
+      // Weekly: SME 7-day plans only
+      weekly: [
+        { size:'500MB', val:'7 Days', planId:'500',     ck:235  },
+        { size:'1GB',   val:'7 Days', planId:'1000.12', ck:329  },
+        { size:'3GB',   val:'7 Days', planId:'3000.12', ck:987  },
+        { size:'5GB',   val:'7 Days', planId:'5000.12', ck:1645 },
+        { size:'6GB',   val:'7 Days', planId:'1500.02', ck:1500 },
+        { size:'2.6GB', val:'30 Days',planId:'1000.01', ck:1000 },
+      ],
+      // Monthly: SME 30-day plans only
+      monthly: [
+        { size:'1GB',  val:'30 Days', planId:'1000',    ck:470  },
+        { size:'2GB',  val:'30 Days', planId:'2000',    ck:940  },
+        { size:'3GB',  val:'30 Days', planId:'3000',    ck:1410 },
+        { size:'5GB',  val:'30 Days', planId:'5000',    ck:2350 },
+        { size:'7.5GB',val:'30 Days', planId:'2500.01', ck:2500 },
+        { size:'10GB', val:'30 Days', planId:'10000',   ck:4700 },
+      ]
+    },
+    '9mobile': {
+      // Daily: Awoof Data — short duration plans only
+      daily: [
+        { size:'250MB', val:'1 Day',  planId:'200.01',  ck:200  },
+        { size:'450MB', val:'1 Day',  planId:'350.01',  ck:350  },
+        { size:'650MB', val:'3 Days', planId:'500.01',  ck:500  },
+        { size:'650MB', val:'14 Days',planId:'600.01',  ck:600  },
+        { size:'1.75GB',val:'7 Days', planId:'1500.01', ck:1500 },
+        { size:'1.1GB', val:'30 Days',planId:'1000.01', ck:1000 },
+      ],
+      // Weekly: 1 true 7-day plan + SME 30-day value plans
+      weekly: [
+        { size:'1.75GB',val:'7 Days', planId:'1500.01', ck:1500 },
+        { size:'1GB',   val:'30 Days',planId:'1000',    ck:450  },
+        { size:'2GB',   val:'30 Days',planId:'2000',    ck:900  },
+        { size:'3GB',   val:'30 Days',planId:'3000',    ck:1350 },
+        { size:'4GB',   val:'30 Days',planId:'4000',    ck:1800 },
+        { size:'5GB',   val:'30 Days',planId:'5000',    ck:2250 },
+      ],
+      // Monthly: Direct Data — 30 day plans only
+      monthly: [
+        { size:'1.1GB', val:'30 Days', planId:'1000.01', ck:1000 },
+        { size:'1.4GB', val:'30 Days', planId:'1200.01', ck:1200 },
+        { size:'2.44GB',val:'30 Days', planId:'2000.01', ck:2000 },
+        { size:'3.91GB',val:'30 Days', planId:'3000.01', ck:3000 },
+        { size:'5.1GB', val:'30 Days', planId:'4000.01', ck:4000 },
+        { size:'6.5GB', val:'30 Days', planId:'5000.01', ck:5000 },
+      ]
+    }
+  };
+
+  function fmt(n) { return '₦' + Math.round(n).toLocaleString(); }
+
+  function renderBundles() {
+    ['daily','weekly','monthly'].forEach(tab => {
+      const plans = PLANS[NET] && PLANS[NET][tab] ? PLANS[NET][tab] : [];
+      const container = document.getElementById('bundles-' + tab);
+      if (!container) return;
+      container.innerHTML = plans.map(p => {
+        const yours = p.ck + 10;
+        const subsidi = yours - 90;
+        return `<div class="bundle" onclick="openSheet('${p.size}','${p.val}',${subsidi},${yours},'${p.planId}','${NET}')">
+          <div class="b-val">${p.val}</div>
+          <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
+          <div class="b-orig">${fmt(yours)}</div>
+          <div class="b-price">${fmt(subsidi)}</div>
+          <div class="b-btn">${cardActive ? 'Best Price' : 'Market Price'}</div>
+        </div>`;
+      }).join('');
+    });
+  }
+
   function selNet(el, n) {
     document.querySelectorAll('.net').forEach(b => b.classList.remove('sel'));
     el.classList.add('sel'); NET = n;
+    renderBundles();
   }
 
   // ── Tab switcher ──

@@ -1540,15 +1540,20 @@
   }
 
   // ── Card expiry ──
+  let cardTimerTimeout = null;
+
   function startCardTimer() {
+    // Cancel any existing timer so renewal doesn't get overridden
+    if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
     cardActive = true;
-    cardExpireAt = Date.now() + 30000; // record exact expiry time
+    cardExpireAt = Date.now() + 30000;
     renderBundles();
     const wrapInit = document.getElementById('subsidy-bar-wrap');
     if (wrapInit) wrapInit.style.display = '';
     updateCardGlow();
 
-    setTimeout(() => {
+    cardTimerTimeout = setTimeout(() => {
+      cardTimerTimeout = null;
       cardActive = false;
       cardExpireAt = null;
       const saved = localStorage.getItem('subsidi_user');
@@ -1643,7 +1648,8 @@
     badge.style.borderColor = 'rgba(0,200,150,.18)';
     badge.style.color = 'var(--green)';
     badge.style.cursor = 'default';
-    renderBundles();
+    updateCardGlow();
+    startCardTimer();
   }
 
   // ── Profile stats tracking ──

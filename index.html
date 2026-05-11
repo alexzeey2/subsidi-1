@@ -861,6 +861,8 @@
   let balance = 300;
   let cardActive = true;
   let cardTimer = null;
+  let cardTimerTimeout = null;
+  let cardExpireAt = null;
   let registeredCard = null;
   let cardSecret = null;
   let userPin = null;
@@ -938,14 +940,17 @@
       document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
       show('dash');
       if (!cardActive) {
-        // Temporarily show as active for 30s so user can see the app first
+        // Show as active for 30s so user can browse, then expire
         cardActive = true;
+        cardExpireAt = Date.now() + 30000;
         renderBundles();
         updateSubsidyUI();
         updateCardGlow();
-        // After 30s, flip to expired state
-        setTimeout(() => {
+        if (cardTimerTimeout) clearTimeout(cardTimerTimeout);
+        cardTimerTimeout = setTimeout(() => {
+          cardTimerTimeout = null;
           cardActive = false;
+          cardExpireAt = null;
           const w = document.getElementById('subsidy-bar-wrap');
           if (w) w.style.display = 'none';
           renderBundles();
@@ -1540,8 +1545,6 @@
   }
 
   // ── Card expiry ──
-  let cardTimerTimeout = null;
-
   function startCardTimer() {
     // Cancel any existing timer so renewal doesn't get overridden
     if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
@@ -1573,7 +1576,6 @@
   function badgeTap() { if (!cardActive) showExpiredModal(); }
 
   let cardActiveCountdownInterval = null;
-  let cardExpireAt = null; // timestamp when card expires
 
   function myCardTap() {
     if (!cardActive) {

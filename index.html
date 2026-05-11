@@ -1633,8 +1633,8 @@
   function reactivateCard() {
     updateBalance(650);
     // Reset subsidy fund to a fresh amount on renewal
-    subsidyFund = 700;
-    discountPurchasesLeft = Math.floor(subsidyFund / 140); // always 5
+    subsidyFund = Math.max(0, subsidyFund) + 280;  // renewal adds 2 purchases (2 × ₦140)
+    discountPurchasesLeft = Math.floor(subsidyFund / 140);
     cardActive = true;
     console.log('[reactivate] subsidyFund:', subsidyFund, 'discountPurchasesLeft:', discountPurchasesLeft);
     // Persist
@@ -1957,13 +1957,12 @@
   }
 
   function applySubsidyPurchase() {
-    subsidyFund -= 120;
+    subsidyFund -= 140;                            // full cost of one discount purchase
     const commission = Math.round(cur.orig * 0.03);
-    subsidyFund += 20 + commission;
+    subsidyFund += 20 + commission;                // ₦20 + data margin flows back in
     subsidyFund = Math.max(0, subsidyFund);
-    // Track stats
     totalPurchases++;
-    if (cardActive) totalSaved += (cur.orig - cur.price);
+    if (cardActive) totalSaved += 120;
     updateSubsidyUI();
   }
 

@@ -1632,29 +1632,36 @@
 
   function reactivateCard() {
     updateBalance(650);
-    cardActive = true;
-    subsidyFund += 350;
+    // Reset subsidy fund to a fresh amount on renewal
+    subsidyFund = Math.max(subsidyFund, 0) + 350;
     discountPurchasesLeft = Math.floor(subsidyFund / 140);
-    console.log('[reactivate] cardActive:', cardActive, 'subsidyFund:', subsidyFund, 'discountPurchasesLeft:', discountPurchasesLeft);
-    // Persist active state
+    cardActive = true;
+    console.log('[reactivate] subsidyFund:', subsidyFund, 'discountPurchasesLeft:', discountPurchasesLeft);
+    // Persist
     const savedR = localStorage.getItem('subsidi_user');
     if (savedR) {
       const uR = JSON.parse(savedR);
       uR.cardActive = true;
       uR.subsidyFund = subsidyFund;
       localStorage.setItem('subsidi_user', JSON.stringify(uR));
-      console.log('[reactivate] saved to localStorage:', uR);
     }
     document.getElementById('expired-ov').classList.remove('open');
     const wrap = document.getElementById('subsidy-bar-wrap');
     if (wrap) wrap.style.display = '';
-    updateSubsidyUI();
+    // Update subsidy bar text directly — don't call updateSubsidyUI() as it may recalculate
+    const fill = document.getElementById('subsidy-bar-fill');
+    const text = document.getElementById('subsidy-bar-text');
+    const pct = Math.min(100, (subsidyFund / 700) * 100);
+    if (fill) fill.style.width = pct + '%';
+    if (text) text.textContent = discountPurchasesLeft + ' discount purchase' + (discountPurchasesLeft !== 1 ? 's' : '') + ' left';
     const badge = document.getElementById('card-badge');
-    badge.innerHTML = '<span class="pip"></span>Card Active';
-    badge.style.background = 'var(--gbg)';
-    badge.style.borderColor = 'rgba(0,200,150,.18)';
-    badge.style.color = 'var(--green)';
-    badge.style.cursor = 'default';
+    if (badge) {
+      badge.innerHTML = '<span class="pip"></span>Card Active';
+      badge.style.background = 'var(--gbg)';
+      badge.style.borderColor = 'rgba(0,200,150,.18)';
+      badge.style.color = 'var(--green)';
+      badge.style.cursor = 'default';
+    }
     updateCardGlow();
     startCardTimer();
   }
@@ -1937,16 +1944,16 @@
 
   // ── Subsidy UI ──
   function updateSubsidyUI() {
-    const purchases = Math.floor(subsidyFund / 140);
-    discountPurchasesLeft = purchases;
+    discountPurchasesLeft = Math.floor(subsidyFund / 140);
     const pct = Math.min(100, (subsidyFund / 700) * 100);
     const fill = document.getElementById('subsidy-bar-fill');
     const text = document.getElementById('subsidy-bar-text');
     const wrap = document.getElementById('subsidy-bar-wrap');
     if (fill) fill.style.width = pct + '%';
-    if (text) text.textContent = purchases + ' discount purchase' + (purchases !== 1 ? 's' : '') + ' left';
+    if (text) text.textContent = discountPurchasesLeft + ' discount purchase' + (discountPurchasesLeft !== 1 ? 's' : '') + ' left';
     if (wrap) wrap.style.display = cardActive ? '' : 'none';
     updateCardGlow();
+    renderBundles();
   }
 
   function applySubsidyPurchase() {

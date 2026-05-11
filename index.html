@@ -1488,6 +1488,7 @@
   function fmt(n) { return '₦' + Math.round(n).toLocaleString(); }
 
   function renderBundles() {
+    console.log('[render] cardActive:', cardActive, 'discountPurchasesLeft:', discountPurchasesLeft);
     ['daily','weekly','monthly'].forEach(tab => {
       const plans = PLANS[NET] && PLANS[NET][tab] ? PLANS[NET][tab] : [];
       const container = document.getElementById('bundles-' + tab);
@@ -1546,10 +1547,10 @@
 
   // ── Card expiry ──
   function startCardTimer() {
-    // Cancel any existing timer so renewal doesn't get overridden
-    if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
+    if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; console.log('[timer] cleared old timer'); }
     cardActive = true;
     cardExpireAt = Date.now() + 30000;
+    console.log('[timer] starting — cardActive:', cardActive, 'discountPurchasesLeft:', discountPurchasesLeft);
     renderBundles();
     const wrapInit = document.getElementById('subsidy-bar-wrap');
     if (wrapInit) wrapInit.style.display = '';
@@ -1559,6 +1560,7 @@
       cardTimerTimeout = null;
       cardActive = false;
       cardExpireAt = null;
+      console.log('[timer] expired — cardActive set to false');
       const saved = localStorage.getItem('subsidi_user');
       if (saved) {
         const u = JSON.parse(saved);
@@ -1631,18 +1633,21 @@
   function reactivateCard() {
     updateBalance(650);
     cardActive = true;
+    subsidyFund += 350;
+    discountPurchasesLeft = Math.floor(subsidyFund / 140);
+    console.log('[reactivate] cardActive:', cardActive, 'subsidyFund:', subsidyFund, 'discountPurchasesLeft:', discountPurchasesLeft);
     // Persist active state
     const savedR = localStorage.getItem('subsidi_user');
     if (savedR) {
       const uR = JSON.parse(savedR);
       uR.cardActive = true;
+      uR.subsidyFund = subsidyFund;
       localStorage.setItem('subsidi_user', JSON.stringify(uR));
+      console.log('[reactivate] saved to localStorage:', uR);
     }
     document.getElementById('expired-ov').classList.remove('open');
     const wrap = document.getElementById('subsidy-bar-wrap');
     if (wrap) wrap.style.display = '';
-    subsidyFund += 350;
-    discountPurchasesLeft = Math.floor(subsidyFund / 140);
     updateSubsidyUI();
     const badge = document.getElementById('card-badge');
     badge.innerHTML = '<span class="pip"></span>Card Active';

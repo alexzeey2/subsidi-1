@@ -923,7 +923,7 @@
       const u = JSON.parse(saved);
       userId = u.userId;
       username = u.username;
-      balance = (u.balance === 500) ? 300 : (u.balance || 300);
+      balance = u.balance ?? 300;
       subsidyFund = u.subsidyFund || 700;
       discountPurchasesLeft = Math.floor(subsidyFund / 140);
       registeredCard = u.cardCode || null;
@@ -1031,7 +1031,7 @@
         // Card exists — go to login
         userId = data.userId;
         username = data.username;
-        balance = data.balance || 300;
+        balance = 300;
         document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
         goLoginStep();
       } else {
@@ -1217,7 +1217,7 @@
         userPin = loginPinEntry;
         // Save to localStorage
         localStorage.setItem('subsidi_user', JSON.stringify({
-          userId, username, balance, cardCode: registeredCard
+          userId, username, balance, cardCode: registeredCard, subsidyFund
         }));
         // Update balance display
         const whole = Math.floor(balance).toLocaleString();

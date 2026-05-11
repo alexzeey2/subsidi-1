@@ -488,8 +488,6 @@
       <div class="tab on"  onclick="swTab(this,'daily')">Daily</div>
       <div class="tab" onclick="swTab(this,'weekly')">Weekly</div>
       <div class="tab" onclick="swTab(this,'monthly')">Monthly</div>
-      <div class="tab" onclick="swTab(this,'social')">Social</div>
-      <div class="tab" onclick="swTab(this,'night')">Night</div>
     </div>
 
     <!-- DAILY -->
@@ -501,65 +499,6 @@
     <!-- MONTHLY -->
     <div id="tab-monthly" class="plantab" style="display:none"><div class="bundles" id="bundles-monthly"></div></div>
 
-        <!-- SOCIAL -->
-    <div id="tab-social" class="plantab" style="display:none">
-      <div class="bundles">
-        <div class="bundle" onclick="openSheet('WhatsApp 1GB','7 days',150,200)">
-          <div class="b-val">7 Days</div><div class="b-size" style="font-size:20px;padding:0 4px">WhatsApp</div>
-          <div class="b-orig">₦200</div><div class="b-price">₦150</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('Instagram 1GB','7 days',150,200)">
-          <div class="b-val">7 Days</div><div class="b-size" style="font-size:20px;padding:0 4px">Instagram</div>
-          <div class="b-orig">₦200</div><div class="b-price">₦150</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('TikTok 1GB','7 days',150,200)">
-          <div class="b-val">7 Days</div><div class="b-size" style="font-size:20px;padding:0 4px">TikTok</div>
-          <div class="b-orig">₦200</div><div class="b-price">₦150</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('Twitter 1GB','7 days',150,200)">
-          <div class="b-val">7 Days</div><div class="b-size" style="font-size:20px;padding:0 4px">Twitter/X</div>
-          <div class="b-orig">₦200</div><div class="b-price">₦150</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('Social Bundle 2GB','30 days',400,550)">
-          <div class="b-val">30 Days</div><div class="b-size" style="font-size:17px;padding:0 4px">All Social</div>
-          <div class="b-orig">₦550</div><div class="b-price">₦400</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('YouTube 3GB','7 days',350,450)">
-          <div class="b-val">7 Days</div><div class="b-size" style="font-size:20px;padding:0 4px">YouTube</div>
-          <div class="b-orig">₦450</div><div class="b-price">₦350</div><div class="b-btn">Best Price</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- NIGHT -->
-    <div id="tab-night" class="plantab" style="display:none">
-      <div class="bundles">
-        <div class="bundle" onclick="openSheet('1 GB','12am–5am',95,150)">
-          <div class="b-val">12am – 5am</div><div class="b-size">1<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦150</div><div class="b-price">₦95</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('2 GB','12am–5am',170,250)">
-          <div class="b-val">12am – 5am</div><div class="b-size">2<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦250</div><div class="b-price">₦170</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('5 GB','12am–5am',350,500)">
-          <div class="b-val">12am – 5am</div><div class="b-size">5<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦500</div><div class="b-price">₦350</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('10 GB','12am–5am',600,900)">
-          <div class="b-val">12am – 5am</div><div class="b-size">10<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦900</div><div class="b-price">₦600</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('15 GB','12am–5am',850,1200)">
-          <div class="b-val">12am – 5am</div><div class="b-size">15<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦1,200</div><div class="b-price">₦850</div><div class="b-btn">Best Price</div>
-        </div>
-        <div class="bundle" onclick="openSheet('25 GB','12am–5am',1300,1800)">
-          <div class="b-val">12am – 5am</div><div class="b-size">25<span class="b-unit">GB</span></div>
-          <div class="b-orig">₦1,800</div><div class="b-price">₦1,300</div><div class="b-btn">Best Price</div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <div class="sec" id="refblock" style="display:none">
@@ -629,6 +568,24 @@
   <div class="s-body" id="sbody">Data delivered successfully.</div>
   <div class="s-amt" id="samt">₦265 deducted</div>
   <button class="done" onclick="goHome()">Back to Home</button>
+</div>
+
+<!-- ── CARD ACTIVE SHEET ── -->
+<div class="overlay" id="card-active-ov" onclick="closeCardActiveOv(event)">
+  <div class="sheet" style="text-align:center;padding:28px 24px 44px;">
+    <div class="sh-bar"></div>
+    <div style="width:56px;height:56px;border-radius:50%;background:rgba(0,200,150,0.1);border:1.5px solid rgba(0,200,150,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+    </div>
+    <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;margin-bottom:8px;">Card Active</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Your Subsidi card is active and working.</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:6px;" id="card-active-purchases"></div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:28px;">Card expires in <span id="card-active-countdown" style="color:var(--p-light);font-weight:700;">--</span></div>
+    <button onclick="closeCardActiveOv()" style="width:100%;padding:16px;background:var(--p);border:none;border-radius:14px;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Got it</button>
+  </div>
 </div>
 
 <!-- ── CARD EXPIRED MODAL ── -->
@@ -725,40 +682,6 @@
     <div class="prof-id" id="prof-id">ID · subsidi.app/ref/swiftwave</div>
   </div>
 
-  <!-- Stats strip -->
-  <div class="prof-stats">
-    <div class="prof-stat">
-      <div class="prof-stat-val" id="prof-stat-balance">₦300</div>
-      <div class="prof-stat-lbl">Balance</div>
-    </div>
-    <div class="prof-stat">
-      <div class="prof-stat-val" id="prof-stat-purchases">0</div>
-      <div class="prof-stat-lbl">Purchases</div>
-    </div>
-    <div class="prof-stat">
-      <div class="prof-stat-val" id="prof-stat-saved">₦0</div>
-      <div class="prof-stat-lbl">Saved</div>
-    </div>
-  </div>
-
-  <!-- Card visual -->
-  <div class="prof-sec">
-    <div class="prof-sec-title">My Card</div>
-    <div class="prof-card-visual">
-      <div class="pcv-glow"></div>
-      <div class="pcv-chip"></div>
-      <div class="pcv-net">Subsidi Card</div>
-      <div class="pcv-num" id="pcv-num">•••• •••• ••••</div>
-      <div class="pcv-bottom">
-        <div>
-          <div class="pcv-holder">Card Holder</div>
-          <div class="pcv-holder-val" id="pcv-holder">—</div>
-        </div>
-        <div id="pcv-status-badge" class="pcv-status-badge active"><span class="pip"></span>Active</div>
-      </div>
-    </div>
-  </div>
-
   <!-- Account settings -->
   <div class="prof-sec">
     <div class="prof-sec-title">Account</div>
@@ -793,37 +716,6 @@
   </div>
 
   <!-- Card management -->
-  <div class="prof-sec">
-    <div class="prof-sec-title">Card</div>
-    <div class="prof-card">
-      <div class="prof-row" onclick="myCardTap()">
-        <div class="prof-row-ico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="5" width="20" height="14" rx="2"/>
-            <line x1="2" y1="10" x2="22" y2="10"/>
-          </svg>
-        </div>
-        <div class="prof-row-body">
-          <div class="prof-row-title">Card Status</div>
-          <div class="prof-row-sub" id="prof-card-sub">Checking...</div>
-        </div>
-        <div class="prof-row-right" id="prof-card-right" style="color:var(--green)">Active</div>
-      </div>
-      <div class="prof-row" onclick="showDep()">
-        <div class="prof-row-ico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
-          </svg>
-        </div>
-        <div class="prof-row-body">
-          <div class="prof-row-title">Top Up Wallet</div>
-          <div class="prof-row-sub">Add funds to buy data</div>
-        </div>
-        <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </div>
-  </div>
-
   <!-- Support -->
   <div class="prof-sec">
     <div class="prof-sec-title">Support</div>
@@ -880,8 +772,9 @@
           <rect x="2" y="5" width="20" height="14" rx="2"/>
           <line x1="2" y1="10" x2="22" y2="10"/>
         </svg>
+        <div class="mycard-glow" id="mycard-glow-prof"></div>
       </div>
-      <span class="ni-lbl">My Card</span>
+      <span class="ni-lbl" id="mycard-lbl-prof">My Card</span>
     </div>
     <div class="ni" onclick="navTo('dash',this);togRef()">
       <div class="ni-ico">
@@ -1646,21 +1539,18 @@
     document.getElementById('pin-buy-ov').classList.add('open');
   }
 
-  
   // ── Card expiry ──
   function startCardTimer() {
-    // Always start with a 30s countdown regardless of card state
-    // During 30s: show everything as active (subsidy prices, bar visible, no glow)
     cardActive = true;
+    cardExpireAt = Date.now() + 30000; // record exact expiry time
     renderBundles();
     const wrapInit = document.getElementById('subsidy-bar-wrap');
     if (wrapInit) wrapInit.style.display = '';
-    updateCardGlow(); // no glow during 30s (cardActive=true)
+    updateCardGlow();
 
-    // After 30s: expire the card, switch everything
     setTimeout(() => {
       cardActive = false;
-      // Persist to localStorage
+      cardExpireAt = null;
       const saved = localStorage.getItem('subsidi_user');
       if (saved) {
         const u = JSON.parse(saved);
@@ -1669,21 +1559,66 @@
       }
       const wrap = document.getElementById('subsidy-bar-wrap');
       if (wrap) wrap.style.display = 'none';
-      updateCardGlow(); // now glow starts
-      renderBundles();  // prices switch to market price
+      updateCardGlow();
+      renderBundles();
       showExpiredModal();
     }, 30000);
   }
 
   function badgeTap() { if (!cardActive) showExpiredModal(); }
 
+  let cardActiveCountdownInterval = null;
+  let cardExpireAt = null; // timestamp when card expires
+
   function myCardTap() {
-    // Always show the card status sheet
-    document.getElementById('expired-ov').classList.add('open');
+    if (!cardActive) {
+      showExpiredModal();
+    } else {
+      // Update purchases left text
+      const p = discountPurchasesLeft;
+      document.getElementById('card-active-purchases').textContent =
+        p + ' discount purchase' + (p !== 1 ? 's' : '') + ' remaining';
+      // Start live countdown
+      if (cardActiveCountdownInterval) clearInterval(cardActiveCountdownInterval);
+      function tickCountdown() {
+        if (!cardExpireAt) {
+          document.getElementById('card-active-countdown').textContent = '--';
+          return;
+        }
+        const secsLeft = Math.max(0, Math.round((cardExpireAt - Date.now()) / 1000));
+        const m = Math.floor(secsLeft / 60);
+        const s = secsLeft % 60;
+        document.getElementById('card-active-countdown').textContent =
+          m > 0 ? m + 'm ' + s + 's' : s + 's';
+        if (secsLeft <= 0) clearInterval(cardActiveCountdownInterval);
+      }
+      tickCountdown();
+      cardActiveCountdownInterval = setInterval(tickCountdown, 1000);
+      document.getElementById('card-active-ov').classList.add('open');
+    }
+  }
+
+  function closeCardActiveOv(e) {
+    if (!e || e.target === document.getElementById('card-active-ov') || e.type === 'click') {
+      document.getElementById('card-active-ov').classList.remove('open');
+      if (cardActiveCountdownInterval) { clearInterval(cardActiveCountdownInterval); cardActiveCountdownInterval = null; }
+    }
   }
 
   function showExpiredModal() {
     document.getElementById('expired-ov').classList.add('open');
+  }
+
+  function updateCardGlow() {
+    // Apply to both dashboard and profile nav buttons
+    ['mycard-glow','mycard-glow-prof'].forEach(id => {
+      const glow = document.getElementById(id);
+      if (glow) glow.classList.toggle('expired', !cardActive);
+    });
+    ['mycard-lbl','mycard-lbl-prof'].forEach(id => {
+      const lbl = document.getElementById(id);
+      if (lbl) lbl.classList.toggle('expired', !cardActive);
+    });
   }
 
   function reactivateCard() {
@@ -1999,21 +1934,6 @@
     if (text) text.textContent = purchases + ' discount purchase' + (purchases !== 1 ? 's' : '') + ' left';
     if (wrap) wrap.style.display = cardActive ? '' : 'none';
     updateCardGlow();
-  }
-
-  function updateCardGlow() {
-    const glow = document.getElementById('mycard-glow');
-    const lbl = document.getElementById('mycard-lbl');
-    if (!glow || !lbl) return;
-    if (!cardActive) {
-      // Card expired — start glowing as warning
-      glow.classList.add('expired');
-      lbl.classList.add('expired');
-    } else {
-      // Card active — no glow
-      glow.classList.remove('expired');
-      lbl.classList.remove('expired');
-    }
   }
 
   function applySubsidyPurchase() {

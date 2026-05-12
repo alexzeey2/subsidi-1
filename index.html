@@ -1976,11 +1976,21 @@
     btn.textContent = 'Add ₦' + amt.toLocaleString() + ' to Wallet';
   }
 
-  function confirmDep() {
+  async function confirmDep() {
     if (!selectedDep) return;
+    const amount = selectedDep;
+    console.log('[deposit] userId:', userId, 'amount:', amount);
     document.getElementById('dep-ov').classList.remove('open');
-    updateBalance(-selectedDep);
     selectedDep = 0;
+    try {
+      showSpinner('Adding funds...');
+      await callEdge('deposit', { userId, amount });
+      await fetchUserData();
+    } catch(e) {
+      // Fallback: update locally
+      updateBalance(-amount);
+      hideSpinner();
+    }
   }
 
   function closeDepOv(e) {

@@ -1049,24 +1049,8 @@
       renderBundles();
       updateSubsidyUI();
       updateCardGlow();
-      // Read expiry from Supabase first, fall back to localStorage
-      const dbExpireAt = data && data.cardExpireAt ? parseInt(data.cardExpireAt) : 0;
-      const localExpireAt = parseInt(localStorage.getItem('subsidi_cardExpireAt') || '0');
-      const resolvedExpireAt = dbExpireAt || localExpireAt;
-      if (resolvedExpireAt && resolvedExpireAt > Date.now()) {
-        // Sync whichever source had it to the other
-        localStorage.setItem('subsidi_cardExpireAt', String(resolvedExpireAt));
-        startCardTimer(resolvedExpireAt);
-      } else if (resolvedExpireAt) {
-        // Timestamp exists but already expired
-        cardActive = false;
-        localStorage.removeItem('subsidi_cardExpireAt');
-        updateCardGlow();
-        renderBundles();
-      } else {
-        // No expiry saved at all — fresh timer
-        startCardTimer();
-      }
+      // Always start a fresh timer on load for now (Supabase persistence comes later)
+      startCardTimer();
     } else {
       // No account — show dashboard in guest/preview mode
       isGuest = true;

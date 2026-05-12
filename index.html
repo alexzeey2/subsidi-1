@@ -1723,14 +1723,16 @@
     }
     updateCardGlow();
     startCardTimer();
-    // Save renewal to Supabase — deduct ₦650 and update subsidy fund
+    // Deduct ₦650 optimistically so UI is correct immediately
+    updateBalance(650);
+    updateSubsidyUI();
+    // Save renewal to Supabase
     try {
       showSpinner('Renewing card...');
       await callEdge('renew-card', { userId, subsidyFund, discountPurchasesLeft });
-      await fetchUserData();
+      await fetchUserData(); // will sync true balance from DB
     } catch(e) {
-      updateBalance(650);
-      updateSubsidyUI();
+      // Already deducted above, just hide spinner
       hideSpinner();
     }
   }
@@ -1988,8 +1990,13 @@
       await callEdge('deposit', { userId, amount });
       await fetchUserData();
     } catch(e) {
-      // Fallback: update locally
-      updateBalance(-amount);
+      // Fallback: update locally (deposit adds to balance, so deduct negative = add)
+      balance += amount;
+      if (balance < 0) balance = 0;
+      const whole = Math.floor(balance).toLocaleString();
+      const dec = (balance % 1).toFixed(2).slice(1);
+      document.getElementById('bal-display').innerHTML =
+        '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
       hideSpinner();
     }
   }

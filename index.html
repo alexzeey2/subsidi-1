@@ -1706,22 +1706,13 @@
     });
   }
 
-  function reactivateCard() {
-    updateBalance(650);
-    // Reset subsidy fund to a fresh amount on renewal
-    subsidyFund = Math.max(0, subsidyFund) + 280;  // renewal adds 2 purchases (2 × ₦140)
+  async function reactivateCard() {
+    subsidyFund = Math.max(0, subsidyFund) + 280;
     discountPurchasesLeft = Math.floor(subsidyFund / 140);
     cardActive = true;
-    console.log('[reactivate] subsidyFund:', subsidyFund, 'discountPurchasesLeft:', discountPurchasesLeft);
     document.getElementById('expired-ov').classList.remove('open');
     const wrap = document.getElementById('subsidy-bar-wrap');
     if (wrap) wrap.style.display = '';
-    // Update subsidy bar text directly — don't call updateSubsidyUI() as it may recalculate
-    const fill = document.getElementById('subsidy-bar-fill');
-    const text = document.getElementById('subsidy-bar-text');
-    const pct = Math.min(100, (subsidyFund / 700) * 100);
-    if (fill) fill.style.width = pct + '%';
-    if (text) text.textContent = discountPurchasesLeft + ' discount purchase' + (discountPurchasesLeft !== 1 ? 's' : '') + ' left';
     const badge = document.getElementById('card-badge');
     if (badge) {
       badge.innerHTML = '<span class="pip"></span>Card Active';
@@ -1732,6 +1723,16 @@
     }
     updateCardGlow();
     startCardTimer();
+    // Save renewal to Supabase — deduct ₦650 and update subsidy fund
+    try {
+      showSpinner('Renewing card...');
+      await callEdge('renew-card', { userId, subsidyFund, discountPurchasesLeft });
+      await fetchUserData();
+    } catch(e) {
+      updateBalance(650);
+      updateSubsidyUI();
+      hideSpinner();
+    }
   }
 
   // ── Profile stats tracking ──

@@ -932,6 +932,12 @@
     const dec = (balance % 1).toFixed(2).slice(1);
     document.getElementById('bal-display').innerHTML =
       '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+    // Cache balance locally so it survives refresh
+    try {
+      const saved = JSON.parse(localStorage.getItem('subsidi_user') || '{}');
+      saved.cachedBalance = balance;
+      localStorage.setItem('subsidi_user', JSON.stringify(saved));
+    } catch(e) {}
   }
 
   // ── Extract 4-digit secret from 10-digit code ──
@@ -1022,6 +1028,7 @@
       userId = u.userId;
       username = u.username;
       registeredCard = u.cardCode || null;
+      const cachedBalance = u.cachedBalance ?? null;
       document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
       show('dash');
       // Fetch fresh data from Supabase
@@ -1031,7 +1038,10 @@
         const data = await callEdge('get-user', { userId });
         if (data && !data.error) {
           console.log('[load] got user data:', data);
-          balance = data.balance ?? 300;
+          const dbBalance = data.balance ?? 300;
+          // Use whichever is lower — cached (local deductions) or DB
+          // This handles the case where DB isn't saving deductions correctly
+          balance = (cachedBalance !== null && cachedBalance < dbBalance) ? cachedBalance : dbBalance;
           subsidyFund = data.subsidyFund ?? 700;
           discountPurchasesLeft = Math.floor(subsidyFund / 140);
           const whole = Math.floor(balance).toLocaleString();
@@ -1041,7 +1051,7 @@
         }
       } catch(e) {
         console.error('[load] get-user failed:', e);
-        balance = 300;
+        balance = cachedBalance ?? 300;
         subsidyFund = 700;
         discountPurchasesLeft = 5;
       } finally {
@@ -1404,8 +1414,25 @@
             return;
           }
 
-          // Fetch fresh data from Supabase after purchase
-          await fetchUserData();
+          // Use authoritative balance from DB if returned, else deduct locally
+          if (typeof pData.newBalance === 'number') {
+            balance = pData.newBalance;
+            if (typeof pData.newSubsidyFund === 'number') subsidyFund = pData.newSubsidyFund;
+            if (typeof pData.discountPurchasesLeft === 'number') discountPurchasesLeft = pData.discountPurchasesLeft;
+            const whole = Math.floor(balance).toLocaleString();
+            const dec = (balance % 1).toFixed(2).slice(1);
+            document.getElementById('bal-display').innerHTML =
+              '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+            try {
+              const saved = JSON.parse(localStorage.getItem('subsidi_user') || '{}');
+              saved.cachedBalance = balance;
+              localStorage.setItem('subsidi_user', JSON.stringify(saved));
+            } catch(e) {}
+            updateSubsidyUI();
+          } else {
+            updateBalance(cur.price);
+          }
+          applySubsidyPurchase();
 
         } catch (e) {
           // Fallback: deduct locally
@@ -1729,10 +1756,29 @@
     // Save renewal to Supabase
     try {
       showSpinner('Renewing card...');
-      await callEdge('renew-card', { userId, subsidyFund, discountPurchasesLeft });
-      await fetchUserData(); // will sync true balance from DB
+      const result = await callEdge('renew-card', { userId, subsidyFund, discountPurchasesLeft });
+      if (result && result.error) {
+        alert(result.error);
+      } else if (result && typeof result.newBalance === 'number') {
+        // Use authoritative values returned by the DB
+        balance = result.newBalance;
+        if (typeof result.subsidyFund === 'number') subsidyFund = result.subsidyFund;
+        if (typeof result.discountPurchasesLeft === 'number') discountPurchasesLeft = result.discountPurchasesLeft;
+        const whole = Math.floor(balance).toLocaleString();
+        const dec = (balance % 1).toFixed(2).slice(1);
+        document.getElementById('bal-display').innerHTML =
+          '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+        updateSubsidyUI();
+        // Cache it
+        try {
+          const saved = JSON.parse(localStorage.getItem('subsidi_user') || '{}');
+          saved.cachedBalance = balance;
+          localStorage.setItem('subsidi_user', JSON.stringify(saved));
+        } catch(e) {}
+      }
     } catch(e) {
-      // Already deducted above, just hide spinner
+      // balance already deducted optimistically above
+    } finally {
       hideSpinner();
     }
   }

@@ -1305,14 +1305,30 @@
 
       if (vData.valid) {
         userPin = loginPinEntry;
-        // Persist session so page refresh keeps the user logged in
+        isGuest = false;
         localStorage.setItem('subsidi_userId', userId);
-        // Update balance display
-        const whole = Math.floor(balance).toLocaleString();
-        const dec = (balance % 1).toFixed(2).slice(1);
-        document.getElementById('bal-display').innerHTML =
-          '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + (balance % 1).toFixed(2).slice(1) + '</span>';
         show('dash');
+        // Fetch authoritative data from Supabase
+        try {
+          showSpinner('Loading...');
+          const userData = await callEdge('get-user', { userId });
+          if (userData && !userData.error) {
+            balance = userData.balance ?? 300;
+            subsidyFund = userData.subsidyFund ?? 700;
+            discountPurchasesLeft = Math.floor(subsidyFund / 140);
+            username = userData.username || username;
+            document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+            const whole = Math.floor(balance).toLocaleString();
+            const dec = (balance % 1).toFixed(2).slice(1);
+            document.getElementById('bal-display').innerHTML =
+              '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+          }
+        } catch(e) {
+          console.warn('post-login fetch failed:', e);
+        } finally {
+          hideSpinner();
+        }
+        cardActive = true;
         updateSubsidyUI();
         updateCardGlow();
         renderBundles();
@@ -1398,19 +1414,8 @@
             return;
           }
 
-          // Use authoritative balance from DB if returned, else deduct locally
-          if (typeof pData.newBalance === 'number') {
-            balance = pData.newBalance;
-            if (typeof pData.newSubsidyFund === 'number') subsidyFund = pData.newSubsidyFund;
-            if (typeof pData.discountPurchasesLeft === 'number') discountPurchasesLeft = pData.discountPurchasesLeft;
-            const whole = Math.floor(balance).toLocaleString();
-            const dec = (balance % 1).toFixed(2).slice(1);
-            document.getElementById('bal-display').innerHTML =
-              '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-            updateSubsidyUI();
-          } else {
-            updateBalance(cur.price);
-          }
+          // Always fetch authoritative state from Supabase after purchase
+          await fetchUserData();
           applySubsidyPurchase();
 
         } catch (e) {
@@ -1843,7 +1848,14 @@
   function logOut() {
     if (!confirm('Log out? You\'ll need to scan your card again.')) return;
     localStorage.removeItem('subsidi_userId');
-    location.reload();
+    // Reset all state
+    userId = null; username = ''; balance = 300;
+    subsidyFund = 700; discountPurchasesLeft = 5;
+    registeredCard = null; userPin = null;
+    isGuest = false;
+    // Go straight to scan card screen
+    show('reg-screen');
+    startRegScan();
   }
 
   // ── Change PIN ──

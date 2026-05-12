@@ -1739,7 +1739,7 @@
     document.getElementById('expired-ov').classList.remove('open');
     try {
       showSpinner('Renewing card...');
-      const result = await callEdge('renew-card', { userId, subsidyFund, discountPurchasesLeft });
+      const result = await callEdge('Renew-Card', { userId, subsidyFund, discountPurchasesLeft });
       if (!result || result.error) {
         alert(result?.error || 'Renewal failed. Please try again.');
         hideSpinner();

@@ -1026,9 +1026,11 @@
       show('dash');
       // Fetch fresh data from Supabase
       try {
+        console.log('[load] userId:', userId, 'fetching from get-user...');
         showSpinner('Loading...');
         const data = await callEdge('get-user', { userId });
         if (data && !data.error) {
+          console.log('[load] got user data:', data);
           balance = data.balance ?? 300;
           subsidyFund = data.subsidyFund ?? 700;
           discountPurchasesLeft = Math.floor(subsidyFund / 140);
@@ -1038,7 +1040,7 @@
             '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
         }
       } catch(e) {
-        console.warn('Failed to fetch user data:', e);
+        console.error('[load] get-user failed:', e);
         balance = 300;
         subsidyFund = 700;
         discountPurchasesLeft = 5;

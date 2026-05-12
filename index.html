@@ -932,12 +932,6 @@
     const dec = (balance % 1).toFixed(2).slice(1);
     document.getElementById('bal-display').innerHTML =
       '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-    // Cache balance locally so it survives refresh
-    try {
-      const saved = JSON.parse(localStorage.getItem('subsidi_user') || '{}');
-      saved.cachedBalance = balance;
-      localStorage.setItem('subsidi_user', JSON.stringify(saved));
-    } catch(e) {}
   }
 
   // ── Extract 4-digit secret from 10-digit code ──
@@ -1022,28 +1016,22 @@
     return true; // blocked
   }
   window.addEventListener("load", async () => {
-    const saved = localStorage.getItem('subsidi_user');
-    if (saved) {
-      const u = JSON.parse(saved);
-      userId = u.userId;
-      username = u.username;
-      registeredCard = u.cardCode || null;
-      const cachedBalance = u.cachedBalance ?? null;
-      document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+    const savedUserId = localStorage.getItem('subsidi_userId');
+    if (savedUserId) {
+      userId = savedUserId;
       show('dash');
-      // Fetch fresh data from Supabase
       try {
         console.log('[load] userId:', userId, 'fetching from get-user...');
         showSpinner('Loading...');
         const data = await callEdge('get-user', { userId });
         if (data && !data.error) {
           console.log('[load] got user data:', data);
-          const dbBalance = data.balance ?? 300;
-          // Use whichever is lower — cached (local deductions) or DB
-          // This handles the case where DB isn't saving deductions correctly
-          balance = (cachedBalance !== null && cachedBalance < dbBalance) ? cachedBalance : dbBalance;
+          username = data.username || username;
+          registeredCard = data.cardCode || null;
+          balance = data.balance ?? 300;
           subsidyFund = data.subsidyFund ?? 700;
           discountPurchasesLeft = Math.floor(subsidyFund / 140);
+          document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
           const dec = (balance % 1).toFixed(2).slice(1);
           document.getElementById('bal-display').innerHTML =
@@ -1051,7 +1039,7 @@
         }
       } catch(e) {
         console.error('[load] get-user failed:', e);
-        balance = cachedBalance ?? 300;
+        balance = 300;
         subsidyFund = 700;
         discountPurchasesLeft = 5;
       } finally {
@@ -1260,10 +1248,8 @@
       console.warn('Registration edge function failed, proceeding offline:', e);
     }
 
-    // Save only identity to localStorage
-    localStorage.setItem('subsidi_user', JSON.stringify({
-      userId, username, cardCode: registeredCard
-    }));
+    // Persist session so page refresh keeps the user logged in
+    localStorage.setItem('subsidi_userId', userId);
 
     show('dash');
     updateSubsidyUI();
@@ -1319,10 +1305,8 @@
 
       if (vData.valid) {
         userPin = loginPinEntry;
-        // Save only identity to localStorage
-        localStorage.setItem('subsidi_user', JSON.stringify({
-          userId, username, cardCode: registeredCard
-        }));
+        // Persist session so page refresh keeps the user logged in
+        localStorage.setItem('subsidi_userId', userId);
         // Update balance display
         const whole = Math.floor(balance).toLocaleString();
         const dec = (balance % 1).toFixed(2).slice(1);
@@ -1423,11 +1407,6 @@
             const dec = (balance % 1).toFixed(2).slice(1);
             document.getElementById('bal-display').innerHTML =
               '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-            try {
-              const saved = JSON.parse(localStorage.getItem('subsidi_user') || '{}');
-              saved.cachedBalance = balance;
-              localStorage.setItem('subsidi_user', JSON.stringify(saved));
-            } catch(e) {}
             updateSubsidyUI();
           } else {
             updateBalance(cur.price);
@@ -1769,12 +1748,6 @@
         document.getElementById('bal-display').innerHTML =
           '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
         updateSubsidyUI();
-        // Cache it
-        try {
-          const saved = JSON.parse(localStorage.getItem('subsidi_user') || '{}');
-          saved.cachedBalance = balance;
-          localStorage.setItem('subsidi_user', JSON.stringify(saved));
-        } catch(e) {}
       }
     } catch(e) {
       // balance already deducted optimistically above
@@ -1869,7 +1842,7 @@
 
   function logOut() {
     if (!confirm('Log out? You\'ll need to scan your card again.')) return;
-    localStorage.removeItem('subsidi_user');
+    localStorage.removeItem('subsidi_userId');
     location.reload();
   }
 

@@ -1663,10 +1663,6 @@
     } else {
       cardExpireAt = Date.now() + 30000; // 30s test
       localStorage.setItem('subsidi_cardExpireAt', String(cardExpireAt));
-      // Persist to Supabase so it survives device switches
-      if (userId) {
-        callEdge('update-card-expiry', { userId, cardExpireAt }).catch(() => {});
-      }
     }
     cardActive = true;
     renderBundles();
@@ -1707,8 +1703,13 @@
       if (cardActiveCountdownInterval) clearInterval(cardActiveCountdownInterval);
       function tickCountdown() {
         if (!cardExpireAt) {
-          document.getElementById('card-active-countdown').textContent = '--';
-          return;
+          // Try to recover from localStorage
+          const saved = parseInt(localStorage.getItem('subsidi_cardExpireAt') || '0');
+          if (saved && saved > Date.now()) { cardExpireAt = saved; }
+          else {
+            document.getElementById('card-active-countdown').textContent = '--';
+            return;
+          }
         }
         const secsLeft = Math.max(0, Math.round((cardExpireAt - Date.now()) / 1000));
         const d = Math.floor(secsLeft / 86400);

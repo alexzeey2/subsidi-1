@@ -1347,7 +1347,6 @@
       document.getElementById('pin-buy-ov').classList.remove('open');
       document.getElementById('ov').classList.remove('open');
 
-      // If we have userId, call purchase-data edge function
       if (userId) {
         try {
           err.textContent = '';
@@ -1362,34 +1361,47 @@
           });
 
           if (pData.error) {
-            // Show error on success screen or alert
             alert(pData.error);
             return;
           }
 
-          // Update local balance from server response
+          // Update balance from server
           balance = pData.newBalance;
           const whole = Math.floor(balance).toLocaleString();
           const dec = (balance % 1).toFixed(2).slice(1);
           document.getElementById('bal-display').innerHTML =
             '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-          // Persist updated balance
-          renderBundles();
-    const saved = localStorage.getItem('subsidi_user');
+
+          // Update subsidy from server response
+          if (pData.discountPurchasesLeft !== undefined) {
+            discountPurchasesLeft = pData.discountPurchasesLeft;
+            subsidyFund = pData.newSubsidyFund || subsidyFund;
+          } else {
+            // Server didn't return subsidy data, update locally
+            applySubsidyPurchase();
+          }
+
+          // Persist to localStorage
+          const saved = localStorage.getItem('subsidi_user');
           if (saved) {
             const u = JSON.parse(saved);
             u.balance = balance;
+            u.subsidyFund = subsidyFund;
             localStorage.setItem('subsidi_user', JSON.stringify(u));
           }
+
+          updateSubsidyUI();
+          renderBundles();
 
         } catch (e) {
           // Fallback: deduct locally
           updateBalance(cur.price);
+          applySubsidyPurchase();
         }
       } else {
         updateBalance(cur.price);
+        applySubsidyPurchase();
       }
-      applySubsidyPurchase();
 
       document.getElementById('sbody').textContent = cur.size + ' delivered to ' + ph2;
       document.getElementById('samt').textContent = '₦' + cur.price.toLocaleString() + ' deducted';

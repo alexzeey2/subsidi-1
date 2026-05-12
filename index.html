@@ -319,6 +319,13 @@
   .chpin-step{display:none}
   .chpin-step.active{display:block}
 
+  /* ── SPINNER ── */
+  .spinner-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+  .spinner-ov.open{display:flex}
+  .spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--p-light);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner-lbl{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:.5px}
+
   /* ── GUEST GATE ── */
   .gate-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:400;align-items:flex-end}
   .gate-ov.open{display:flex}
@@ -807,6 +814,12 @@
   </div>
 </div>
 
+<!-- ── SPINNER ── -->
+<div class="spinner-ov" id="spinner-ov">
+  <div class="spinner"></div>
+  <div class="spinner-lbl" id="spinner-lbl">Updating...</div>
+</div>
+
 <!-- ── GUEST GATE OVERLAY ── -->
 <div class="gate-ov" id="gate-ov">
   <div class="gate-sheet">
@@ -943,6 +956,41 @@
     setTimeout(() => el.classList.remove('show'), 2800);
   }
 
+  // ── Spinner ──
+  function showSpinner(msg) {
+    document.getElementById('spinner-lbl').textContent = msg || 'Updating...';
+    document.getElementById('spinner-ov').classList.add('open');
+  }
+
+  function hideSpinner() {
+    document.getElementById('spinner-ov').classList.remove('open');
+  }
+
+  // ── Fetch fresh user data from Supabase ──
+  async function fetchUserData() {
+    if (!userId) return;
+    try {
+      showSpinner('Refreshing...');
+      const data = await callEdge('get-user', { userId });
+      if (data && !data.error) {
+        balance = data.balance ?? balance;
+        subsidyFund = data.subsidyFund ?? subsidyFund;
+        discountPurchasesLeft = Math.floor(subsidyFund / 140);
+        // Update balance display
+        const whole = Math.floor(balance).toLocaleString();
+        const dec = (balance % 1).toFixed(2).slice(1);
+        document.getElementById('bal-display').innerHTML =
+          '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+        updateSubsidyUI();
+        renderBundles();
+      }
+    } catch(e) {
+      console.warn('fetchUserData failed:', e);
+    } finally {
+      hideSpinner();
+    }
+  }
+
   // ── Guest mode ──
   let isGuest = false;
 
@@ -967,52 +1015,41 @@
     showGate(title, sub);
     return true; // blocked
   }
-  window.addEventListener("load", () => {
+  window.addEventListener("load", async () => {
     const saved = localStorage.getItem('subsidi_user');
     if (saved) {
       const u = JSON.parse(saved);
       userId = u.userId;
       username = u.username;
-      balance = u.balance ?? 300;
-      subsidyFund = u.subsidyFund || 700;
-      discountPurchasesLeft = Math.floor(subsidyFund / 140);
       registeredCard = u.cardCode || null;
-      // Restore card state BEFORE rendering bundles
-      cardActive = u.cardActive !== undefined ? u.cardActive : true;
-      // Hide subsidy bar immediately if card is expired
-      const wrap = document.getElementById('subsidy-bar-wrap');
-      if (wrap) wrap.style.display = cardActive ? '' : 'none';
-      // Update balance display
-      const whole = Math.floor(balance).toLocaleString();
-      const dec = (balance % 1).toFixed(2).slice(1);
-      document.getElementById('bal-display').innerHTML =
-        '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
       document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
       show('dash');
-      if (!cardActive) {
-        // Show as active for 30s so user can browse, then expire
-        cardActive = true;
-        cardExpireAt = Date.now() + 30000;
-        renderBundles();
-        updateSubsidyUI();
-        updateCardGlow();
-        if (cardTimerTimeout) clearTimeout(cardTimerTimeout);
-        cardTimerTimeout = setTimeout(() => {
-          cardTimerTimeout = null;
-          cardActive = false;
-          cardExpireAt = null;
-          const w = document.getElementById('subsidy-bar-wrap');
-          if (w) w.style.display = 'none';
-          renderBundles();
-          updateCardGlow();
-          showExpiredModal();
-        }, 30000);
-      } else {
-        renderBundles();
-        updateSubsidyUI();
-        updateCardGlow();
-        startCardTimer();
+      // Fetch fresh data from Supabase
+      try {
+        showSpinner('Loading...');
+        const data = await callEdge('get-user', { userId });
+        if (data && !data.error) {
+          balance = data.balance ?? 300;
+          subsidyFund = data.subsidyFund ?? 700;
+          discountPurchasesLeft = Math.floor(subsidyFund / 140);
+          const whole = Math.floor(balance).toLocaleString();
+          const dec = (balance % 1).toFixed(2).slice(1);
+          document.getElementById('bal-display').innerHTML =
+            '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+        }
+      } catch(e) {
+        console.warn('Failed to fetch user data:', e);
+        balance = 300;
+        subsidyFund = 700;
+        discountPurchasesLeft = 5;
+      } finally {
+        hideSpinner();
       }
+      cardActive = true;
+      renderBundles();
+      updateSubsidyUI();
+      updateCardGlow();
+      startCardTimer();
     } else {
       // No account — show dashboard in guest/preview mode
       isGuest = true;
@@ -1211,9 +1248,9 @@
       console.warn('Registration edge function failed, proceeding offline:', e);
     }
 
-    // Save user to localStorage so app remembers after refresh
+    // Save only identity to localStorage
     localStorage.setItem('subsidi_user', JSON.stringify({
-      userId, username, balance, cardCode: registeredCard, subsidyFund
+      userId, username, cardCode: registeredCard
     }));
 
     show('dash');
@@ -1270,9 +1307,9 @@
 
       if (vData.valid) {
         userPin = loginPinEntry;
-        // Save to localStorage
+        // Save only identity to localStorage
         localStorage.setItem('subsidi_user', JSON.stringify({
-          userId, username, balance, cardCode: registeredCard, subsidyFund
+          userId, username, cardCode: registeredCard
         }));
         // Update balance display
         const whole = Math.floor(balance).toLocaleString();
@@ -1365,33 +1402,8 @@
             return;
           }
 
-          // Update balance from server
-          balance = pData.newBalance;
-          const whole = Math.floor(balance).toLocaleString();
-          const dec = (balance % 1).toFixed(2).slice(1);
-          document.getElementById('bal-display').innerHTML =
-            '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-
-          // Update subsidy from server response
-          if (pData.discountPurchasesLeft !== undefined) {
-            discountPurchasesLeft = pData.discountPurchasesLeft;
-            subsidyFund = pData.newSubsidyFund || subsidyFund;
-          } else {
-            // Server didn't return subsidy data, update locally
-            applySubsidyPurchase();
-          }
-
-          // Persist to localStorage
-          const saved = localStorage.getItem('subsidi_user');
-          if (saved) {
-            const u = JSON.parse(saved);
-            u.balance = balance;
-            u.subsidyFund = subsidyFund;
-            localStorage.setItem('subsidi_user', JSON.stringify(u));
-          }
-
-          updateSubsidyUI();
-          renderBundles();
+          // Fetch fresh data from Supabase after purchase
+          await fetchUserData();
 
         } catch (e) {
           // Fallback: deduct locally
@@ -1628,12 +1640,6 @@
       cardActive = false;
       cardExpireAt = null;
       console.log('[timer] expired — cardActive set to false');
-      const saved = localStorage.getItem('subsidi_user');
-      if (saved) {
-        const u = JSON.parse(saved);
-        u.cardActive = false;
-        localStorage.setItem('subsidi_user', JSON.stringify(u));
-      }
       const wrap = document.getElementById('subsidy-bar-wrap');
       if (wrap) wrap.style.display = 'none';
       updateCardGlow();
@@ -1705,14 +1711,6 @@
     discountPurchasesLeft = Math.floor(subsidyFund / 140);
     cardActive = true;
     console.log('[reactivate] subsidyFund:', subsidyFund, 'discountPurchasesLeft:', discountPurchasesLeft);
-    // Persist
-    const savedR = localStorage.getItem('subsidi_user');
-    if (savedR) {
-      const uR = JSON.parse(savedR);
-      uR.cardActive = true;
-      uR.subsidyFund = subsidyFund;
-      localStorage.setItem('subsidi_user', JSON.stringify(uR));
-    }
     document.getElementById('expired-ov').classList.remove('open');
     const wrap = document.getElementById('subsidy-bar-wrap');
     if (wrap) wrap.style.display = '';
@@ -1943,12 +1941,6 @@
   function cancelReactivate() {
     document.getElementById('expired-ov').classList.remove('open');
     cardActive = false;
-    const savedC = localStorage.getItem('subsidi_user');
-    if (savedC) {
-      const uC = JSON.parse(savedC);
-      uC.cardActive = false;
-      localStorage.setItem('subsidi_user', JSON.stringify(uC));
-    }
     const wrap = document.getElementById('subsidy-bar-wrap');
     if (wrap) wrap.style.display = 'none';
     const badge = document.getElementById('card-badge');

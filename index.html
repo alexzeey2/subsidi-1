@@ -1049,16 +1049,22 @@
       renderBundles();
       updateSubsidyUI();
       updateCardGlow();
-      // Restore saved card expiry so refresh doesn't reset the countdown
-      const savedExpireAt = parseInt(localStorage.getItem('subsidi_cardExpireAt') || '0');
-      if (savedExpireAt && savedExpireAt > Date.now()) {
-        startCardTimer(savedExpireAt);
-      } else if (savedExpireAt) {
-        // Already expired
+      // Read expiry from Supabase first, fall back to localStorage
+      const dbExpireAt = data && data.cardExpireAt ? parseInt(data.cardExpireAt) : 0;
+      const localExpireAt = parseInt(localStorage.getItem('subsidi_cardExpireAt') || '0');
+      const resolvedExpireAt = dbExpireAt || localExpireAt;
+      if (resolvedExpireAt && resolvedExpireAt > Date.now()) {
+        // Sync whichever source had it to the other
+        localStorage.setItem('subsidi_cardExpireAt', String(resolvedExpireAt));
+        startCardTimer(resolvedExpireAt);
+      } else if (resolvedExpireAt) {
+        // Timestamp exists but already expired
         cardActive = false;
+        localStorage.removeItem('subsidi_cardExpireAt');
         updateCardGlow();
         renderBundles();
       } else {
+        // No expiry saved at all — fresh timer
         startCardTimer();
       }
     } else {
@@ -1651,12 +1657,16 @@
   // ── Card expiry ──
   function startCardTimer(existingExpireAt) {
     if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
-    // Resume from saved expiry if provided, otherwise start fresh
+    // Resume from saved expiry if provided, otherwise start fresh 28-day timer
     if (existingExpireAt && existingExpireAt > Date.now()) {
       cardExpireAt = existingExpireAt;
     } else {
-      cardExpireAt = Date.now() + 28 * 24 * 60 * 60 * 1000; // 28 days
+      cardExpireAt = Date.now() + 30000; // 30s test
       localStorage.setItem('subsidi_cardExpireAt', String(cardExpireAt));
+      // Persist to Supabase so it survives device switches
+      if (userId) {
+        callEdge('update-card-expiry', { userId, cardExpireAt }).catch(() => {});
+      }
     }
     cardActive = true;
     renderBundles();
@@ -1665,6 +1675,8 @@
     updateCardGlow();
 
     const msLeft = cardExpireAt - Date.now();
+    // Cap at ~24.8 days (max setTimeout value ~2^31 ms)
+    const safeMs = Math.min(msLeft, 2147483647);
     cardTimerTimeout = setTimeout(() => {
       cardTimerTimeout = null;
       cardActive = false;
@@ -1675,7 +1687,7 @@
       updateCardGlow();
       renderBundles();
       showExpiredModal();
-    }, msLeft);
+    }, safeMs);
   }
 
   function badgeTap() { if (!cardActive) showExpiredModal(); }
@@ -1699,9 +1711,13 @@
           return;
         }
         const secsLeft = Math.max(0, Math.round((cardExpireAt - Date.now()) / 1000));
-        const m = Math.floor(secsLeft / 60);
+        const d = Math.floor(secsLeft / 86400);
+        const h = Math.floor((secsLeft % 86400) / 3600);
+        const m = Math.floor((secsLeft % 3600) / 60);
         const s = secsLeft % 60;
         document.getElementById('card-active-countdown').textContent =
+          d > 0 ? d + 'd ' + h + 'h ' + m + 'm' :
+          h > 0 ? h + 'h ' + m + 'm ' + s + 's' :
           m > 0 ? m + 'm ' + s + 's' : s + 's';
         if (secsLeft <= 0) clearInterval(cardActiveCountdownInterval);
       }

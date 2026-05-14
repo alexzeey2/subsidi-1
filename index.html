@@ -1040,6 +1040,17 @@
   let buyPinEntry = '';
   let loginPinEntry = '';
 
+  // ── Local transaction log (fallback for history) ──
+  function getLocalTxns() {
+    try { return JSON.parse(localStorage.getItem('subsidi_txns') || '[]'); } catch(e) { return []; }
+  }
+  function saveLocalTxn(txn) {
+    const txns = getLocalTxns();
+    txns.unshift({ ...txn, created_at: new Date().toISOString() });
+    // Keep last 100
+    localStorage.setItem('subsidi_txns', JSON.stringify(txns.slice(0, 100)));
+  }
+
   // ── Balance ──
   function updateBalance(amount) {
     balance -= amount;
@@ -1132,6 +1143,10 @@
     return true; // blocked
   }
   window.addEventListener("load", async () => {
+    // Restore card expiry from localStorage so countdown survives page reload
+    const savedExpiry = localStorage.getItem('subsidi_cardExpireAt');
+    if (savedExpiry) cardExpireAt = parseInt(savedExpiry, 10);
+
     const savedUserId = localStorage.getItem('subsidi_userId');
     if (savedUserId) {
       userId = savedUserId;
@@ -1756,7 +1771,17 @@
   function startCardTimer(renewalDateISO) {
     if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
     if (renewalDateISO) {
-      cardExpireAt = new Date(renewalDateISO).getTime() + 30000; // 30s for testing
+      // Compute fresh expiry: renewalDate + 30s, but only if this is a newer renewal
+      const newExpiry = new Date(renewalDateISO).getTime() + 30000; // 30s for testing
+      // Only update if this gives us more time (avoids stale renewalDate overwriting a good expiry)
+      if (!cardExpireAt || newExpiry > cardExpireAt) {
+        cardExpireAt = newExpiry;
+      }
+      localStorage.setItem('subsidi_cardExpireAt', String(cardExpireAt));
+    } else if (!cardExpireAt) {
+      // Try restoring from localStorage on page load
+      const saved = localStorage.getItem('subsidi_cardExpireAt');
+      if (saved) cardExpireAt = parseInt(saved, 10);
     }
     if (!cardExpireAt || cardExpireAt <= Date.now()) {
       cardActive = false;
@@ -1777,6 +1802,7 @@
       cardTimerTimeout = null;
       cardActive = false;
       cardExpireAt = null;
+      localStorage.removeItem('subsidi_cardExpireAt');
       const wrap = document.getElementById('subsidy-bar-wrap');
       if (wrap) wrap.style.display = 'none';
       updateCardGlow();
@@ -1855,6 +1881,11 @@
         hideSpinner();
         return;
       }
+      // Set a fresh expiry immediately from current time (don't rely on server roundtrip lag)
+      cardExpireAt = Date.now() + 30000; // 30s for testing
+      localStorage.setItem('subsidi_cardExpireAt', String(cardExpireAt));
+      // Log locally so history shows it
+      saveLocalTxn({ type: 'renewal', data_plan: 'card_renewal', amount: result.amount || result.cost || 200, status: 'success' });
       // Fetch fresh data from Supabase after renewal
       await fetchUserData();
     } catch(e) {
@@ -2126,6 +2157,8 @@
         hideSpinner();
         return;
       }
+      // Log locally so history shows it even if server doesn't return it
+      saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
       await fetchUserData();
     } catch(e) {
       alert('Connection error: ' + e.message);
@@ -2199,11 +2232,26 @@
   async function showHistoryOv() {
     document.getElementById('hist-ov').classList.add('open');
     document.getElementById('hist-body').innerHTML = '<div class="hist-loader" id="hist-loader">Loading...</div>';
+    const localTxns = getLocalTxns();
     try {
       const data = await callEdge('get-transactions', { userId });
-      renderHistory(data && data.transactions ? data.transactions : []);
+      const serverTxns = (data && data.transactions) ? data.transactions : [];
+      // Merge: server is source of truth, but add local entries not already in server results
+      // We key on type+amount+approximate time (within 60s) to avoid duplicates
+      const merged = [...serverTxns];
+      localTxns.forEach(lt => {
+        const ltTime = new Date(lt.created_at).getTime();
+        const alreadyPresent = serverTxns.some(st => {
+          const stTime = new Date(st.created_at || st.inserted_at || 0).getTime();
+          return st.type === lt.type && Number(st.amount) === Number(lt.amount) && Math.abs(stTime - ltTime) < 60000;
+        });
+        if (!alreadyPresent) merged.push(lt);
+      });
+      // Sort newest first
+      merged.sort((a, b) => new Date(b.created_at || b.inserted_at || 0) - new Date(a.created_at || a.inserted_at || 0));
+      renderHistory(merged);
     } catch(e) {
-      renderHistory([]);
+      renderHistory(localTxns);
     }
   }
 

@@ -1544,16 +1544,20 @@
             return;
           }
 
+          // Log transaction locally so history always reflects it
+          saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
+
           // Always fetch authoritative state from Supabase after purchase
           await fetchUserData();
-          applySubsidyPurchase();
 
         } catch (e) {
           // Fallback: deduct locally
+          saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
           updateBalance(cur.price);
           applySubsidyPurchase();
         }
       } else {
+        saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
         updateBalance(cur.price);
         applySubsidyPurchase();
       }

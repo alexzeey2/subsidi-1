@@ -1091,7 +1091,7 @@
       if (data && !data.error) {
         balance = data.balance ?? balance;
         subsidyFund = data.subsidyFund ?? subsidyFund;
-        discountPurchasesLeft = Math.floor(subsidyFund / 140);
+        discountPurchasesLeft = data.discountPurchasesLeft ?? Math.floor(subsidyFund / 140);
         // Update balance display
         const whole = Math.floor(balance).toLocaleString();
         const dec = (balance % 1).toFixed(2).slice(1);
@@ -1146,7 +1146,12 @@
           registeredCard = data.cardCode || null;
           balance = data.balance ?? 300;
           subsidyFund = data.subsidyFund ?? 700;
-          discountPurchasesLeft = Math.floor(subsidyFund / 140);
+          discountPurchasesLeft = data.discountPurchasesLeft ?? Math.floor(subsidyFund / 140);
+          // Set cardActive based on renewalDate from server
+          if (data.renewalDate) {
+            const expiry = new Date(data.renewalDate).getTime() + 28 * 24 * 60 * 60 * 1000;
+            cardActive = Date.now() < expiry;
+          }
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
           const dec = (balance % 1).toFixed(2).slice(1);
@@ -1161,7 +1166,6 @@
       } finally {
         hideSpinner();
       }
-      cardActive = true;
       renderBundles();
       updateSubsidyUI();
       updateCardGlow();

@@ -1135,6 +1135,7 @@
     const savedUserId = localStorage.getItem('subsidi_userId');
     if (savedUserId) {
       userId = savedUserId;
+      alert('DEBUG userId: ' + savedUserId);
       show('dash');
       try {
         console.log('[load] userId:', userId, 'fetching from get-user...');

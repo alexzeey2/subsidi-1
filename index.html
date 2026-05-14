@@ -1885,7 +1885,7 @@
       cardExpireAt = Date.now() + 30000; // 30s for testing
       localStorage.setItem('subsidi_cardExpireAt', String(cardExpireAt));
       // Log locally so history shows it
-      saveLocalTxn({ type: 'renewal', data_plan: 'card_renewal', amount: result.amount || result.cost || 200, status: 'success' });
+      saveLocalTxn({ type: 'renewal', data_plan: 'card_renewal', amount: 180, status: 'success' });
       // Fetch fresh data from Supabase after renewal
       await fetchUserData();
     } catch(e) {

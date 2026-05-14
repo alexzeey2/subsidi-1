@@ -1547,8 +1547,25 @@
           // Log transaction locally so history always reflects it
           saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
 
-          // Always fetch authoritative state from Supabase after purchase
-          await fetchUserData();
+          // Use the values returned directly from buy-data (avoids a second round trip
+          // and the field-name mismatch in get-user)
+          if (typeof pData.newBalance === 'number') {
+            balance = pData.newBalance;
+            const whole = Math.floor(balance).toLocaleString();
+            const dec = (balance % 1).toFixed(2).slice(1);
+            document.getElementById('bal-display').innerHTML =
+              '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+          }
+          if (typeof pData.newSubsidyFund === 'number') {
+            subsidyFund = pData.newSubsidyFund;
+          }
+          if (typeof pData.discountPurchasesLeft === 'number') {
+            discountPurchasesLeft = pData.discountPurchasesLeft;
+          }
+          totalPurchases++;
+          if (cardActive) totalSaved += 120;
+          updateSubsidyUI();
+          renderBundles();
 
         } catch (e) {
           // Fallback: deduct locally

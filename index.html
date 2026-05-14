@@ -1089,16 +1089,16 @@
       showSpinner('Refreshing...');
       const data = await callEdge('get-user', { userId });
       if (data && !data.error) {
-        balance = data.balance ?? balance;
-        subsidyFund = data.subsidyFund ?? subsidyFund;
-        discountPurchasesLeft = data.discountPurchasesLeft ?? Math.floor(subsidyFund / 140);
-        // Update balance display
+        balance = data.balance ?? 0;
+        subsidyFund = data.subsidyFund ?? 0;
+        discountPurchasesLeft = data.discountPurchasesLeft ?? 0;
         const whole = Math.floor(balance).toLocaleString();
         const dec = (balance % 1).toFixed(2).slice(1);
         document.getElementById('bal-display').innerHTML =
           '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
         updateSubsidyUI();
         renderBundles();
+        startCardTimer(data.renewalDate || null);
       }
     } catch(e) {
       console.warn('fetchUserData failed:', e);
@@ -1137,40 +1137,34 @@
       userId = savedUserId;
       show('dash');
       try {
-        console.log('[load] userId:', userId, 'fetching from get-user...');
         showSpinner('Loading...');
         const data = await callEdge('get-user', { userId });
         if (data && !data.error) {
-          console.log('[load] got user data:', data);
           username = data.username || username;
           registeredCard = data.cardCode || null;
-          balance = data.balance ?? 300;
-          subsidyFund = data.subsidyFund ?? 700;
-          discountPurchasesLeft = data.discountPurchasesLeft ?? Math.floor(subsidyFund / 140);
-          // Set cardActive based on renewalDate from server
-          if (data.renewalDate) {
-            const expiry = new Date(data.renewalDate).getTime() + 28 * 24 * 60 * 60 * 1000;
-            cardActive = Date.now() < expiry;
-          }
+          balance = data.balance ?? 0;
+          subsidyFund = data.subsidyFund ?? 0;
+          discountPurchasesLeft = data.discountPurchasesLeft ?? 0;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
           const dec = (balance % 1).toFixed(2).slice(1);
           document.getElementById('bal-display').innerHTML =
             '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+          renderBundles();
+          updateSubsidyUI();
+          updateCardGlow();
+          startCardTimer(data.renewalDate || null);
+        } else {
+          renderBundles();
+          updateSubsidyUI();
         }
       } catch(e) {
         console.error('[load] get-user failed:', e);
-        balance = 300;
-        subsidyFund = 700;
-        discountPurchasesLeft = 5;
+        renderBundles();
+        updateSubsidyUI();
       } finally {
         hideSpinner();
       }
-      renderBundles();
-      updateSubsidyUI();
-      updateCardGlow();
-      // Always start a fresh timer on load for now (Supabase persistence comes later)
-      startCardTimer();
     } else {
       // No account — show dashboard in guest/preview mode
       isGuest = true;
@@ -1759,14 +1753,17 @@
   }
 
   // ── Card expiry ──
-  function startCardTimer(existingExpireAt) {
+  function startCardTimer(renewalDateISO) {
     if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
-    // Resume from saved expiry if provided, otherwise start fresh 28-day timer
-    if (existingExpireAt && existingExpireAt > Date.now()) {
-      cardExpireAt = existingExpireAt;
-    } else {
-      cardExpireAt = Date.now() + 30000; // 30s test
-      localStorage.setItem('subsidi_cardExpireAt', String(cardExpireAt));
+    if (renewalDateISO) {
+      cardExpireAt = new Date(renewalDateISO).getTime() + 28 * 24 * 60 * 60 * 1000;
+    }
+    if (!cardExpireAt || cardExpireAt <= Date.now()) {
+      cardActive = false;
+      updateCardGlow();
+      renderBundles();
+      if (cardExpireAt && cardExpireAt > 0) showExpiredModal();
+      return;
     }
     cardActive = true;
     renderBundles();
@@ -1775,13 +1772,11 @@
     updateCardGlow();
 
     const msLeft = cardExpireAt - Date.now();
-    // Cap at ~24.8 days (max setTimeout value ~2^31 ms)
     const safeMs = Math.min(msLeft, 2147483647);
     cardTimerTimeout = setTimeout(() => {
       cardTimerTimeout = null;
       cardActive = false;
       cardExpireAt = null;
-      localStorage.removeItem('subsidi_cardExpireAt');
       const wrap = document.getElementById('subsidy-bar-wrap');
       if (wrap) wrap.style.display = 'none';
       updateCardGlow();
@@ -1807,13 +1802,8 @@
       if (cardActiveCountdownInterval) clearInterval(cardActiveCountdownInterval);
       function tickCountdown() {
         if (!cardExpireAt) {
-          // Try to recover from localStorage
-          const saved = parseInt(localStorage.getItem('subsidi_cardExpireAt') || '0');
-          if (saved && saved > Date.now()) { cardExpireAt = saved; }
-          else {
-            document.getElementById('card-active-countdown').textContent = '--';
-            return;
-          }
+          document.getElementById('card-active-countdown').textContent = '--';
+          return;
         }
         const secsLeft = Math.max(0, Math.round((cardExpireAt - Date.now()) / 1000));
         const d = Math.floor(secsLeft / 86400);
@@ -1865,28 +1855,8 @@
         hideSpinner();
         return;
       }
-      // Use authoritative values from Supabase
-      balance = result.newBalance;
-      subsidyFund = result.newSubsidyFund;
-      discountPurchasesLeft = result.discountPurchasesLeft;
-      cardActive = true;
-      const wrap = document.getElementById('subsidy-bar-wrap');
-      if (wrap) wrap.style.display = '';
-      const badge = document.getElementById('card-badge');
-      if (badge) {
-        badge.innerHTML = '<span class="pip"></span>Card Active';
-        badge.style.background = 'var(--gbg)';
-        badge.style.borderColor = 'rgba(0,200,150,.18)';
-        badge.style.color = 'var(--green)';
-        badge.style.cursor = 'default';
-      }
-      const whole = Math.floor(balance).toLocaleString();
-      const dec = (balance % 1).toFixed(2).slice(1);
-      document.getElementById('bal-display').innerHTML =
-        '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-      updateCardGlow();
-      updateSubsidyUI();
-      startCardTimer();
+      // Fetch fresh data from Supabase after renewal
+      await fetchUserData();
     } catch(e) {
       alert('Connection error. Please try again.');
     } finally {
@@ -1981,7 +1951,6 @@
   function logOut() {
     if (!confirm('Log out? You\'ll need to scan your card again.')) return;
     localStorage.removeItem('subsidi_userId');
-    localStorage.removeItem('subsidi_cardExpireAt');
     // Reset all state
     userId = null; username = ''; balance = 300;
     subsidyFund = 700; discountPurchasesLeft = 5;

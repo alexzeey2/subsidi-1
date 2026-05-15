@@ -1118,6 +1118,33 @@
     }
   }
 
+  // Poll until CK confirms delivery, then refresh balance + subsidy
+  let _pollTimer = null;
+  function pollForDelivery(ref, amountPaid) {
+    let attempts = 0;
+    const MAX = 24; // 2 minutes max (24 x 5s)
+    _pollTimer = setInterval(async () => {
+      attempts++;
+      try {
+        const data = await callEdge('get-transactions', { userId });
+        const txn = (data.transactions || []).find(t => t.clubkonnect_ref === ref);
+        if (txn && txn.status === 'success') {
+          clearInterval(_pollTimer);
+          // Update success screen text
+          document.getElementById('sbody').textContent = document.getElementById('sbody').textContent.replace('is being delivered', 'has been delivered');
+          document.getElementById('samt').textContent = '₦' + amountPaid.toLocaleString() + ' deducted';
+          // Refresh balance and subsidy from server
+          await fetchUserData();
+        } else if (txn && txn.status === 'failed') {
+          clearInterval(_pollTimer);
+          document.getElementById('sbody').textContent = 'Delivery failed. Please contact support.';
+          document.getElementById('samt').textContent = 'You were not charged';
+        }
+      } catch(e) { /* silent */ }
+      if (attempts >= MAX) clearInterval(_pollTimer);
+    }, 5000);
+  }
+
   // ── Guest mode ──
   let isGuest = false;
 
@@ -1547,6 +1574,8 @@
 
           // Log locally as pending — balance + subsidy update via CK callback
           saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'pending' });
+          // Start polling — refresh UI the moment CK confirms delivery
+          pollForDelivery(pData.clubkonnect_ref, cur.price);
 
         } catch (e) {
           alert('Network error. Please check your connection and try again.');
@@ -2213,6 +2242,8 @@
   }
 
   function goHome() {
+    if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+    fetchUserData(); // always refresh balance when returning home
     show('dash');
   }
 

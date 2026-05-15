@@ -1536,7 +1536,8 @@
             planId: cur.planId,
             dataPlan: cur.size,
             amount: cur.price,
-            origPrice: cur.orig
+            origPrice: cur.orig,
+            cardActive: cardActive
           });
 
           if (pData.error) {
@@ -1544,43 +1545,20 @@
             return;
           }
 
-          // Log transaction locally so history always reflects it
-          saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
-
-          // Use the values returned directly from buy-data (avoids a second round trip
-          // and the field-name mismatch in get-user)
-          if (typeof pData.newBalance === 'number') {
-            balance = pData.newBalance;
-            const whole = Math.floor(balance).toLocaleString();
-            const dec = (balance % 1).toFixed(2).slice(1);
-            document.getElementById('bal-display').innerHTML =
-              '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-          }
-          if (typeof pData.newSubsidyFund === 'number') {
-            subsidyFund = pData.newSubsidyFund;
-          }
-          if (typeof pData.discountPurchasesLeft === 'number') {
-            discountPurchasesLeft = pData.discountPurchasesLeft;
-          }
-          totalPurchases++;
-          if (cardActive) totalSaved += 120;
-          updateSubsidyUI();
-          renderBundles();
+          // Log locally as pending — balance + subsidy update via CK callback
+          saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'pending' });
 
         } catch (e) {
-          // Fallback: deduct locally
-          saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
-          updateBalance(cur.price);
-          applySubsidyPurchase();
+          alert('Network error. Please check your connection and try again.');
+          return;
         }
       } else {
-        saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
-        updateBalance(cur.price);
-        applySubsidyPurchase();
+        return; // guests are gated before this point
       }
 
-      document.getElementById('sbody').textContent = cur.size + ' delivered to ' + ph2;
-      document.getElementById('samt').textContent = '₦' + cur.price.toLocaleString() + ' deducted';
+      // Pending message — balance only debits after ClubKonnect confirms delivery
+      document.getElementById('sbody').textContent = cur.size + ' is being delivered to ' + ph2;
+      document.getElementById('samt').textContent = '₦' + cur.price.toLocaleString() + ' will be deducted on delivery';
       show('success');
 
     } else {

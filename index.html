@@ -1252,15 +1252,28 @@
       ctx.drawImage(video, 0, 0);
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const code = jsQR(imageData.data, imageData.width, imageData.height);
-      if (code && code.data.length === 10 && /^\d{10}$/.test(code.data)) {
-        stopStream(regStream);
-        clearTimeout(regScanLoop);
-        registeredCard = code.data;
-        cardSecret = extractSecret(code.data);
-        playSuccessSound();
-        document.getElementById('reg-scan-status').textContent = '✓ Card scanned! Checking...';
-        checkCardExists(code.data);
-        return;
+      if (code && code.data) {
+        const raw = code.data.trim();
+        // Master QR (one QR printed on all physical cards)
+        if (raw === 'SUBSIDI_ACTIVATE_CARD_V1') {
+          stopStream(regStream);
+          clearTimeout(regScanLoop);
+          playSuccessSound();
+          document.getElementById('reg-scan-status').textContent = '✓ Card detected! Claiming your slot...';
+          claimNextCode();
+          return;
+        }
+        // Legacy: individual numeric code
+        if (raw.length === 10 && /^\d{10}$/.test(raw)) {
+          stopStream(regStream);
+          clearTimeout(regScanLoop);
+          registeredCard = raw;
+          cardSecret = extractSecret(raw);
+          playSuccessSound();
+          document.getElementById('reg-scan-status').textContent = '✓ Card scanned! Checking...';
+          checkCardExists(raw);
+          return;
+        }
       }
     }
     regScanLoop = setTimeout(scanRegFrame, 200);
@@ -1292,6 +1305,53 @@
       // Fallback to registration if check fails
       username = generateUsername(cardCode);
       goRegStep3();
+    }
+  }
+
+  // ── Claim next unclaimed code from Supabase (master QR flow) ──
+  async function claimNextCode() {
+    const statusEl = document.getElementById('reg-scan-status');
+    try {
+      // Fetch the next unclaimed code
+      const res = await fetch(SUPA_URL + '/rest/v1/cards?status=eq.unclaimed&order=created_at.asc&limit=1&select=id,raw_code', {
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Content-Type': 'application/json'
+        }
+      });
+      const rows = await res.json();
+      if (!rows || rows.length === 0) {
+        statusEl.textContent = '⚠️ No cards available. Contact support.';
+        setTimeout(() => {
+          statusEl.textContent = 'Scan your card';
+          startRegScan();
+        }, 3000);
+        return;
+      }
+      const { id, raw_code } = rows[0];
+      // Claim it — mark as claimed (user id assigned after registration)
+      await fetch(SUPA_URL + '/rest/v1/cards?id=eq.' + id, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ status: 'claimed', claimed_at: new Date().toISOString() })
+      });
+      // Use the raw_code as the card code going forward
+      registeredCard = raw_code;
+      cardSecret = typeof extractSecret === 'function' ? extractSecret(raw_code) : raw_code;
+      statusEl.textContent = '✓ Card claimed! Set your PIN.';
+      checkCardExists(raw_code);
+    } catch(e) {
+      statusEl.textContent = '⚠️ Connection error. Try again.';
+      setTimeout(() => {
+        statusEl.textContent = 'Scan your card';
+        startRegScan();
+      }, 3000);
     }
   }
 
@@ -1399,6 +1459,22 @@
       username = data.username;
       balance = 300;
       document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+
+      // Link the claimed card code to this userId in Supabase
+      if (userId && registeredCard) {
+        try {
+          await fetch(SUPA_URL + '/rest/v1/cards?raw_code=eq.' + registeredCard, {
+            method: 'PATCH',
+            headers: {
+              'apikey': SUPA_KEY,
+              'Authorization': 'Bearer ' + SUPA_KEY,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({ claimed_by: userId })
+          });
+        } catch(e) { console.warn('Could not link card to user:', e); }
+      }
 
     } catch (e) {
       // If edge function fails, still proceed (offline fallback)

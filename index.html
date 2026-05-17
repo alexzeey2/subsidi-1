@@ -389,6 +389,8 @@
 
 
 </style>
+  <script src="https://checkout.flutterwave.com/v3.js"></script>
+  <script src="https://checkout.flutterwave.com/v3.js"></script>
 </head>
 <body>
 
@@ -2259,22 +2261,52 @@
     if (!selectedDep) return;
     const amount = selectedDep;
     document.getElementById('dep-ov').classList.remove('open');
-    selectedDep = 0;
-    try {
-      showSpinner('Adding funds...');
-      const result = await callEdge('deposit', { userId, amount });
-      if (result && result.error) {
-        alert('Deposit failed: ' + result.error);
-        hideSpinner();
-        return;
+
+    FlutterwaveCheckout({
+      public_key: 'FLWPUBK-16380ee34e09a6311e9966c72a666010-X',
+      tx_ref: 'subsidi-' + userId + '-' + Date.now(),
+      amount: amount,
+      currency: 'NGN',
+      payment_options: 'card, banktransfer, ussd',
+      customer: {
+        email: (username || userId) + '@subsidi.app',
+        name: username || 'Subsidi User',
+      },
+      customizations: {
+        title: 'Subsidi Wallet',
+        description: 'Top up your Subsidi wallet',
+        logo: 'https://subsidi-1.vercel.app/icon-192.png',
+      },
+      callback: async function(response) {
+        if (response.status === 'successful' || response.status === 'completed') {
+          try {
+            showSpinner('Verifying payment...');
+            const result = await callEdge('flw-webhook', {
+              transaction_id: response.transaction_id,
+              tx_ref: response.tx_ref,
+              userId,
+              amount
+            });
+            if (result && result.error) {
+              alert('Payment verification failed: ' + result.error);
+              hideSpinner();
+              return;
+            }
+            saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
+            selectedDep = 0;
+            await fetchUserData();
+          } catch(e) {
+            alert('Connection error: ' + e.message);
+            hideSpinner();
+          }
+        } else {
+          alert('Payment was not successful. Please try again.');
+        }
+      },
+      onclose: function() {
+        selectedDep = 0;
       }
-      // Log locally so history shows it even if server doesn't return it
-      saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
-      await fetchUserData();
-    } catch(e) {
-      alert('Connection error: ' + e.message);
-      hideSpinner();
-    }
+    });
   }
 
   function closeDepOv(e) {

@@ -2181,7 +2181,6 @@
   async function confirmDep() {
     if (!selectedDep) return;
     const amount = selectedDep;
-    document.getElementById('dep-ov').classList.remove('open');
 
     if (typeof PaystackPop === 'undefined') {
       alert('Payment system failed to load. Please refresh and try again.');
@@ -2223,10 +2222,15 @@
         }
       },
       onClose: function() {
+        document.getElementById('dep-ov').classList.remove('open');
         selectedDep = 0;
       }
     });
-    handler.openIframe(); // falls back gracefully in PWA
+    try {
+      handler.openIframe();
+    } catch(e) {
+      alert('Paystack error: ' + e.message);
+    }
   }
 
   function closeDepOv(e) {

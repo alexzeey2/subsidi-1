@@ -2222,16 +2222,28 @@
     // Save pending deposit to localStorage so we can verify after redirect
     localStorage.setItem('pendingDeposit', JSON.stringify({ ref, userId, amount }));
 
-    const paystackUrl = 'https://checkout.paystack.com/' + 
-      '?key=pk_live_70d96b0510c7f254ecb5488355dabd0f03f53854' +
-      '&email=' + encodeURIComponent(email) +
-      '&amount=' + (amount * 100) +
-      '&currency=NGN' +
-      '&ref=' + ref +
-      '&channels[]=bank_transfer' +
-      '&callback_url=' + encodeURIComponent(window.location.href);
-
-    window.location.href = paystackUrl;
+    // Initialize via Paystack API then redirect
+    const initRes = await fetch('https://api.paystack.co/transaction/initialize', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer pk_live_70d96b0510c7f254ecb5488355dabd0f03f53854',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        amount: amount * 100,
+        currency: 'NGN',
+        reference: ref,
+        channels: ['bank_transfer'],
+        callback_url: window.location.href
+      })
+    });
+    const initData = await initRes.json();
+    if (initData.status && initData.data?.authorization_url) {
+      window.location.href = initData.data.authorization_url;
+    } else {
+      alert('Could not initialize payment. Please try again.');
+    }
   }
 
   function closeDepOv(e) {

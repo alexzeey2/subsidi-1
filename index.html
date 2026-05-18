@@ -2183,6 +2183,10 @@
     const amount = selectedDep;
     document.getElementById('dep-ov').classList.remove('open');
 
+    if (typeof PaystackPop === 'undefined') {
+      alert('Payment system failed to load. Please refresh and try again.');
+      return;
+    }
     const handler = PaystackPop.setup({
       key: 'pk_live_70d96b0510c7f254ecb5488355dabd0f03f53854',
       email: (username || userId) + '@subsidi.app',
@@ -2222,7 +2226,7 @@
         selectedDep = 0;
       }
     });
-    handler.openIframe();
+    handler.openIframe(); // falls back gracefully in PWA
   }
 
   function closeDepOv(e) {

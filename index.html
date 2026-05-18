@@ -120,6 +120,9 @@
   .net.sel .net-n{color:var(--w70)}
 
   .tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  .data-market-hdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;padding:0 2px}
+  .data-market-title{font-size:13px;font-weight:700;letter-spacing:.3px;color:var(--w)}
+  .data-market-count{font-size:11px;color:var(--w40);font-weight:500}
   .tabs::-webkit-scrollbar{display:none}
   .tab{flex-shrink:0;padding:9px 16px;border-radius:20px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;color:var(--w40);transition:all .18s;background:var(--dark-3);border:1px solid var(--border)}
   .tab.on{background:var(--p);border-color:var(--p);color:var(--w)}
@@ -551,21 +554,11 @@
   </div>
 
   <div class="sec">
-    <div class="tabs">
-      <div class="tab on"  onclick="swTab(this,'daily')">Daily</div>
-      <div class="tab" onclick="swTab(this,'weekly')">Weekly</div>
-      <div class="tab" onclick="swTab(this,'monthly')">Monthly</div>
+    <div class="data-market-hdr">
+      <span class="data-market-title">Data Market</span>
+      <span class="data-market-count" id="market-count"></span>
     </div>
-
-    <!-- DAILY -->
-    <div id="tab-daily" class="plantab"><div class="bundles" id="bundles-daily"></div></div>
-
-    <!-- WEEKLY -->
-    <div id="tab-weekly" class="plantab" style="display:none"><div class="bundles" id="bundles-weekly"></div></div>
-
-    <!-- MONTHLY -->
-    <div id="tab-monthly" class="plantab" style="display:none"><div class="bundles" id="bundles-monthly"></div></div>
-
+    <div class="bundles" id="bundles-all"></div>
   </div>
 
   <div class="sec" id="refblock" style="display:none">
@@ -1641,10 +1634,14 @@
       if (userId) {
         try {
           err.textContent = '';
+          // Datastation network IDs: 1=MTN, 2=Glo, 3=9Mobile, 4=Airtel
+          const dsNetworkMap = { 'MTN': '1', 'Glo': '2', '9mobile': '3', 'Airtel': '4' };
+          const dsNetwork = dsNetworkMap[cur.planNetwork || NET] || '1';
+
           const pData = await callEdge('buy-data', {
             userId,
             phoneNumber: ph2,
-            network: cur.planNetwork || NET,
+            network: dsNetwork,
             planId: cur.planId,
             dataPlan: cur.size,
             amount: cur.price,
@@ -1657,10 +1654,9 @@
             return;
           }
 
-          // Log locally as pending — balance + subsidy update via CK callback
-          saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'pending' });
-          // Start polling — refresh UI the moment CK confirms delivery
-          pollForDelivery(pData.clubkonnect_ref, cur.price);
+          // Log locally
+          saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
+          await fetchUserData();
 
         } catch (e) {
           alert('Network error. Please check your connection and try again.');
@@ -1700,149 +1696,80 @@
 
   // ── Network selector ──
 
-  // ── Plans data (CK cost + ₦10 = your price; subsidi = your price - ₦120) ──
+  // ── Plans data (Datastation — flat list per network) ──
   const PLANS = {
-    MTN: {
-      // Daily: Awoof Data plans — 1 to 2 day durations only
-      daily: [
-        { size:'230MB', val:'1 Day',  planId:'200.01',  ck:200  },
-        { size:'500MB', val:'1 Day',  planId:'350.01',  ck:350  },
-        { size:'1GB',   val:'1 Day',  planId:'500.01',  ck:500  },
-        { size:'2.5GB', val:'1 Day',  planId:'750.01',  ck:750  },
-        { size:'2.5GB', val:'2 Days', planId:'900.01',  ck:900  },
-        { size:'3.2GB', val:'2 Days', planId:'1000.01', ck:1000 },
-      ],
-      // Weekly: Direct Data — 7 day plans only
-      weekly: [
-        { size:'500MB', val:'7 Days', planId:'500.02',  ck:500  },
-        { size:'1GB',   val:'7 Days', planId:'800.01',  ck:800  },
-        { size:'1.5GB', val:'7 Days', planId:'1000.03', ck:1000 },
-        { size:'3.5GB', val:'7 Days', planId:'1500.03', ck:1500 },
-        { size:'6GB',   val:'7 Days', planId:'2500.01', ck:2500 },
-        { size:'11GB',  val:'7 Days', planId:'3500.01', ck:3500 },
-      ],
-      // Monthly: Direct Data — 30 day plans only
-      monthly: [
-        { size:'2GB',   val:'30 Days', planId:'1500.02', ck:1500 },
-        { size:'3.5GB', val:'30 Days', planId:'2500.02', ck:2500 },
-        { size:'7GB',   val:'30 Days', planId:'3500.02', ck:3500 },
-        { size:'10GB',  val:'30 Days', planId:'4500.01', ck:4500 },
-        { size:'12.5GB',val:'30 Days', planId:'5500.01', ck:5500 },
-        { size:'20GB',  val:'30 Days', planId:'7500.01', ck:7500 },
-      ]
-    },
-    Airtel: {
-      // Daily: Awoof Data — 1 to 2 day durations only
-      daily: [
-        { size:'1GB',   val:'1 Day',  planId:'499.91',  ck:500  },
-        { size:'1.5GB', val:'2 Days', planId:'599.91',  ck:600  },
-        { size:'2GB',   val:'2 Days', planId:'749.91',  ck:750  },
-        { size:'3GB',   val:'2 Days', planId:'999.91',  ck:1000 },
-        { size:'5GB',   val:'2 Days', planId:'1499.91', ck:1500 },
-        { size:'500MB', val:'7 Days', planId:'499.92',  ck:500  },
-      ],
-      // Weekly: Direct Data — 7 day plans only
-      weekly: [
-        { size:'500MB', val:'7 Days', planId:'499.92',  ck:500  },
-        { size:'1GB',   val:'7 Days', planId:'799.91',  ck:800  },
-        { size:'1.5GB', val:'7 Days', planId:'999.92',  ck:1000 },
-        { size:'3.5GB', val:'7 Days', planId:'1499.92', ck:1500 },
-        { size:'6GB',   val:'7 Days', planId:'2499.91', ck:2500 },
-        { size:'10GB',  val:'7 Days', planId:'2999.91', ck:3000 },
-      ],
-      // Monthly: Direct Data — 30 day plans only
-      monthly: [
-        { size:'2GB',  val:'30 Days', planId:'1499.93', ck:1500 },
-        { size:'3GB',  val:'30 Days', planId:'1999.91', ck:2000 },
-        { size:'4GB',  val:'30 Days', planId:'2499.92', ck:2500 },
-        { size:'8GB',  val:'30 Days', planId:'2999.92', ck:3000 },
-        { size:'10GB', val:'30 Days', planId:'3999.91', ck:4000 },
-        { size:'13GB', val:'30 Days', planId:'4999.92', ck:5000 },
-      ]
-    },
-    Glo: {
-      // Daily: Awoof Data (short duration) + SME 3-day plans
-      daily: [
-        { size:'260MB', val:'2 Days', planId:'200.01',  ck:200  },
-        { size:'2GB',   val:'1 Day',  planId:'500.02',  ck:500  },
-        { size:'1GB',   val:'3 Days', planId:'1000.11', ck:282  },
-        { size:'3GB',   val:'3 Days', planId:'3000.11', ck:846  },
-        { size:'5GB',   val:'3 Days', planId:'5000.11', ck:1410 },
-        { size:'1.5GB', val:'14 Days',planId:'500.01',  ck:500  },
-      ],
-      // Weekly: SME 7-day plans only
-      weekly: [
-        { size:'500MB', val:'7 Days', planId:'500',     ck:235  },
-        { size:'1GB',   val:'7 Days', planId:'1000.12', ck:329  },
-        { size:'3GB',   val:'7 Days', planId:'3000.12', ck:987  },
-        { size:'5GB',   val:'7 Days', planId:'5000.12', ck:1645 },
-        { size:'6GB',   val:'7 Days', planId:'1500.02', ck:1500 },
-        { size:'2.6GB', val:'30 Days',planId:'1000.01', ck:1000 },
-      ],
-      // Monthly: SME 30-day plans only
-      monthly: [
-        { size:'1GB',  val:'30 Days', planId:'1000',    ck:470  },
-        { size:'2GB',  val:'30 Days', planId:'2000',    ck:940  },
-        { size:'3GB',  val:'30 Days', planId:'3000',    ck:1410 },
-        { size:'5GB',  val:'30 Days', planId:'5000',    ck:2350 },
-        { size:'7.5GB',val:'30 Days', planId:'2500.01', ck:2500 },
-        { size:'10GB', val:'30 Days', planId:'10000',   ck:4700 },
-      ]
-    },
-    '9mobile': {
-      // Daily: Awoof Data — short duration plans only
-      daily: [
-        { size:'250MB', val:'1 Day',  planId:'200.01',  ck:200  },
-        { size:'450MB', val:'1 Day',  planId:'350.01',  ck:350  },
-        { size:'650MB', val:'3 Days', planId:'500.01',  ck:500  },
-        { size:'650MB', val:'14 Days',planId:'600.01',  ck:600  },
-        { size:'1.75GB',val:'7 Days', planId:'1500.01', ck:1500 },
-        { size:'1.1GB', val:'30 Days',planId:'1000.01', ck:1000 },
-      ],
-      // Weekly: 1 true 7-day plan + SME 30-day value plans
-      weekly: [
-        { size:'1.75GB',val:'7 Days', planId:'1500.01', ck:1500 },
-        { size:'1GB',   val:'30 Days',planId:'1000',    ck:450  },
-        { size:'2GB',   val:'30 Days',planId:'2000',    ck:900  },
-        { size:'3GB',   val:'30 Days',planId:'3000',    ck:1350 },
-        { size:'4GB',   val:'30 Days',planId:'4000',    ck:1800 },
-        { size:'5GB',   val:'30 Days',planId:'5000',    ck:2250 },
-      ],
-      // Monthly: Direct Data — 30 day plans only
-      monthly: [
-        { size:'1.1GB', val:'30 Days', planId:'1000.01', ck:1000 },
-        { size:'1.4GB', val:'30 Days', planId:'1200.01', ck:1200 },
-        { size:'2.44GB',val:'30 Days', planId:'2000.01', ck:2000 },
-        { size:'3.91GB',val:'30 Days', planId:'3000.01', ck:3000 },
-        { size:'5.1GB', val:'30 Days', planId:'4000.01', ck:4000 },
-        { size:'6.5GB', val:'30 Days', planId:'5000.01', ck:5000 },
-      ]
-    }
+    MTN: [
+      { size:'230MB', val:'1 Day',   planId:'432', ck:200  },
+      { size:'1GB',   val:'1 Day',   planId:'419', ck:250  },
+      { size:'2.5GB', val:'1 Day',   planId:'420', ck:560  },
+      { size:'2GB',   val:'2 Days',  planId:'328', ck:735  },
+      { size:'2.5GB', val:'2 Days',  planId:'329', ck:882  },
+      { size:'3.2GB', val:'2 Days',  planId:'218', ck:990  },
+      { size:'500MB', val:'7 Days',  planId:'350', ck:490  },
+      { size:'1GB',   val:'7 Days',  planId:'409', ck:560  },
+      { size:'1.2GB', val:'7 Days',  planId:'321', ck:735  },
+      { size:'1GB',   val:'7 Days',  planId:'340', ck:785  },
+      { size:'1.5GB', val:'7 Days',  planId:'360', ck:980  },
+      { size:'3.5GB', val:'7 Days',  planId:'407', ck:1485 },
+      { size:'500MB', val:'5 Days',  planId:'416', ck:400  },
+      { size:'1GB',   val:'30 Days', planId:'417', ck:610  },
+      { size:'2GB',   val:'30 Days', planId:'403', ck:1120 },
+      { size:'2GB',   val:'30 Days', planId:'335', ck:1470 },
+    ],
+    Airtel: [
+      { size:'300MB', val:'2 Days',  planId:'405', ck:145  },
+      { size:'600MB', val:'2 Days',  planId:'404', ck:245  },
+      { size:'1.5GB', val:'1 Day',   planId:'382', ck:545  },
+      { size:'500MB', val:'7 Days',  planId:'375', ck:545  },
+      { size:'1.5GB', val:'2 Days',  planId:'387', ck:645  },
+      { size:'2GB',   val:'2 Days',  planId:'383', ck:645  },
+      { size:'3GB',   val:'2 Days',  planId:'431', ck:800  },
+      { size:'1GB',   val:'7 Days',  planId:'428', ck:850  },
+      { size:'1.5GB', val:'7 Days',  planId:'425', ck:1045 },
+    ],
+    Glo: [
+      { size:'750MB', val:'1 Day',   planId:'275', ck:190  },
+      { size:'500MB', val:'14 Days', planId:'203', ck:212  },
+      { size:'1GB',   val:'3 Days',  planId:'396', ck:255  },
+      { size:'1.5GB', val:'1 Day',   planId:'276', ck:297  },
+      { size:'1GB',   val:'7 Days',  planId:'399', ck:297  },
+      { size:'2.5GB', val:'2 Days',  planId:'277', ck:480  },
+      { size:'3GB',   val:'3 Days',  planId:'397', ck:765  },
+      { size:'3GB',   val:'7 Days',  planId:'400', ck:892  },
+      { size:'5GB',   val:'3 Days',  planId:'398', ck:1275 },
+      { size:'5GB',   val:'7 Days',  planId:'401', ck:1487 },
+    ],
+    '9mobile': [
+      { size:'500MB', val:'30 Days', planId:'221', ck:240  },
+      { size:'1GB',   val:'30 Days', planId:'183', ck:480  },
+      { size:'1.5GB', val:'30 Days', planId:'184', ck:720  },
+      { size:'2GB',   val:'30 Days', planId:'185', ck:960  },
+      { size:'3GB',   val:'30 Days', planId:'186', ck:1440 },
+    ],
   };
 
   function fmt(n) { return '₦' + Math.round(n).toLocaleString(); }
 
   function renderBundles() {
-    console.log('[render] cardActive:', cardActive, 'discountPurchasesLeft:', discountPurchasesLeft);
-    ['daily','weekly','monthly'].forEach(tab => {
-      const plans = PLANS[NET] && PLANS[NET][tab] ? PLANS[NET][tab] : [];
-      const container = document.getElementById('bundles-' + tab);
-      if (!container) return;
-      container.innerHTML = plans.map(p => {
-        const yours = p.ck + 10;        // market price
-        const subsidi = yours - 120;   // subsidised price (₦120 discount)
-        const hasDiscount = cardActive && discountPurchasesLeft > 0;
-        const displayPrice = hasDiscount ? subsidi : yours;
-        const strikePrice = hasDiscount ? yours : '';
-        return `<div class="bundle" onclick="openSheet('${p.size}','${p.val}',${hasDiscount ? subsidi : yours},${yours},'${p.planId}','${NET}')">
-          <div class="b-val">${p.val}</div>
-          <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
-          <div class="b-orig">${strikePrice ? fmt(strikePrice) : ''}</div>
-          <div class="b-price">${fmt(displayPrice)}</div>
-          <div class="b-btn">${hasDiscount ? 'Best Price' : 'Market Price'}</div>
-        </div>`;
-      }).join('');
-    });
+    const plans = PLANS[NET] || [];
+    const container = document.getElementById('bundles-all');
+    if (!container) return;
+    const count = document.getElementById('market-count');
+    if (count) count.textContent = plans.length + ' plans';
+    container.innerHTML = plans.map(p => {
+      const yours = p.ck + 10;
+      const subsidi = yours - 120;
+      const hasDiscount = cardActive && discountPurchasesLeft > 0;
+      const displayPrice = hasDiscount ? subsidi : yours;
+      const strikePrice = hasDiscount ? yours : '';
+      return `<div class="bundle" onclick="openSheet('${p.size}','${p.val}',${hasDiscount ? subsidi : yours},${yours},'${p.planId}','${NET}')">
+        <div class="b-val">${p.val}</div>
+        <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
+        <div class="b-orig">${strikePrice ? fmt(strikePrice) : ''}</div>
+        <div class="b-price">${fmt(displayPrice)}</div>
+        <div class="b-btn">${hasDiscount ? 'Best Price' : 'Market Price'}</div>
+      </div>`;
+    }).join('');
   }
 
   function selNet(el, n) {
@@ -1852,12 +1779,7 @@
   }
 
   // ── Tab switcher ──
-  function swTab(el, t) {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
-    el.classList.add('on');
-    document.querySelectorAll('.plantab').forEach(p => p.style.display = 'none');
-    document.getElementById('tab-' + t).style.display = 'block';
-  }
+
 
 
 

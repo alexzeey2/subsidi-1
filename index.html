@@ -393,7 +393,6 @@
 
 </style>
   <script src="https://checkout.flutterwave.com/v3.js"></script>
-  <script src="https://checkout.flutterwave.com/v3.js"></script>
 </head>
 <body>
 
@@ -2185,11 +2184,11 @@
     document.getElementById('dep-ov').classList.remove('open');
 
     FlutterwaveCheckout({
-      public_key: 'FLWPUBK-16380ee34e09a6311e9966c72a666010-X',
+      public_key: 'FLWPUBK-3585effc46b87a21f4b14c44adf5faa4-X',
       tx_ref: 'subsidi-' + userId + '-' + Date.now(),
       amount: amount,
       currency: 'NGN',
-      payment_options: 'card, banktransfer, ussd',
+      payment_options: 'banktransfer',
       customer: {
         email: (username || userId) + '@subsidi.app',
         name: username || 'Subsidi User',

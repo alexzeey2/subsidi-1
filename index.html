@@ -392,7 +392,7 @@
 
 
 </style>
-  <script src="https://checkout.flutterwave.com/v3.js"></script>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
 <body>
 
@@ -2183,51 +2183,46 @@
     const amount = selectedDep;
     document.getElementById('dep-ov').classList.remove('open');
 
-    FlutterwaveCheckout({
-      public_key: 'FLWPUBK-3585effc46b87a21f4b14c44adf5faa4-X',
-      tx_ref: 'subsidi-' + userId + '-' + Date.now(),
-      amount: amount,
+    const handler = PaystackPop.setup({
+      key: 'pk_live_70d96b0510c7f254ecb5488355dabd0f03f53854',
+      email: (username || userId) + '@subsidi.app',
+      amount: amount * 100, // Paystack uses kobo
       currency: 'NGN',
-      payment_options: 'banktransfer',
-      customer: {
-        email: (username || userId) + '@subsidi.app',
-        name: username || 'Subsidi User',
-      },
-      customizations: {
-        title: 'Subsidi Wallet',
-        description: 'Top up your Subsidi wallet',
-        logo: 'https://subsidi-1.vercel.app/icon-192.png',
+      ref: 'subsidi-' + userId + '-' + Date.now(),
+      label: username || 'Subsidi User',
+      channels: ['bank_transfer'],
+      metadata: {
+        custom_fields: [
+          { display_name: 'App', variable_name: 'app', value: 'Subsidi Wallet' }
+        ]
       },
       callback: async function(response) {
-        if (response.status === 'successful' || response.status === 'completed') {
-          try {
-            showSpinner('Verifying payment...');
-            const result = await callEdge('flw-webhook', {
-              transaction_id: response.transaction_id,
-              tx_ref: response.tx_ref,
-              userId,
-              amount
-            });
-            if (result && result.error) {
-              alert('Payment verification failed: ' + result.error);
-              hideSpinner();
-              return;
-            }
-            saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
-            selectedDep = 0;
-            await fetchUserData();
-          } catch(e) {
-            alert('Connection error: ' + e.message);
+        try {
+          showSpinner('Verifying payment...');
+          const result = await callEdge('deposit', {
+            reference: response.reference,
+            userId,
+            amount
+          });
+          if (result && result.error) {
+            alert('Payment verification failed: ' + result.error);
             hideSpinner();
+            return;
           }
-        } else {
-          alert('Payment was not successful. Please try again.');
+          saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
+          selectedDep = 0;
+          await fetchUserData();
+          hideSpinner();
+        } catch(e) {
+          alert('Connection error: ' + e.message);
+          hideSpinner();
         }
       },
-      onclose: function() {
+      onClose: function() {
         selectedDep = 0;
       }
     });
+    handler.openIframe();
   }
 
   function closeDepOv(e) {

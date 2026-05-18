@@ -1215,6 +1215,39 @@
       updateSubsidyUI();
       show('dash');
     }
+
+    // Check if returning from Paystack redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    const paystackRef = urlParams.get('reference') || urlParams.get('trxref');
+    const pending = localStorage.getItem('pendingDeposit');
+
+    if (paystackRef && pending) {
+      try {
+        const { ref, userId: pendingUserId, amount } = JSON.parse(pending);
+        if (paystackRef === ref) {
+          localStorage.removeItem('pendingDeposit');
+          showSpinner('Verifying payment...');
+          const result = await callEdge('deposit', {
+            reference: paystackRef,
+            userId: pendingUserId,
+            amount
+          });
+          hideSpinner();
+          if (result && result.success) {
+            saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
+            await fetchUserData();
+            alert('₦' + amount.toLocaleString() + ' added to your wallet!');
+          } else {
+            alert('Payment verification failed. Contact support with ref: ' + paystackRef);
+          }
+          // Clean URL
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      } catch(e) {
+        hideSpinner();
+        console.error('Deposit verify error:', e);
+      }
+    }
   });
 
   async function startRegScan() {
@@ -2182,55 +2215,23 @@
     if (!selectedDep) return;
     const amount = selectedDep;
 
-    if (typeof PaystackPop === 'undefined') {
-      alert('Payment system failed to load. Please refresh and try again.');
-      return;
-    }
-    const handler = PaystackPop.setup({
-      key: 'pk_live_70d96b0510c7f254ecb5488355dabd0f03f53854',
-      email: (username || userId) + '@subsidi.app',
-      amount: amount * 100, // Paystack uses kobo
-      currency: 'NGN',
-      ref: 'subsidi-' + userId + '-' + Date.now(),
-      label: username || 'Subsidi User',
-      channels: ['bank_transfer'],
-      metadata: {
-        custom_fields: [
-          { display_name: 'App', variable_name: 'app', value: 'Subsidi Wallet' }
-        ]
-      },
-      callback: async function(response) {
-        try {
-          showSpinner('Verifying payment...');
-          const result = await callEdge('deposit', {
-            reference: response.reference,
-            userId,
-            amount
-          });
-          if (result && result.error) {
-            alert('Payment verification failed: ' + result.error);
-            hideSpinner();
-            return;
-          }
-          saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
-          selectedDep = 0;
-          await fetchUserData();
-          hideSpinner();
-        } catch(e) {
-          alert('Connection error: ' + e.message);
-          hideSpinner();
-        }
-      },
-      onClose: function() {
-        document.getElementById('dep-ov').classList.remove('open');
-        selectedDep = 0;
-      }
-    });
-    try {
-      handler.openIframe();
-    } catch(e) {
-      alert('Paystack error: ' + e.message);
-    }
+    // Use Paystack redirect — more reliable on mobile
+    const ref = 'subsidi-' + userId + '-' + Date.now();
+    const email = (username || userId) + '@subsidi.app';
+    
+    // Save pending deposit to localStorage so we can verify after redirect
+    localStorage.setItem('pendingDeposit', JSON.stringify({ ref, userId, amount }));
+
+    const paystackUrl = 'https://checkout.paystack.com/' + 
+      '?key=pk_live_70d96b0510c7f254ecb5488355dabd0f03f53854' +
+      '&email=' + encodeURIComponent(email) +
+      '&amount=' + (amount * 100) +
+      '&currency=NGN' +
+      '&ref=' + ref +
+      '&channels[]=bank_transfer' +
+      '&callback_url=' + encodeURIComponent(window.location.href);
+
+    window.location.href = paystackUrl;
   }
 
   function closeDepOv(e) {

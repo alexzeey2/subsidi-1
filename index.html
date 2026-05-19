@@ -1953,6 +1953,26 @@
       localStorage.setItem('subsidi_cardExpireAt', String(cardExpireAt));
       // Log locally so history shows it
       saveLocalTxn({ type: 'renewal', data_plan: 'card_renewal', amount: 180, status: 'success' });
+      // Log renewal to Supabase transactions table
+      try {
+        await fetch(SUPA_URL + '/rest/v1/transactions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPA_KEY,
+            'Authorization': 'Bearer ' + SUPA_KEY,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            type: 'renewal',
+            data_plan: 'card_renewal',
+            amount: 180,
+            status: 'success',
+            card_active: true
+          })
+        });
+      } catch(e) { console.warn('Failed to log renewal to Supabase:', e); }
       // Fetch fresh data from Supabase after renewal
       await fetchUserData();
     } catch(e) {

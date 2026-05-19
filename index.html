@@ -1581,8 +1581,8 @@
           const userData = await callEdge('get-user', { userId });
           if (userData && !userData.error) {
             balance = userData.balance ?? 300;
-            subsidyFund = userData.subsidyFund ?? 700;
-            discountPurchasesLeft = Math.floor(subsidyFund / 140);
+            subsidyFund = userData.subsidyFund ?? subsidyFund;
+            discountPurchasesLeft = userData.discountPurchasesLeft ?? Math.floor(subsidyFund / 120);
             username = userData.username || username;
             document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();
@@ -1942,7 +1942,7 @@
     document.getElementById('expired-ov').classList.remove('open');
     try {
       showSpinner('Renewing card...');
-      const result = await callEdge('Renew-Card', { userId, subsidyFund, discountPurchasesLeft });
+      const result = await callEdge('Renew-Card', { userId });
       if (!result || result.error) {
         alert(result?.error || 'Renewal failed. Please try again.');
         hideSpinner();
@@ -2263,7 +2263,7 @@
 
   // ── Subsidy UI ──
   function updateSubsidyUI() {
-    discountPurchasesLeft = Math.floor(subsidyFund / 140);
+    discountPurchasesLeft = Math.floor(subsidyFund / 120);
     const pct = Math.min(100, (subsidyFund / 700) * 100);
     const fill = document.getElementById('subsidy-bar-fill');
     const text = document.getElementById('subsidy-bar-text');

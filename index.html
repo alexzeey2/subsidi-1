@@ -525,7 +525,7 @@
 
     <div class="reg-step" id="reg-step-4">
       <div class="reg-title">Welcome back</div>
-      <div class="reg-sub">This card is already registered. Enter your PIN to continue.</div>
+      <div class="reg-sub" id="login-step-sub">Enter your PIN to continue.</div>
       <div class="reg-pin-lbl" id="login-pin-lbl">Enter PIN</div>
       <div class="reg-dots" id="login-pin-dots">
         <div class="dot" id="lpd0"></div>
@@ -1550,6 +1550,11 @@
     document.getElementById('reg-step-2').classList.remove('active');
     document.getElementById('reg-step-choice').classList.remove('active');
     document.getElementById('reg-step-4').classList.add('active');
+    // Subtitle differs: master QR has no card identity, individual card confirms registration
+    const sub = document.getElementById('login-step-sub');
+    if (sub) sub.textContent = userId
+      ? 'Account found. Enter your PIN to continue.'
+      : 'Enter your PIN to access your account.';
     updateLoginPinDots('');
   }
 

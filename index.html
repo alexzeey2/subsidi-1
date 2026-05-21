@@ -1386,13 +1386,20 @@
           // Not a URL — use raw value as-is
         }
 
-        // Master QR (one QR printed on all physical cards)
+        // Master QR (one QR used as the universal gateway)
         if (payload === 'SUBSIDI_ACTIVATE_CARD_V1' || raw === 'https://subsidi-1.vercel.app/' || raw === 'https://subsidi-1.vercel.app') {
           stopStream(regStream);
           clearTimeout(regScanLoop);
           playSuccessSound();
-          document.getElementById('reg-scan-status').textContent = '✓ Card detected! Verifying...';
-          claimNextCode();
+          if (scanIntent === 'login') {
+            // My Account: no card to claim — just go to PIN entry
+            document.getElementById('reg-scan-status').textContent = '✓ QR scanned! Enter your PIN.';
+            goLoginStep();
+          } else {
+            // New Account: claim next available code
+            document.getElementById('reg-scan-status').textContent = '✓ QR scanned! Checking availability...';
+            claimNextCode();
+          }
           return;
         }
         // Individual numeric code (plain or URL-embedded)
@@ -1523,7 +1530,7 @@
 
   function chooseNewAccount() {
     scanIntent = 'new';
-    document.getElementById('scan-title').textContent = 'Scan your new card';
+    document.getElementById('scan-title').textContent = 'Scan the QR code';
     document.getElementById('reg-step-choice').classList.remove('active');
     document.getElementById('reg-step-2').classList.add('active');
     startRegScan();
@@ -1531,7 +1538,8 @@
 
   function chooseMyAccount() {
     scanIntent = 'login';
-    document.getElementById('scan-title').textContent = 'Scan your card';
+    userId = null; // will be resolved after PIN entry via login-by-pin
+    document.getElementById('scan-title').textContent = 'Scan the QR code';
     document.getElementById('reg-step-choice').classList.remove('active');
     document.getElementById('reg-step-2').classList.add('active');
     startRegScan();
@@ -1733,10 +1741,23 @@
     try {
       err.textContent = 'Verifying...';
       err.classList.add('show');
-      const vData = await callEdge('verify-pin', { userId, pin: loginPinEntry });
+
+      let vData;
+      if (userId) {
+        // Individual card scan — verify PIN against known user
+        vData = await callEdge('verify-pin', { userId, pin: loginPinEntry });
+      } else {
+        // Master QR login — find user by PIN alone
+        vData = await callEdge('login-by-pin', { pin: loginPinEntry });
+        if (vData && vData.valid && vData.userId) {
+          userId = vData.userId;
+          username = vData.username || '';
+        }
+      }
+
       err.classList.remove('show');
 
-      if (vData.valid) {
+      if (vData && vData.valid) {
         userPin = loginPinEntry;
         isGuest = false;
         localStorage.setItem('subsidi_userId', userId);

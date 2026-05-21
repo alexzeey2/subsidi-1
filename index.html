@@ -1391,7 +1391,7 @@
           stopStream(regStream);
           clearTimeout(regScanLoop);
           playSuccessSound();
-          document.getElementById('reg-scan-status').textContent = '✓ Card detected! Claiming your slot...';
+          document.getElementById('reg-scan-status').textContent = '✓ Card detected! Verifying...';
           claimNextCode();
           return;
         }
@@ -1475,7 +1475,7 @@
       });
       const rows = await res.json();
       if (!rows || rows.length === 0) {
-        statusEl.textContent = '⚠️ No cards available. Contact support.';
+        statusEl.textContent = '⚠️ Your card has not been registered. Please contact support.';
         setTimeout(() => {
           statusEl.textContent = 'Scan your card';
           startRegScan();

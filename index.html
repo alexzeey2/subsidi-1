@@ -1373,8 +1373,21 @@
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       if (code && code.data) {
         const raw = code.data.trim();
+
+        // Extract the meaningful payload — works whether QR contains a plain
+        // string or a full URL (e.g. https://subsidi.app/activate/SUBSIDI_ACTIVATE_CARD_V1)
+        let payload = raw;
+        try {
+          const url = new URL(raw);
+          // Grab the last non-empty path segment as the payload
+          const parts = url.pathname.split('/').filter(Boolean);
+          if (parts.length > 0) payload = parts[parts.length - 1];
+        } catch (_) {
+          // Not a URL — use raw value as-is
+        }
+
         // Master QR (one QR printed on all physical cards)
-        if (raw === 'SUBSIDI_ACTIVATE_CARD_V1') {
+        if (payload === 'SUBSIDI_ACTIVATE_CARD_V1' || raw === 'https://subsidi-1.vercel.app/' || raw === 'https://subsidi-1.vercel.app') {
           stopStream(regStream);
           clearTimeout(regScanLoop);
           playSuccessSound();
@@ -1382,16 +1395,16 @@
           claimNextCode();
           return;
         }
-        // Legacy: individual numeric code
-        if (raw.length === 10 && /^\d{10}$/.test(raw)) {
+        // Individual numeric code (plain or URL-embedded)
+        if (payload.length === 10 && /^\d{10}$/.test(payload)) {
           stopStream(regStream);
           clearTimeout(regScanLoop);
-          registeredCard = raw;
-          cardSecret = extractSecret(raw);
+          registeredCard = payload;
+          cardSecret = extractSecret(payload);
           playSuccessSound();
           document.getElementById('reg-scan-status').textContent = '✓ Card scanned! Verifying...';
-          pendingCardCode = raw;
-          checkCardExists(raw, scanIntent);
+          pendingCardCode = payload;
+          checkCardExists(payload, scanIntent);
           return;
         }
       }

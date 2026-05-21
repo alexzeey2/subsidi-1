@@ -391,6 +391,60 @@
 
 
 
+
+  /* ── SUB TOKEN SYSTEM ── */
+  :root { --sub:#F5A623; --sub-glow:rgba(245,166,35,0.2); --sub-bg:rgba(245,166,35,0.08); --sub-border:rgba(245,166,35,0.15); }
+
+  /* Subtle star dot on plan card */
+  .b-sub-dot {
+    position:absolute; top:8px; right:8px;
+    width:6px; height:6px; border-radius:50%;
+    background:var(--sub);
+    opacity:0.7;
+  }
+
+  /* Subsidy bar — minimal */
+  .subsidy-bar-wrap { margin:16px 0 0; padding-bottom:4px; }
+  .sub-bar-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:6px;
+  }
+  .sub-bar-label {
+    font-size:10px; font-weight:600; color:rgba(255,255,255,0.35);
+    letter-spacing:.5px;
+  }
+  .sub-bar-amount {
+    font-size:12px; font-weight:700; color:var(--sub);
+    letter-spacing:-.2px;
+  }
+  .subsidy-bar-track {
+    position:relative; height:6px; border-radius:6px;
+    background:rgba(255,255,255,0.06);
+    overflow:hidden;
+  }
+  .subsidy-bar-fill {
+    position:absolute; top:0; left:0; height:100%;
+    background:linear-gradient(90deg,#b87010,#F5A623);
+    border-radius:6px;
+    transition:width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+  .subsidy-water {
+    position:absolute; inset:0;
+    background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.15) 50%,transparent 100%);
+    animation:waterflow 2s linear infinite;
+    border-radius:6px;
+  }
+  .subsidy-bar-text { display:none; }
+
+  /* Buy sheet Sub row — subtle, revealed after tap */
+  .sheet-sub-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 2px; margin:2px 0 10px;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+  }
+  .sheet-sub-cost { display:flex; align-items:center; gap:5px; font-size:12px; color:rgba(245,166,35,0.8); }
+  .sheet-sub-earn { display:flex; align-items:center; gap:5px; font-size:12px; color:rgba(255,255,255,0.3); }
+
 </style>
   <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
@@ -506,6 +560,10 @@
     <div class="bal-amt" id="bal-display"><span class="bal-cur">₦</span>300<span class="bal-dec">.00</span></div>
     <!-- Subsidy bar -->
     <div class="subsidy-bar-wrap" id="subsidy-bar-wrap">
+      <div class="sub-bar-header">
+        <div class="sub-bar-label">Sub balance</div>
+        <div class="sub-bar-amount" id="sub-bar-amount">5.00 SUB</div>
+      </div>
       <div class="subsidy-bar-track">
         <div class="subsidy-bar-fill" id="subsidy-bar-fill"></div>
         <div class="subsidy-bar-text" id="subsidy-bar-text">5 discount purchases left</div>
@@ -694,6 +752,10 @@
       <input type="tel" placeholder="080xxxxxxxx" id="phinput" maxlength="11">
     </div>
     <div class="drow"><span class="dk">You pay</span><span class="dv ac" id="dprice">₦285</span></div>
+    <div class="sheet-sub-row" id="sheet-sub-row">
+      <div class="sheet-sub-cost"><span id="sheet-sub-cost">−1 SUB</span></div>
+      <div class="sheet-sub-earn"><span id="sheet-sub-earn">+0.125 SUB back</span></div>
+    </div>
     <button class="cbtn" onclick="confirmBuy()">Confirm Purchase</button>
   </div>
 </div>
@@ -1017,7 +1079,7 @@
   let cardSecret = null;
   let userPin = null;
   let username = '';
-  let subsidyFund = 700;
+  let subsidyFund = 600;
   let discountPurchasesLeft = 5;
   let renewDays = 28;
 
@@ -1533,10 +1595,22 @@
   function openSheet(size, val, price, orig, planId, planNetwork) {
     if (gateCheck('Buy data at subsidy prices', 'Create a free account to purchase ' + size + ' for ₦' + price + ' — cheaper than anywhere else.')) return;
     const actualPrice = cardActive ? price : orig;
-    cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET };
+    const subCost = cardActive ? '1 SUB' : '—';
+    const subEarnSheet = (actualPrice * 0.03 / 120).toFixed(3);
+    cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET, subCost, subEarnSheet };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
     document.getElementById('shsub').textContent = (planNetwork || NET) + ' · ' + val;
     document.getElementById('dprice').textContent = '₦' + actualPrice.toLocaleString();
+    const subCostEl = document.getElementById('sheet-sub-cost');
+    const subEarnEl = document.getElementById('sheet-sub-earn');
+    const subRowEl = document.getElementById('sheet-sub-row');
+    if (cardActive && discountPurchasesLeft >= 1) {
+      if (subCostEl) subCostEl.textContent = '-1 SUB';
+      if (subEarnEl) subEarnEl.textContent = '+' + subEarnSheet + ' SUB earned';
+      if (subRowEl) subRowEl.style.display = '';
+    } else {
+      if (subRowEl) subRowEl.style.display = 'none';
+    }
     document.getElementById('phinput').value = '';
     document.getElementById('ov').classList.add('open');
   }
@@ -1794,7 +1868,8 @@
       const hasDiscount = cardActive && discountPurchasesLeft > 0;
       const displayPrice = hasDiscount ? subsidi : yours;
       const strikePrice = hasDiscount ? yours : '';
-      return `<div class="bundle" onclick="openSheet('${p.size}','${p.val}',${hasDiscount ? subsidi : yours},${yours},'${p.planId}','${NET}')">
+      return `<div class="bundle" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${hasDiscount ? subsidi : yours},${yours},'${p.planId}','${NET}')">
+        ${hasDiscount ? '<div class="b-sub-dot"></div>' : ''}
         <div class="b-val">${p.val}</div>
         <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
         <div class="b-orig">${strikePrice ? fmt(strikePrice) : ''}</div>
@@ -2283,13 +2358,16 @@
 
   // ── Subsidy UI ──
   function updateSubsidyUI() {
-    discountPurchasesLeft = Math.floor(subsidyFund / 120);
+    discountPurchasesLeft = subsidyFund / 120; // keep as decimal now
     const pct = Math.min(100, (subsidyFund / 700) * 100);
     const fill = document.getElementById('subsidy-bar-fill');
     const text = document.getElementById('subsidy-bar-text');
     const wrap = document.getElementById('subsidy-bar-wrap');
+    const amountEl = document.getElementById('sub-bar-amount');
+    const subTokens = discountPurchasesLeft.toFixed(2);
     if (fill) fill.style.width = pct + '%';
-    if (text) text.textContent = discountPurchasesLeft + ' discount purchase' + (discountPurchasesLeft !== 1 ? 's' : '') + ' left';
+    if (text) text.textContent = subTokens + ' SUB';
+    if (amountEl) amountEl.textContent = subTokens + ' SUB';
     if (wrap) wrap.style.display = cardActive ? '' : 'none';
     updateCardGlow();
     renderBundles();

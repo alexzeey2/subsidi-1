@@ -2006,7 +2006,7 @@
     if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
     if (renewalDateISO) {
       // Compute fresh expiry: renewalDate + 30s, but only if this is a newer renewal
-      const newExpiry = new Date(renewalDateISO).getTime() + 30000; // 30s for testing
+      const newExpiry = new Date(renewalDateISO).getTime() + 7 * 24 * 60 * 60 * 1000; // 7 days
       // Only update if this gives us more time (avoids stale renewalDate overwriting a good expiry)
       if (!cardExpireAt || newExpiry > cardExpireAt) {
         cardExpireAt = newExpiry;

@@ -436,14 +436,16 @@
   }
   .subsidy-bar-text { display:none; }
 
-  /* Buy sheet Sub row — subtle, revealed after tap */
-  .sheet-sub-row {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:8px 2px; margin:2px 0 10px;
-    border-bottom:1px solid rgba(255,255,255,0.05);
+  /* Buy sheet Sub rows */
+  .sheet-sub-row { margin:10px 0 4px; }
+  .sheet-sub-row .drow { margin:4px 0; }
+  .sheet-sub-price-combined { display:flex; align-items:center; gap:6px; }
+  .sheet-sub-tag {
+    font-size:12px; font-weight:700; color:var(--sub);
+    background:var(--sub-bg); border:1px solid var(--sub-border);
+    border-radius:20px; padding:2px 8px;
   }
-  .sheet-sub-cost { display:flex; align-items:center; gap:5px; font-size:12px; color:rgba(245,166,35,0.8); }
-  .sheet-sub-earn { display:flex; align-items:center; gap:5px; font-size:12px; color:rgba(255,255,255,0.3); }
+  .sheet-earn-val { font-size:14px; font-weight:700; color:var(--sub); }
 
 </style>
   <script src="https://js.paystack.co/v1/inline.js"></script>
@@ -753,8 +755,17 @@
     </div>
     <div class="drow"><span class="dk">You pay</span><span class="dv ac" id="dprice">₦285</span></div>
     <div class="sheet-sub-row" id="sheet-sub-row">
-      <div class="sheet-sub-cost"><span id="sheet-sub-cost">−1 SUB</span></div>
-      <div class="sheet-sub-earn"><span id="sheet-sub-earn">+0.125 SUB back</span></div>
+      <div class="drow">
+        <span class="dk">You pay</span>
+        <span class="dv ac sheet-sub-price-combined">
+          <span id="dprice2"></span>
+          <span class="sheet-sub-tag" id="sheet-sub-cost">+ 1 SUB</span>
+        </span>
+      </div>
+      <div class="drow">
+        <span class="dk">You earn</span>
+        <span class="sheet-earn-val" id="sheet-sub-earn">+0.125 SUB</span>
+      </div>
     </div>
     <button class="cbtn" onclick="confirmBuy()">Confirm Purchase</button>
   </div>
@@ -1600,15 +1611,20 @@
     cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET, subCost, subEarnSheet };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
     document.getElementById('shsub').textContent = (planNetwork || NET) + ' · ' + val;
-    document.getElementById('dprice').textContent = '₦' + actualPrice.toLocaleString();
-    const subCostEl = document.getElementById('sheet-sub-cost');
-    const subEarnEl = document.getElementById('sheet-sub-earn');
+    const origPayRow = document.querySelector('#ov .drow');
     const subRowEl = document.getElementById('sheet-sub-row');
+    const subEarnEl = document.getElementById('sheet-sub-earn');
+    const dprice2 = document.getElementById('dprice2');
     if (cardActive && discountPurchasesLeft >= 1) {
-      if (subCostEl) subCostEl.textContent = '-1 SUB';
-      if (subEarnEl) subEarnEl.textContent = '+' + subEarnSheet + ' SUB earned';
+      // Show new combined rows, hide original pay row
+      if (origPayRow) origPayRow.style.display = 'none';
       if (subRowEl) subRowEl.style.display = '';
+      if (dprice2) dprice2.textContent = '₦' + actualPrice.toLocaleString();
+      if (subEarnEl) subEarnEl.textContent = '+' + subEarnSheet + ' SUB';
     } else {
+      // Show original pay row, hide sub row
+      document.getElementById('dprice').textContent = '₦' + actualPrice.toLocaleString();
+      if (origPayRow) origPayRow.style.display = '';
       if (subRowEl) subRowEl.style.display = 'none';
     }
     document.getElementById('phinput').value = '';

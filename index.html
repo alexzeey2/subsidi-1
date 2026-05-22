@@ -1187,8 +1187,8 @@
       const data = await callEdge('get-user', { userId });
       if (data && !data.error) {
         balance = data.balance ?? 0;
-        subsidyFund = data.subsidyFund ?? 0;
-        discountPurchasesLeft = data.discountPurchasesLeft ?? 0;
+        subsidyFund = data.subsidyFund ?? data.subsidy_fund ?? subsidyFund;
+        discountPurchasesLeft = data.discountPurchasesLeft ?? data.discount_purchases_left ?? discountPurchasesLeft;
         const whole = Math.floor(balance).toLocaleString();
         const dec = (balance % 1).toFixed(2).slice(1);
         document.getElementById('bal-display').innerHTML =
@@ -1271,7 +1271,7 @@
           username = data.username || username;
           registeredCard = data.cardCode || null;
           balance = data.balance ?? 0;
-          subsidyFund = data.subsidyFund ?? 0;
+          subsidyFund = data.subsidyFund ?? data.subsidy_fund ?? subsidyFund;
           discountPurchasesLeft = data.discountPurchasesLeft ?? 0;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
@@ -1773,8 +1773,8 @@
           const userData = await callEdge('get-user', { userId });
           if (userData && !userData.error) {
             balance = userData.balance ?? 300;
-            subsidyFund = userData.subsidyFund ?? subsidyFund;
-            discountPurchasesLeft = userData.discountPurchasesLeft ?? Math.floor(subsidyFund / 120);
+            subsidyFund = userData.subsidyFund ?? userData.subsidy_fund ?? subsidyFund;
+            discountPurchasesLeft = userData.discountPurchasesLeft ?? userData.discount_purchases_left ?? discountPurchasesLeft;
             username = userData.username || username;
             document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();
@@ -2476,7 +2476,7 @@
 
   // ── Subsidy UI ──
   function updateSubsidyUI() {
-    discountPurchasesLeft = subsidyFund / 120; // keep as decimal now
+    // discountPurchasesLeft is managed by buy-data edge fn, not recalculated here
     const pct = Math.min(100, (subsidyFund / 700) * 100);
     const fill = document.getElementById('subsidy-bar-fill');
     const text = document.getElementById('subsidy-bar-text');

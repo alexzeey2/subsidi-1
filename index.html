@@ -463,8 +463,18 @@
 
   <div class="reg-box">
 
+    <!-- Step 0: Choose path -->
+    <div class="reg-step active" id="reg-step-choice">
+      <div class="reg-title">Get started</div>
+      <div class="reg-sub">Do you have an existing Subsidi account?</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:24px;">
+        <button class="reg-btn" onclick="chooseNewAccount()">New Account</button>
+        <button class="reg-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);" onclick="chooseMyAccount()">My Account</button>
+      </div>
+    </div>
+
     <!-- Step 1: Scan QR card -->
-    <div class="reg-step active" id="reg-step-2">
+    <div class="reg-step" id="reg-step-2">
       <div class="reg-title">Scan your Subsidi card</div>
       <div class="reg-sub">Hold your card up to the camera — we'll set you up automatically</div>
 
@@ -1325,6 +1335,31 @@
     }
   });
 
+  let scanIntent = 'new';
+
+  function goBackToChoice() {
+    if (typeof regStream !== 'undefined' && regStream) {
+      regStream.getTracks().forEach(t => t.stop());
+      regStream = null;
+    }
+    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('reg-step-choice').classList.add('active');
+  }
+
+  function chooseNewAccount() {
+    scanIntent = 'new';
+    document.getElementById('reg-step-choice').classList.remove('active');
+    document.getElementById('reg-step-2').classList.add('active');
+    startRegScan();
+  }
+
+  function chooseMyAccount() {
+    scanIntent = 'login';
+    document.getElementById('reg-step-choice').classList.remove('active');
+    document.getElementById('reg-step-2').classList.add('active');
+    startRegScan();
+  }
+
   async function startRegScan() {
     try {
       regStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -1364,12 +1399,16 @@
       if (code && code.data) {
         const raw = code.data.trim();
         // Master QR (one QR printed on all physical cards)
-        if (raw === 'SUBSIDI_ACTIVATE_CARD_V1') {
+        if (raw === 'SUBSIDI_ACTIVATE_CARD_V1' || raw === 'https://subsidi-1.vercel.app/' || raw.startsWith('https://subsidi-1.vercel.app')) {
           stopStream(regStream);
           clearTimeout(regScanLoop);
           playSuccessSound();
-          document.getElementById('reg-scan-status').textContent = '✓ Card detected! Claiming your slot...';
-          claimNextCode();
+          document.getElementById('reg-scan-status').textContent = '✓ Card detected!';
+          if (scanIntent === 'login') {
+            goLoginStep();
+          } else {
+            claimNextCode();
+          }
           return;
         }
         // Legacy: individual numeric code
@@ -1466,7 +1505,7 @@
 
   function goLoginStep() {
     loginPinEntry = '';
-    document.getElementById('reg-step-2').classList.remove('active');
+    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
     document.getElementById('reg-step-4').classList.add('active');
     updateLoginPinDots('');
   }

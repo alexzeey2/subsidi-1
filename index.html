@@ -463,23 +463,14 @@
 
   <div class="reg-box">
 
-    <!-- Step 1: Choose path (shown first) -->
-    <div class="reg-step active" id="reg-step-choice">
-      <div class="reg-title">Get started</div>
-      <div class="reg-sub">Do you have an existing Subsidi account?</div>
-      <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
-        <button class="reg-btn" onclick="chooseNewAccount()">New Account</button>
-        <button class="reg-btn" style="background:transparent;border:1px solid var(--border);color:var(--w70);" onclick="chooseMyAccount()">My Account</button>
-      </div>
-    </div>
-
-    <!-- Step 2: Scan QR card -->
-    <div class="reg-step" id="reg-step-2">
-      <div class="reg-title" id="scan-title">Scan your Subsidi card</div>
-      <div class="reg-sub">Hold your card up to the camera</div>
+    <!-- Step 1: Scan QR card -->
+    <div class="reg-step active" id="reg-step-2">
+      <div class="reg-title">Scan your Subsidi card</div>
+      <div class="reg-sub">Hold your card up to the camera — we'll set you up automatically</div>
 
       <div style="position:relative;width:100%;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
         <video id="reg-video" style="width:100%;display:block;border-radius:20px;" autoplay playsinline muted></video>
+        <!-- Scanner frame -->
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
           <div style="width:180px;height:180px;position:relative;">
             <div style="position:absolute;top:0;left:0;width:36px;height:36px;border-top:3px solid var(--p-light);border-left:3px solid var(--p-light);border-radius:4px 0 0 0;"></div>
@@ -492,7 +483,6 @@
 
       <div id="reg-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:20px;">Starting camera...</div>
       <div class="reg-err" id="reg-err-2"></div>
-      <button style="background:transparent;border:none;color:var(--w40);font-size:13px;width:100%;text-align:center;padding:8px;cursor:pointer;" onclick="goBackToChoice()">← Back</button>
     </div>
 
     <!-- Step 3: Set PIN -->
@@ -525,7 +515,7 @@
 
     <div class="reg-step" id="reg-step-4">
       <div class="reg-title">Welcome back</div>
-      <div class="reg-sub" id="login-step-sub">Enter your PIN to continue.</div>
+      <div class="reg-sub">This card is already registered. Enter your PIN to continue.</div>
       <div class="reg-pin-lbl" id="login-pin-lbl">Enter PIN</div>
       <div class="reg-dots" id="login-pin-dots">
         <div class="dot" id="lpd0"></div>
@@ -1116,8 +1106,6 @@
   // ── Buy PIN state ──
   let buyPinEntry = '';
   let loginPinEntry = '';
-  let pendingCardCode = '';
-  let scanIntent = 'new'; // 'new' or 'login'
 
   // ── Local transaction log (fallback for history) ──
   function getLocalTxns() {
@@ -1187,8 +1175,8 @@
       const data = await callEdge('get-user', { userId });
       if (data && !data.error) {
         balance = data.balance ?? 0;
-        subsidyFund = data.subsidyFund ?? data.subsidy_fund ?? subsidyFund;
-        discountPurchasesLeft = data.discountPurchasesLeft ?? data.discount_purchases_left ?? discountPurchasesLeft;
+        subsidyFund = data.subsidyFund ?? subsidyFund;
+        discountPurchasesLeft = data.discountPurchasesLeft ?? 0;
         const whole = Math.floor(balance).toLocaleString();
         const dec = (balance % 1).toFixed(2).slice(1);
         document.getElementById('bal-display').innerHTML =
@@ -1271,7 +1259,7 @@
           username = data.username || username;
           registeredCard = data.cardCode || null;
           balance = data.balance ?? 0;
-          subsidyFund = data.subsidyFund ?? data.subsidy_fund ?? subsidyFund;
+          subsidyFund = data.subsidyFund ?? subsidyFund;
           discountPurchasesLeft = data.discountPurchasesLeft ?? 0;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
@@ -1373,45 +1361,24 @@
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       if (code && code.data) {
         const raw = code.data.trim();
-
-        // Extract the meaningful payload — works whether QR contains a plain
-        // string or a full URL (e.g. https://subsidi.app/activate/SUBSIDI_ACTIVATE_CARD_V1)
-        let payload = raw;
-        try {
-          const url = new URL(raw);
-          // Grab the last non-empty path segment as the payload
-          const parts = url.pathname.split('/').filter(Boolean);
-          if (parts.length > 0) payload = parts[parts.length - 1];
-        } catch (_) {
-          // Not a URL — use raw value as-is
-        }
-
-        // Master QR (one QR used as the universal gateway)
-        if (payload === 'SUBSIDI_ACTIVATE_CARD_V1' || raw === 'https://subsidi-1.vercel.app/' || raw === 'https://subsidi-1.vercel.app') {
+        // Master QR (one QR printed on all physical cards)
+        if (raw === 'SUBSIDI_ACTIVATE_CARD_V1') {
           stopStream(regStream);
           clearTimeout(regScanLoop);
           playSuccessSound();
-          if (scanIntent === 'login') {
-            // My Account: no card to claim — just go to PIN entry
-            document.getElementById('reg-scan-status').textContent = '✓ QR scanned! Enter your PIN.';
-            goLoginStep();
-          } else {
-            // New Account: claim next available code
-            document.getElementById('reg-scan-status').textContent = '✓ QR scanned! Checking availability...';
-            claimNextCode();
-          }
+          document.getElementById('reg-scan-status').textContent = '✓ Card detected! Claiming your slot...';
+          claimNextCode();
           return;
         }
-        // Individual numeric code (plain or URL-embedded)
-        if (payload.length === 10 && /^\d{10}$/.test(payload)) {
+        // Legacy: individual numeric code
+        if (raw.length === 10 && /^\d{10}$/.test(raw)) {
           stopStream(regStream);
           clearTimeout(regScanLoop);
-          registeredCard = payload;
-          cardSecret = extractSecret(payload);
+          registeredCard = raw;
+          cardSecret = extractSecret(raw);
           playSuccessSound();
-          document.getElementById('reg-scan-status').textContent = '✓ Card scanned! Verifying...';
-          pendingCardCode = payload;
-          checkCardExists(payload, scanIntent);
+          document.getElementById('reg-scan-status').textContent = '✓ Card scanned! Checking...';
+          checkCardExists(raw);
           return;
         }
       }
@@ -1425,46 +1392,26 @@
 
   // ── Registration Step 3: Set PIN ──
   // Check if card already exists in Supabase
-  async function checkCardExists(cardCode, intent) {
-    const statusEl = document.getElementById('reg-scan-status');
+  async function checkCardExists(cardCode) {
     try {
       const data = await callEdge('check-card', { cardCode });
-
-      // Block fake/unrecognized cards
-      if (!data || data.invalid) {
-        statusEl.textContent = '⚠️ Card not recognized. Contact support.';
-        setTimeout(() => {
-          statusEl.textContent = 'Hold your card up to the camera';
-          startRegScan();
-        }, 3000);
-        return;
-      }
-
-      if (data.exists) {
-        // Card already registered
+      if (data && data.exists) {
+        // Card exists — go to login
         userId = data.userId;
         username = data.username;
         balance = 300;
         document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
         goLoginStep();
       } else {
-        // Card is valid but not yet registered
+        // New card — go to PIN creation
         username = generateUsername(cardCode);
         document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
-        if (intent === 'login') {
-          // They said My Account but card isn't registered — nudge them
-          statusEl.textContent = 'No account found. Creating one for you...';
-          setTimeout(goRegStep3, 1000);
-        } else {
-          goRegStep3();
-        }
+        goRegStep3();
       }
     } catch (e) {
-      statusEl.textContent = '⚠️ Connection error. Try again.';
-      setTimeout(() => {
-        statusEl.textContent = 'Hold your card up to the camera';
-        startRegScan();
-      }, 3000);
+      // Fallback to registration if check fails
+      username = generateUsername(cardCode);
+      goRegStep3();
     }
   }
 
@@ -1482,7 +1429,7 @@
       });
       const rows = await res.json();
       if (!rows || rows.length === 0) {
-        statusEl.textContent = '⚠️ Your card has not been registered. Please contact support.';
+        statusEl.textContent = '⚠️ No cards available. Contact support.';
         setTimeout(() => {
           statusEl.textContent = 'Scan your card';
           startRegScan();
@@ -1504,9 +1451,8 @@
       // Use the raw_code as the card code going forward
       registeredCard = raw_code;
       cardSecret = typeof extractSecret === 'function' ? extractSecret(raw_code) : raw_code;
-      statusEl.textContent = '✓ Card scanned! Verifying...';
-      pendingCardCode = raw_code;
-      checkCardExists(raw_code, scanIntent);
+      statusEl.textContent = '✓ Card claimed! Set your PIN.';
+      checkCardExists(raw_code);
     } catch(e) {
       statusEl.textContent = '⚠️ Connection error. Try again.';
       setTimeout(() => {
@@ -1516,45 +1462,10 @@
     }
   }
 
-  function goChoiceStep() {
-    document.getElementById('reg-step-2').classList.remove('active');
-    document.getElementById('reg-step-choice').classList.add('active');
-  }
-
-  function goBackToChoice() {
-    stopStream(regStream);
-    clearTimeout(regScanLoop);
-    document.getElementById('reg-step-2').classList.remove('active');
-    document.getElementById('reg-step-choice').classList.add('active');
-  }
-
-  function chooseNewAccount() {
-    scanIntent = 'new';
-    document.getElementById('scan-title').textContent = 'Scan the QR code';
-    document.getElementById('reg-step-choice').classList.remove('active');
-    document.getElementById('reg-step-2').classList.add('active');
-    startRegScan();
-  }
-
-  function chooseMyAccount() {
-    scanIntent = 'login';
-    userId = null; // will be resolved after PIN entry via login-by-pin
-    document.getElementById('scan-title').textContent = 'Scan the QR code';
-    document.getElementById('reg-step-choice').classList.remove('active');
-    document.getElementById('reg-step-2').classList.add('active');
-    startRegScan();
-  }
-
   function goLoginStep() {
     loginPinEntry = '';
     document.getElementById('reg-step-2').classList.remove('active');
-    document.getElementById('reg-step-choice').classList.remove('active');
     document.getElementById('reg-step-4').classList.add('active');
-    // Subtitle differs: master QR has no card identity, individual card confirms registration
-    const sub = document.getElementById('login-step-sub');
-    if (sub) sub.textContent = userId
-      ? 'Account found. Enter your PIN to continue.'
-      : 'Enter your PIN to access your account.';
     updateLoginPinDots('');
   }
 
@@ -1704,7 +1615,7 @@
     const subRowEl = document.getElementById('sheet-sub-row');
     const subEarnEl = document.getElementById('sheet-sub-earn');
     const dprice2 = document.getElementById('dprice2');
-    if (cardActive && discountPurchasesLeft >= 1) {
+    if (cardActive && discountPurchasesLeft > 0) {
       // Show new combined rows, hide original pay row
       if (origPayRow) origPayRow.style.display = 'none';
       if (subRowEl) subRowEl.style.display = '';
@@ -1746,23 +1657,10 @@
     try {
       err.textContent = 'Verifying...';
       err.classList.add('show');
-
-      let vData;
-      if (userId) {
-        // Individual card scan — verify PIN against known user
-        vData = await callEdge('verify-pin', { userId, pin: loginPinEntry });
-      } else {
-        // Master QR login — find user by PIN alone
-        vData = await callEdge('login-by-pin', { pin: loginPinEntry });
-        if (vData && vData.valid && vData.userId) {
-          userId = vData.userId;
-          username = vData.username || '';
-        }
-      }
-
+      const vData = await callEdge('verify-pin', { userId, pin: loginPinEntry });
       err.classList.remove('show');
 
-      if (vData && vData.valid) {
+      if (vData.valid) {
         userPin = loginPinEntry;
         isGuest = false;
         localStorage.setItem('subsidi_userId', userId);
@@ -1773,8 +1671,8 @@
           const userData = await callEdge('get-user', { userId });
           if (userData && !userData.error) {
             balance = userData.balance ?? 300;
-            subsidyFund = userData.subsidyFund ?? userData.subsidy_fund ?? subsidyFund;
-            discountPurchasesLeft = userData.discountPurchasesLeft ?? userData.discount_purchases_left ?? discountPurchasesLeft;
+            subsidyFund = userData.subsidyFund ?? subsidyFund;
+            discountPurchasesLeft = userData.discountPurchasesLeft ?? Math.floor(subsidyFund / 120);
             username = userData.username || username;
             document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();
@@ -2032,7 +1930,7 @@
     if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
     if (renewalDateISO) {
       // Compute fresh expiry: renewalDate + 30s, but only if this is a newer renewal
-      const newExpiry = new Date(renewalDateISO).getTime() + 7 * 24 * 60 * 60 * 1000; // 7 days
+      const newExpiry = new Date(renewalDateISO).getTime() + (7 * 24 * 60 * 60 * 1000); // 7 days
       // Only update if this gives us more time (avoids stale renewalDate overwriting a good expiry)
       if (!cardExpireAt || newExpiry > cardExpireAt) {
         cardExpireAt = newExpiry;
@@ -2142,7 +2040,7 @@
         return;
       }
       // Set a fresh expiry immediately from current time (don't rely on server roundtrip lag)
-      cardExpireAt = Date.now() + 30000; // 30s for testing
+      cardExpireAt = Date.now() + (7 * 24 * 60 * 60 * 1000); // 7 days
       localStorage.setItem('subsidi_cardExpireAt', String(cardExpireAt));
       // Log locally so history shows it
       saveLocalTxn({ type: 'renewal', data_plan: 'card_renewal', amount: 180, status: 'success' });
@@ -2476,7 +2374,7 @@
 
   // ── Subsidy UI ──
   function updateSubsidyUI() {
-    // discountPurchasesLeft is managed by buy-data edge fn, not recalculated here
+    discountPurchasesLeft = subsidyFund / 120; // keep as decimal now
     const pct = Math.min(100, (subsidyFund / 700) * 100);
     const fill = document.getElementById('subsidy-bar-fill');
     const text = document.getElementById('subsidy-bar-text');

@@ -1235,7 +1235,9 @@
   function goRegister() {
     closeGate();
     show('reg-screen');
-    startRegScan();
+    // Show choice buttons first — user taps to start scan
+    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('reg-step-choice').classList.add('active');
   }
 
   function gateCheck(title, sub) {
@@ -1361,19 +1363,13 @@
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       if (code && code.data) {
         const raw = code.data.trim();
-        // Official Subsidi card QR — contains the app URL
-        if (raw === 'https://subsidi-1.vercel.app/' || raw.startsWith('https://subsidi-1.vercel.app')) {
+        // Master QR (one QR printed on all physical cards)
+        if (raw === 'SUBSIDI_ACTIVATE_CARD_V1') {
           stopStream(regStream);
           clearTimeout(regScanLoop);
           playSuccessSound();
-          document.getElementById('reg-scan-status').textContent = '✓ Card detected!';
-          if (scanIntent === 'login') {
-            // Existing user — find their account by checking claimed cards
-            goLoginWithCard();
-          } else {
-            // New user — claim next available code
-            claimNextCode();
-          }
+          document.getElementById('reg-scan-status').textContent = '✓ Card detected! Claiming your slot...';
+          claimNextCode();
           return;
         }
         // Legacy: individual numeric code
@@ -1383,7 +1379,7 @@
           registeredCard = raw;
           cardSecret = extractSecret(raw);
           playSuccessSound();
-          document.getElementById('reg-scan-status').textContent = '✓ Card scanned!';
+          document.getElementById('reg-scan-status').textContent = '✓ Card scanned! Checking...';
           checkCardExists(raw);
           return;
         }
@@ -1422,15 +1418,6 @@
   }
 
   // ── Claim next unclaimed code from Supabase (master QR flow) ──
-  async function goLoginWithCard() {
-    const statusEl = document.getElementById('reg-scan-status');
-    statusEl.textContent = 'Looking up your account...';
-    // For My Account — user enters their PIN directly on the login step
-    // We don't know their code yet; just go to login PIN screen
-    // Their account will be found when they enter their PIN
-    goLoginStep();
-  }
-
   async function claimNextCode() {
     const statusEl = document.getElementById('reg-scan-status');
     try {
@@ -2182,7 +2169,8 @@
     isGuest = false;
     // Go straight to scan card screen
     show('reg-screen');
-    startRegScan();
+    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('reg-step-choice').classList.add('active');
   }
 
   // ── Change PIN ──

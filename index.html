@@ -463,6 +463,16 @@
 
   <div class="reg-box">
 
+    <!-- Step 0: Choose path -->
+    <div class="reg-step active" id="reg-step-choice">
+      <div class="reg-title">Get started</div>
+      <div class="reg-sub">Do you have an existing Subsidi account?</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:24px;">
+        <button class="reg-btn" onclick="chooseNewAccount()">New Account</button>
+        <button class="reg-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);" onclick="chooseMyAccount()">My Account</button>
+      </div>
+    </div>
+
     <!-- Step 1: Scan QR card -->
     <div class="reg-step" id="reg-step-2">
       <div class="reg-title">Scan your Subsidi card</div>

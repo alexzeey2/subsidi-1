@@ -463,10 +463,20 @@
 
   <div class="reg-box">
 
+    <!-- Step 0: Choose path -->
+    <div class="reg-step active" id="reg-step-choice">
+      <div class="reg-title">Get started</div>
+      <div class="reg-sub">Do you have an existing Subsidi account?</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:24px;">
+        <button class="reg-btn" onclick="chooseNewAccount()">New Account</button>
+        <button class="reg-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);" onclick="chooseMyAccount()">My Account</button>
+      </div>
+    </div>
+
     <!-- Step 1: Scan QR card -->
-    <div class="reg-step active" id="reg-step-2">
-      <div class="reg-title">Scan your Subsidi card</div>
-      <div class="reg-sub">Hold your card up to the camera — we'll set you up automatically</div>
+    <div class="reg-step" id="reg-step-2">
+      <div class="reg-title" id="scan-title">Scan your Subsidi card</div>
+      <div class="reg-sub">Hold your card up to the camera</div>
 
       <div style="position:relative;width:100%;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
         <video id="reg-video" style="width:100%;display:block;border-radius:20px;" autoplay playsinline muted></video>
@@ -483,6 +493,7 @@
 
       <div id="reg-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:20px;">Starting camera...</div>
       <div class="reg-err" id="reg-err-2"></div>
+      <button style="background:transparent;border:none;color:rgba(255,255,255,0.35);font-size:13px;width:100%;text-align:center;padding:8px;cursor:pointer;margin-top:4px;" onclick="goBackToChoice()">← Back</button>
     </div>
 
     <!-- Step 3: Set PIN -->
@@ -1323,6 +1334,34 @@
     }
   });
 
+  let scanIntent = 'new';
+  let pendingCardCode = '';
+
+  function goBackToChoice() {
+    if (typeof regStream !== 'undefined' && regStream) {
+      regStream.getTracks().forEach(t => t.stop());
+      regStream = null;
+    }
+    document.getElementById('reg-step-2').classList.remove('active');
+    document.getElementById('reg-step-choice').classList.add('active');
+  }
+
+  function chooseNewAccount() {
+    scanIntent = 'new';
+    document.getElementById('scan-title').textContent = 'Scan your new card';
+    document.getElementById('reg-step-choice').classList.remove('active');
+    document.getElementById('reg-step-2').classList.add('active');
+    startRegScan();
+  }
+
+  function chooseMyAccount() {
+    scanIntent = 'login';
+    document.getElementById('scan-title').textContent = 'Scan your card';
+    document.getElementById('reg-step-choice').classList.remove('active');
+    document.getElementById('reg-step-2').classList.add('active');
+    startRegScan();
+  }
+
   async function startRegScan() {
     try {
       regStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -1393,25 +1432,42 @@
   // ── Registration Step 3: Set PIN ──
   // Check if card already exists in Supabase
   async function checkCardExists(cardCode) {
+    const statusEl = document.getElementById('reg-scan-status');
     try {
       const data = await callEdge('check-card', { cardCode });
-      if (data && data.exists) {
-        // Card exists — go to login
+
+      // Block fake/unrecognized cards
+      if (!data || data.invalid) {
+        if (statusEl) statusEl.textContent = '⚠️ Card not recognized. Contact support.';
+        setTimeout(() => {
+          if (statusEl) statusEl.textContent = 'Hold your card up to the camera';
+          startRegScan();
+        }, 3000);
+        return;
+      }
+
+      if (data.exists) {
         userId = data.userId;
         username = data.username;
         balance = 300;
         document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
         goLoginStep();
       } else {
-        // New card — go to PIN creation
         username = generateUsername(cardCode);
         document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
-        goRegStep3();
+        if (scanIntent === 'login') {
+          if (statusEl) statusEl.textContent = 'No account found. Creating one for you...';
+          setTimeout(goRegStep3, 1000);
+        } else {
+          goRegStep3();
+        }
       }
     } catch (e) {
-      // Fallback to registration if check fails
-      username = generateUsername(cardCode);
-      goRegStep3();
+      if (statusEl) statusEl.textContent = '⚠️ Connection error. Try again.';
+      setTimeout(() => {
+        if (statusEl) statusEl.textContent = 'Hold your card up to the camera';
+        startRegScan();
+      }, 3000);
     }
   }
 
@@ -1465,6 +1521,7 @@
   function goLoginStep() {
     loginPinEntry = '';
     document.getElementById('reg-step-2').classList.remove('active');
+    document.getElementById('reg-step-choice').classList.remove('active');
     document.getElementById('reg-step-4').classList.add('active');
     updateLoginPinDots('');
   }

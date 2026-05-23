@@ -862,26 +862,26 @@
   <div class="prof-sec">
     <div class="prof-sec-title">Support</div>
     <div class="prof-card">
-      <div class="prof-row">
+      <div class="prof-row" onclick="openFaqModal()">
         <div class="prof-row-ico">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </div>
         <div class="prof-row-body">
-          <div class="prof-row-title">Help & FAQ</div>
+          <div class="prof-row-title">FAQ</div>
           <div class="prof-row-sub">How Subsidi works</div>
         </div>
         <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <div class="prof-row">
+      <div class="prof-row" onclick="openWhatsApp()">
         <div class="prof-row-ico">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
         </div>
         <div class="prof-row-body">
-          <div class="prof-row-title">Contact Support</div>
+          <div class="prof-row-title">Report Issue</div>
           <div class="prof-row-sub">Get help via WhatsApp</div>
         </div>
         <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -2567,5 +2567,96 @@
     }
     body.innerHTML = html;
   }</script>
+
+<!-- FAQ MODAL -->
+<div class="overlay" id="faq-ov" onclick="if(event.target===this)closeFaqModal()" style="align-items:flex-end">
+  <div style="background:var(--dark-2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-height:85vh;overflow-y:auto;padding:0 0 40px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--dark-2);z-index:1">
+      <div style="font-size:16px;font-weight:700">FAQ</div>
+      <div onclick="closeFaqModal()" style="width:32px;height:32px;border-radius:50%;background:var(--w15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--w40)">×</div>
+    </div>
+    <div style="padding:16px 24px;display:flex;flex-direction:column;gap:4px" id="faq-list"></div>
+  </div>
+</div>
+
+<script>
+  const FAQ_ITEMS = [
+    {
+      q: "What is Subsidi?",
+      a: "Subsidi is a membership that lets you buy mobile data at a discount. You get a card (physical or digital), load SUB points, and use them to buy data cheaper than market price."
+    },
+    {
+      q: "What are SUB points?",
+      a: "SUB is Subsidi's discount currency. Instead of paying full price for data, you spend SUB points and get data at a reduced rate. Think of it as cashback you can only use on data."
+    },
+    {
+      q: "How do I keep my card active?",
+      a: "Pay ₦180 every 7 days to keep your card active. If your card lapses, you can still buy data through the app but at market price — the discount only works with an active card."
+    },
+    {
+      q: "What happens if my card expires?",
+      a: "You lose access to discounted data until you renew. Your SUB balance stays safe — it doesn't disappear. Just renew your card and your points are ready to use again."
+    },
+    {
+      q: "How do I get more SUB points?",
+      a: "You can top up SUB points from the dashboard. You can also earn SUB through referrals and future reward features coming to Subsidi."
+    },
+    {
+      q: "Is my money safe?",
+      a: "Yes. Subsidi doesn't store your payment details. All payments go through Paystack, a secure and licensed payment provider in Nigeria."
+    },
+    {
+      q: "How do I refer someone?",
+      a: "Go to your profile and copy your referral link. Share it with friends — when they sign up and activate, you both benefit."
+    },
+    {
+      q: "Why can't I log back in after logging out?",
+      a: "Access to Subsidi is tied to your physical or digital card. If you log out and don't have a card, you'll need to order a physical card (₦3,000) to regain access."
+    },
+    {
+      q: "How do I report a problem?",
+      a: "Tap 'Report Issue' on the profile page to reach us directly on WhatsApp. We'll sort it out as quickly as possible."
+    }
+  ];
+
+  function openFaqModal() {
+    const list = document.getElementById('faq-list');
+    list.innerHTML = FAQ_ITEMS.map((item, i) => `
+      <div style="border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--dark-3)" id="faq-item-${i}">
+        <div onclick="toggleFaq(${i})" style="padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer">
+          <div style="font-size:14px;font-weight:600;line-height:1.4">${item.q}</div>
+          <svg id="faq-chevron-${i}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--w40);flex-shrink:0;transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div id="faq-ans-${i}" style="max-height:0;overflow:hidden;transition:max-height .28s cubic-bezier(.4,0,.2,1)">
+          <div style="padding:0 18px 16px;font-size:13px;color:var(--w70);line-height:1.7;border-top:1px solid var(--border);padding-top:14px">${item.a}</div>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('faq-ov').classList.add('open');
+  }
+
+  function toggleFaq(i) {
+    const ans = document.getElementById('faq-ans-' + i);
+    const chevron = document.getElementById('faq-chevron-' + i);
+    const isOpen = ans.style.maxHeight && ans.style.maxHeight !== '0px';
+    // Close all
+    FAQ_ITEMS.forEach((_, j) => {
+      document.getElementById('faq-ans-' + j).style.maxHeight = '0px';
+      document.getElementById('faq-chevron-' + j).style.transform = '';
+    });
+    if (!isOpen) {
+      ans.style.maxHeight = '300px';
+      chevron.style.transform = 'rotate(180deg)';
+    }
+  }
+
+  function closeFaqModal() {
+    document.getElementById('faq-ov').classList.remove('open');
+  }
+
+  function openWhatsApp() {
+    window.open('https://wa.me/2349058150220', '_blank');
+  }
+</script>
 </body>
 </html>

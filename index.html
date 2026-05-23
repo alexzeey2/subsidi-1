@@ -2826,12 +2826,10 @@
   }
 
   // ── WhatsApp Group Bell ──
-  let waJoined = false;
-
   function openWaSheet() {
-    // Shake the bell
     const bell = document.getElementById('wa-bell');
     bell.style.animation = 'none';
+    void bell.offsetWidth;
     bell.style.animation = 'bellshake .5s ease';
     setTimeout(() => { bell.style.animation = 'bellglow 2.5s ease-in-out infinite'; }, 600);
     document.getElementById('wa-sheet-bg').classList.add('open');
@@ -2841,87 +2839,12 @@
     document.getElementById('wa-sheet-bg').classList.remove('open');
   }
 
-  async function claimWaReward() {
-    // Open WhatsApp group immediately
+  function claimWaReward() {
     window.open('https://chat.whatsapp.com/Jsf2dK5rFcNBGSfjL3tZbr', '_blank');
-
-    if (!userId) { closeWaSheet(); return; }
-    if (waJoined) {
-      closeWaSheet();
-      return;
-    }
-
-    const btn = document.getElementById('wa-join-btn');
-    btn.disabled = true;
-    btn.textContent = 'Crediting 1 SUB...';
-
-    try {
-      // Check current state first
-      const res = await fetch(SUPA_URL + '/rest/v1/users?id=eq.' + userId + '&select=whatsapp_joined,sub_balance', {
-        headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
-      });
-      const rows = await res.json();
-      const user = rows[0];
-
-      if (user && user.whatsapp_joined) {
-        // Already claimed
-        waJoined = true;
-        hideBellBadge();
-        closeWaSheet();
-        showWaToast('You already claimed your 1 SUB 🎉');
-        return;
-      }
-
-      // Credit 1 SUB and mark as joined
-      const newBal = (user?.sub_balance || 0) + 1;
-      await fetch(SUPA_URL + '/rest/v1/users?id=eq.' + userId, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPA_KEY,
-          'Authorization': 'Bearer ' + SUPA_KEY,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ whatsapp_joined: true, sub_balance: newBal })
-      });
-
-      waJoined = true;
-      hideBellBadge();
-      closeWaSheet();
-      showWaToast('🎉 1 SUB added to your account!');
-    } catch(e) {
-      console.warn('WA reward error:', e);
-      closeWaSheet();
-    }
+    closeWaSheet();
   }
 
-  function hideBellBadge() {
-    const badge = document.getElementById('wa-bell-badge');
-    if (badge) badge.style.display = 'none';
-  }
-
-  function showWaToast(msg) {
-    const t = document.getElementById('toast');
-    if (!t) return;
-    t.textContent = msg;
-    t.className = 'toast ok show';
-    setTimeout(() => { t.className = 'toast'; }, 3000);
-  }
-
-  // On load, check if already joined and hide badge
-  async function checkWaJoined() {
-    if (!userId) return;
-    try {
-      const res = await fetch(SUPA_URL + '/rest/v1/users?id=eq.' + userId + '&select=whatsapp_joined', {
-        headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
-      });
-      const rows = await res.json();
-      if (rows[0]?.whatsapp_joined) {
-        waJoined = true;
-        hideBellBadge();
-      }
-    } catch(e) {}
-  }
+  function checkWaJoined() {}
 </script>
 </body>
 </html>

@@ -1943,7 +1943,6 @@
             dataPlan: cur.size,
             amount: cur.price,
             origPrice: cur.orig,
-            cardActive: cardActive
           });
 
           if (pData.error) {
@@ -2110,11 +2109,6 @@
       if (!cardExpireAt || newExpiry > cardExpireAt) {
         cardExpireAt = newExpiry;
       }
-      localStorage.setItem('subsidi_cardExpireAt', String(cardExpireAt));
-    } else if (!cardExpireAt) {
-      // Try restoring from localStorage on page load
-      const saved = localStorage.getItem('subsidi_cardExpireAt');
-      if (saved) cardExpireAt = parseInt(saved, 10);
     }
     if (!cardExpireAt || cardExpireAt <= Date.now()) {
       cardActive = false;
@@ -2215,8 +2209,13 @@
         return;
       }
       // Set a fresh expiry immediately from current time (don't rely on server roundtrip lag)
-      cardExpireAt = Date.now() + (7 * 24 * 60 * 60 * 1000); // 7 days
-      localStorage.setItem('subsidi_cardExpireAt', String(cardExpireAt));
+      // Fetch fresh renewal_date from Supabase after renewal
+      try {
+        const renewed = await callEdge('get-user', { userId });
+        if (renewed && !renewed.error && renewed.renewalDate) {
+          startCardTimer(renewed.renewalDate);
+        }
+      } catch(e) { console.warn('Could not fetch renewal date:', e); }
       // Log locally so history shows it
       saveLocalTxn({ type: 'renewal', data_plan: 'card_renewal', amount: 180, status: 'success' });
       // Log renewal to Supabase transactions table

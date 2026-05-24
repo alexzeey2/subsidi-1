@@ -1747,7 +1747,19 @@
     show('dash');
     updateSubsidyUI();
     updateCardGlow();
-    startCardTimer();
+
+    // Fetch renewal_date from Supabase immediately so timer starts accurately from day 1
+    try {
+      const freshData = await callEdge('get-user', { userId });
+      if (freshData && !freshData.error && freshData.renewalDate) {
+        startCardTimer(freshData.renewalDate);
+      } else {
+        startCardTimer();
+      }
+    } catch(e) {
+      startCardTimer();
+    }
+
     setTimeout(() => {
       const t = document.getElementById('ad-toast');
       t.classList.add('show');
@@ -2092,8 +2104,8 @@
   function startCardTimer(renewalDateISO) {
     if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
     if (renewalDateISO) {
-      // Compute fresh expiry: renewalDate + 30s, but only if this is a newer renewal
-      const newExpiry = new Date(renewalDateISO).getTime() + (7 * 24 * 60 * 60 * 1000); // 7 days
+      // renewal_date from Supabase IS the expiry date — read it directly
+      const newExpiry = new Date(renewalDateISO).getTime();
       // Only update if this gives us more time (avoids stale renewalDate overwriting a good expiry)
       if (!cardExpireAt || newExpiry > cardExpireAt) {
         cardExpireAt = newExpiry;

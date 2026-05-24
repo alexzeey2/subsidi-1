@@ -1377,9 +1377,9 @@
     return true; // blocked
   }
   window.addEventListener("load", async () => {
-    // Restore card expiry from localStorage so countdown survives page reload
-    const savedExpiry = localStorage.getItem('subsidi_cardExpireAt');
-    if (savedExpiry) cardExpireAt = parseInt(savedExpiry, 10);
+    // Always fetch expiry from Supabase — never restore from localStorage
+    localStorage.removeItem('subsidi_cardExpireAt');
+    cardExpireAt = null;
 
     const savedUserId = localStorage.getItem('subsidi_userId');
     if (savedUserId) {
@@ -2104,8 +2104,8 @@
   function startCardTimer(renewalDateISO) {
     if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
     if (renewalDateISO) {
-      // renewal_date from Supabase IS the expiry date — read it directly
-      const newExpiry = new Date(renewalDateISO).getTime();
+      // Compute fresh expiry: renewalDate + 30s, but only if this is a newer renewal
+      const newExpiry = new Date(renewalDateISO).getTime(); // renewal_date IS the expiry
       // Only update if this gives us more time (avoids stale renewalDate overwriting a good expiry)
       if (!cardExpireAt || newExpiry > cardExpireAt) {
         cardExpireAt = newExpiry;

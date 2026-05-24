@@ -777,9 +777,9 @@
     <div class="drow"><span class="dk">You pay</span><span class="dv ac" id="dprice" style="font-size:22px;font-weight:700;color:var(--w);">₦285</span></div>
     <div class="sheet-sub-row" id="sheet-sub-row" style="display:none;">
       <div class="drow" style="margin-top:6px;">
-        <span class="dk" style="color:var(--gold);font-weight:700;">SUB balance <span id="sheet-sub-balance"></span></span>
+        <span class="dk" style="color:#f0c040;font-weight:700;">SUB balance <span id="sheet-sub-balance"></span></span>
         <span class="dv ac sheet-sub-price-combined">
-          <span id="sheet-sub-cost" style="color:var(--gold);font-size:13px;font-weight:700;"></span>
+          <span id="sheet-sub-cost" style="color:#f0c040;font-size:13px;font-weight:700;"></span>
           <span id="sheet-sub-toggle" style="display:inline-block;width:36px;height:20px;border-radius:10px;margin-left:8px;position:relative;cursor:default;transition:background 0.2s;">
             <span id="sheet-sub-knob" style="position:absolute;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left 0.2s;"></span>
           </span>
@@ -1790,7 +1790,7 @@
     if (cardActive) {
       if (subRowEl) subRowEl.style.display = '';
       if (subBalanceEl) subBalanceEl.textContent = '(' + (subsidyFund / 120).toFixed(2) + ' SUB)';
-      if (subCostEl) subCostEl.textContent = subOn ? '-' + subCostNum + ' SUB' : 'Not enough SUB';
+      if (subCostEl) { subCostEl.textContent = subOn ? '-' + subCostNum + ' SUB' : 'Not enough SUB'; subCostEl.style.color = '#f0c040'; }
       if (subToggle) subToggle.style.background = subOn ? '#7c3aed' : '#444';
       if (subKnob) subKnob.style.left = subOn ? '19px' : '3px';
       if (subEarnEl) subEarnEl.textContent = '+' + subEarnSheet + ' SUB';

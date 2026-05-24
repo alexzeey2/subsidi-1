@@ -1854,17 +1854,17 @@
             const dec = (balance % 1).toFixed(2).slice(1);
             document.getElementById('bal-display').innerHTML =
               '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+            cardActive = true;
+            updateSubsidyUI();
+            updateCardGlow();
+            renderBundles();
+            startCardTimer(userData.renewalDate || null);
           }
         } catch(e) {
           console.warn('post-login fetch failed:', e);
         } finally {
           hideSpinner();
         }
-        cardActive = true;
-        updateSubsidyUI();
-        updateCardGlow();
-        renderBundles();
-        startCardTimer();
       } else {
         err.textContent = 'Incorrect PIN. Try again.';
         err.classList.add('show');
@@ -2209,7 +2209,6 @@
         return;
       }
       // Set a fresh expiry immediately from current time (don't rely on server roundtrip lag)
-      // Fetch fresh renewal_date from Supabase after renewal
       try {
         const renewed = await callEdge('get-user', { userId });
         if (renewed && !renewed.error && renewed.renewalDate) {

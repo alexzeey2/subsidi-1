@@ -777,15 +777,17 @@
     <div class="drow"><span class="dk">You pay</span><span class="dv ac" id="dprice">₦285</span></div>
     <div class="sheet-sub-row" id="sheet-sub-row">
       <div class="drow">
-        <span class="dk">You pay</span>
+        <span class="dk">SUB balance <span id="sheet-sub-balance" style="color:var(--gold);font-weight:700;"></span></span>
         <span class="dv ac sheet-sub-price-combined">
-          <span id="dprice2"></span>
-          <span class="sheet-sub-tag" id="sheet-sub-cost">+ 1 SUB</span>
+          <span id="sheet-sub-cost" style="color:var(--w60);font-size:13px;"></span>
+          <span id="sheet-sub-toggle" style="display:inline-block;width:36px;height:20px;border-radius:10px;margin-left:8px;position:relative;cursor:default;transition:background 0.2s;">
+            <span id="sheet-sub-knob" style="position:absolute;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left 0.2s;"></span>
+          </span>
         </span>
       </div>
-      <div class="drow">
-        <span class="dk">You earn</span>
-        <span class="sheet-earn-val" id="sheet-sub-earn">+0.125 SUB</span>
+      <div class="drow" style="margin-top:4px;">
+        <span class="dk" style="color:var(--w40);font-size:12px;">You earn</span>
+        <span class="sheet-earn-val" id="sheet-sub-earn" style="font-size:12px;color:var(--gold);">+0.125 SUB</span>
       </div>
     </div>
     <button class="cbtn" onclick="confirmBuy()">Confirm Purchase</button>
@@ -1768,23 +1770,37 @@
   }
 
   // ── Buy: open buy sheet directly ──
-  function openSheet(size, val, price, orig, planId, planNetwork) {
+  function openSheet(size, val, price, orig, planId, planNetwork, subCostCount) {
     if (gateCheck('Buy data at subsidy prices', 'Create a free account to purchase ' + size + ' for ₦' + price + ' — cheaper than anywhere else.')) return;
     const actualPrice = cardActive ? price : orig;
-    const subCost = cardActive ? '1 SUB' : '—';
-    const subEarnSheet = (actualPrice * 0.03 / 120).toFixed(3);
-    cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET, subCost, subEarnSheet };
+    const subCostNum = subCostCount || (orig >= 1000 ? 2 : 1);
+    const subCost = cardActive ? subCostNum + ' SUB' : '—';
+    const subEarnSheet = (actualPrice * 0.10 / 120).toFixed(3);
+    cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET, subCost, subEarnSheet, subCostNum };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
     document.getElementById('shsub').textContent = (planNetwork || NET) + ' · ' + val;
     const origPayRow = document.querySelector('#ov .drow');
     const subRowEl = document.getElementById('sheet-sub-row');
     const subEarnEl = document.getElementById('sheet-sub-earn');
-    const dprice2 = document.getElementById('dprice2');
-    if (cardActive && discountPurchasesLeft > 0) {
-      // Show new combined rows, hide original pay row
+    const subBalanceEl = document.getElementById('sheet-sub-balance');
+    const subToggle = document.getElementById('sheet-sub-toggle');
+    const subKnob = document.getElementById('sheet-sub-knob');
+    const subCostEl = document.getElementById('sheet-sub-cost');
+    const subOn = cardActive && discountPurchasesLeft >= subCostNum;
+    if (cardActive) {
+      // Show sub row, hide original pay row
       if (origPayRow) origPayRow.style.display = 'none';
       if (subRowEl) subRowEl.style.display = '';
+      // Populate You pay
+      const dprice2 = document.getElementById('dprice2');
       if (dprice2) dprice2.textContent = '₦' + actualPrice.toLocaleString();
+      // Populate SUB balance
+      if (subBalanceEl) subBalanceEl.textContent = '(' + (subsidyFund / 120).toFixed(2) + ' SUB)';
+      // Populate SUB cost and toggle
+      if (subCostEl) subCostEl.textContent = subOn ? '-' + subCostNum + ' SUB' : 'Not enough SUB';
+      if (subToggle) subToggle.style.background = subOn ? '#7c3aed' : '#444';
+      if (subKnob) subKnob.style.left = subOn ? '19px' : '3px';
+      // Populate You earn
       if (subEarnEl) subEarnEl.textContent = '+' + subEarnSheet + ' SUB';
     } else {
       // Show original pay row, hide sub row
@@ -1943,6 +1959,7 @@
             dataPlan: cur.size,
             amount: cur.price,
             origPrice: cur.orig,
+            subCostNum: cur.subCostNum || 1,
           });
 
           if (pData.error) {
@@ -2053,12 +2070,14 @@
     const count = document.getElementById('market-count');
     if (count) count.textContent = plans.length + ' plans';
     container.innerHTML = plans.map(p => {
-      const yours = p.ck + 10;
-      const subsidi = yours - 120;
-      const hasDiscount = cardActive && discountPurchasesLeft > 0;
+      const yours = Math.round(p.ck * 1.10);
+      const subCost = yours >= 1000 ? 2 : 1;
+      const subDrain = subCost * 120;
+      const subsidi = yours - subDrain;
+      const hasDiscount = cardActive && discountPurchasesLeft >= subCost;
       const displayPrice = hasDiscount ? subsidi : yours;
       const strikePrice = hasDiscount ? yours : '';
-      return `<div class="bundle" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${hasDiscount ? subsidi : yours},${yours},'${p.planId}','${NET}')">
+      return `<div class="bundle" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${hasDiscount ? subsidi : yours},${yours},'${p.planId}','${NET}',${subCost})">
         ${hasDiscount ? '<div class="b-sub-dot"></div>' : ''}
         <div class="b-val">${p.val}</div>
         <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>

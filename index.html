@@ -775,8 +775,8 @@
       <input type="tel" placeholder="080xxxxxxxx" id="phinput" maxlength="11">
     </div>
     <div class="drow"><span class="dk">You pay</span><span class="dv ac" id="dprice">₦285</span></div>
-    <div class="sheet-sub-row" id="sheet-sub-row">
-      <div class="drow">
+    <div class="sheet-sub-row" id="sheet-sub-row" style="display:none;">
+      <div class="drow" style="margin-top:6px;">
         <span class="dk">SUB balance <span id="sheet-sub-balance" style="color:var(--gold);font-weight:700;"></span></span>
         <span class="dv ac sheet-sub-price-combined">
           <span id="sheet-sub-cost" style="color:var(--w60);font-size:13px;"></span>
@@ -785,10 +785,7 @@
           </span>
         </span>
       </div>
-      <div class="drow" style="margin-top:4px;">
-        <span class="dk" style="color:var(--w40);font-size:12px;">You earn</span>
-        <span class="sheet-earn-val" id="sheet-sub-earn" style="font-size:12px;color:var(--gold);">+0.125 SUB</span>
-      </div>
+
     </div>
     <button class="cbtn" onclick="confirmBuy()">Confirm Purchase</button>
   </div>
@@ -1787,25 +1784,17 @@
     const subKnob = document.getElementById('sheet-sub-knob');
     const subCostEl = document.getElementById('sheet-sub-cost');
     const subOn = cardActive && discountPurchasesLeft >= subCostNum;
+    // You pay always visible
+    document.getElementById('dprice').textContent = '₦' + actualPrice.toLocaleString();
+    if (origPayRow) origPayRow.style.display = '';
     if (cardActive) {
-      // Show sub row, hide original pay row
-      if (origPayRow) origPayRow.style.display = 'none';
       if (subRowEl) subRowEl.style.display = '';
-      // Populate You pay
-      const dprice2 = document.getElementById('dprice2');
-      if (dprice2) dprice2.textContent = '₦' + actualPrice.toLocaleString();
-      // Populate SUB balance
       if (subBalanceEl) subBalanceEl.textContent = '(' + (subsidyFund / 120).toFixed(2) + ' SUB)';
-      // Populate SUB cost and toggle
       if (subCostEl) subCostEl.textContent = subOn ? '-' + subCostNum + ' SUB' : 'Not enough SUB';
       if (subToggle) subToggle.style.background = subOn ? '#7c3aed' : '#444';
       if (subKnob) subKnob.style.left = subOn ? '19px' : '3px';
-      // Populate You earn
       if (subEarnEl) subEarnEl.textContent = '+' + subEarnSheet + ' SUB';
     } else {
-      // Show original pay row, hide sub row
-      document.getElementById('dprice').textContent = '₦' + actualPrice.toLocaleString();
-      if (origPayRow) origPayRow.style.display = '';
       if (subRowEl) subRowEl.style.display = 'none';
     }
     document.getElementById('phinput').value = '';

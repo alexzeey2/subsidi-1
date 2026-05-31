@@ -1,0 +1,13 @@
+{
+  "name": "Subsidi — Discounted Data",
+  "short_name": "Subsidi",
+  "description": "Buy mobile data at a discount with your Subsidi membership.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#08080E",
+  "theme_color": "#6C2BD9",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

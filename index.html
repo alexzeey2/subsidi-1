@@ -510,7 +510,35 @@
             <div style="position:absolute;bottom:0;right:0;width:36px;height:36px;border-bottom:3px solid var(--p-light);border-right:3px solid var(--p-light);border-radius:0 0 4px 0;"></div>
           </div>
         </div>
+        <!-- Unrecognized card overlay -->
+        <div id="scan-bad-overlay" style="
+          display:none;
+          position:absolute;inset:0;
+          background:rgba(8,8,14,0.82);
+          backdrop-filter:blur(6px);
+          -webkit-backdrop-filter:blur(6px);
+          border-radius:20px;
+          flex-direction:column;
+          align-items:center;
+          justify-content:center;
+          gap:14px;
+          animation:scanBadIn .2s ease;
+        ">
+          <!-- SVG warning icon -->
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#F0A500" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="9" x2="12" y2="13" stroke="#F0A500" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="12" cy="17" r="1" fill="#F0A500"/>
+          </svg>
+          <div style="text-align:center;padding:0 24px;">
+            <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;letter-spacing:.2px;">Card Not Recognised</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6;">Make sure you're scanning<br>an official Subsidi card</div>
+          </div>
+        </div>
       </div>
+      <style>
+        @keyframes scanBadIn { from { opacity:0; } to { opacity:1; } }
+      </style>
 
       <div id="reg-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:20px;">Starting camera...</div>
       <div class="reg-err" id="reg-err-2"></div>
@@ -1535,6 +1563,18 @@
   // Auto-start camera when page loads
   // auto start handled below
 
+  let _scanBadTimer = null;
+
+  function showScanBad() {
+    const ov = document.getElementById('scan-bad-overlay');
+    if (ov) { ov.style.display = 'flex'; }
+  }
+
+  function hideScanBad() {
+    const ov = document.getElementById('scan-bad-overlay');
+    if (ov) { ov.style.display = 'none'; }
+  }
+
   function scanRegFrame() {
     const video = document.getElementById('reg-video');
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -1547,8 +1587,10 @@
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       if (code && code.data) {
         const raw = code.data.trim();
-        // Master QR (one QR printed on all physical cards)
+        // Valid Subsidi card
         if (raw === 'SUBSIDI_ACTIVATE_CARD_V1' || raw === 'https://subsidi-1.vercel.app/' || raw.startsWith('https://subsidi-1.vercel.app')) {
+          clearTimeout(_scanBadTimer);
+          hideScanBad();
           stopStream(regStream);
           clearTimeout(regScanLoop);
           playSuccessSound();
@@ -1561,17 +1603,29 @@
           }
           return;
         }
-        // Legacy: individual numeric code
+        // Legacy: individual numeric code — login only, cannot create new account
         if (raw.length === 10 && /^\d{10}$/.test(raw)) {
+          clearTimeout(_scanBadTimer);
+          hideScanBad();
           stopStream(regStream);
           clearTimeout(regScanLoop);
           registeredCard = raw;
           cardSecret = extractSecret(raw);
           playSuccessSound();
           document.getElementById('reg-scan-status').textContent = '✓ Card scanned! Checking...';
-          checkCardExists(raw);
+          // Only allow login, never registration for 10-digit codes
+          checkCardExistsLoginOnly(raw);
           return;
         }
+        // QR detected but not a Subsidi card — show overlay
+        clearTimeout(_scanBadTimer);
+        showScanBad();
+        // Auto-hide after 1.5s in case they pull card away without another QR in view
+        _scanBadTimer = setTimeout(hideScanBad, 1500);
+      } else {
+        // Nothing detected — hide overlay
+        clearTimeout(_scanBadTimer);
+        hideScanBad();
       }
     }
     regScanLoop = setTimeout(scanRegFrame, 200);
@@ -1603,6 +1657,33 @@
       // Fallback to registration if check fails
       username = generateUsername(cardCode);
       goRegStep3();
+    }
+  }
+
+  async function checkCardExistsLoginOnly(cardCode) {
+    try {
+      const data = await callEdge('check-card', { cardCode });
+      if (data && data.exists) {
+        userId = data.userId;
+        username = data.username;
+        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        goLoginStep();
+      } else {
+        // 10-digit code not found — reject, cannot register with it
+        const statusEl = document.getElementById('reg-scan-status');
+        statusEl.textContent = '⚠️ Card not found. Use an official Subsidi card.';
+        setTimeout(() => {
+          statusEl.textContent = 'Camera active — scan your card';
+          startRegScan();
+        }, 2500);
+      }
+    } catch (e) {
+      const statusEl = document.getElementById('reg-scan-status');
+      statusEl.textContent = '⚠️ Could not verify card. Try again.';
+      setTimeout(() => {
+        statusEl.textContent = 'Camera active — scan your card';
+        startRegScan();
+      }, 2500);
     }
   }
 

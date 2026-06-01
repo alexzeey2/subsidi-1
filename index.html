@@ -1724,7 +1724,9 @@
       registeredCard = raw_code;
       cardSecret = typeof extractSecret === 'function' ? extractSecret(raw_code) : raw_code;
       statusEl.textContent = '✓ Card claimed! Set your PIN.';
-      checkCardExists(raw_code);
+      username = generateUsername(raw_code);
+      document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+      goRegStep3();
     } catch(e) {
       statusEl.textContent = '⚠️ Connection error. Try again.';
       setTimeout(() => {

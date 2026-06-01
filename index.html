@@ -516,6 +516,21 @@
       <div class="reg-err" id="reg-err-2"></div>
     </div>
 
+    <!-- Step 2b: Phone number (registration) -->
+    <div class="reg-step" id="reg-step-phone-reg">
+      <div class="reg-title">Your phone number</div>
+      <div class="reg-sub">We'll use this to help you recover your account later</div>
+      <div style="margin:28px 0 8px;">
+        <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+          <span style="padding:16px 12px 16px 16px;font-size:15px;color:var(--w40);border-right:1px solid var(--border);white-space:nowrap;">🇳🇬 +234</span>
+          <input id="reg-phone-input" type="tel" inputmode="numeric" maxlength="10" placeholder="8012345678"
+            style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:16px;color:#fff;font-family:inherit;"
+            oninput="this.value=this.value.replace(/\D/g,'').slice(0,10);if(this.value.length===10)setTimeout(submitRegPhone,300);">
+        </div>
+        <div class="pin-err" id="reg-phone-err" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
     <!-- Step 3: Set PIN -->
     <div class="reg-step" id="reg-step-3">
       <div class="reg-title">Create your PIN</div>
@@ -542,6 +557,21 @@
         <div class="key" onclick="regPinDel()">⌫</div>
       </div>
       <div class="pin-err" id="reg-pin-err"></div>
+    </div>
+
+    <!-- Step: Phone number (login flow only) -->
+    <div class="reg-step" id="reg-step-phone">
+      <div class="reg-title">Your phone number</div>
+      <div class="reg-sub">Enter the phone number linked to your account</div>
+      <div style="margin:28px 0 8px;">
+        <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+          <span style="padding:16px 12px 16px 16px;font-size:15px;color:var(--w40);border-right:1px solid var(--border);white-space:nowrap;">🇳🇬 +234</span>
+          <input id="login-phone-input" type="tel" inputmode="numeric" maxlength="10" placeholder="8012345678"
+            style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:16px;color:#fff;font-family:inherit;"
+            oninput="this.value=this.value.replace(/\D/g,'').slice(0,10);if(this.value.length===10)setTimeout(submitLoginPhone,300);">
+        </div>
+        <div class="pin-err" id="login-phone-err" style="margin-top:10px;"></div>
+      </div>
     </div>
 
     <div class="reg-step" id="reg-step-4">
@@ -1624,18 +1654,66 @@
   }
 
   function goLoginStep() {
+    // Go to phone number step first
+    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('reg-step-phone').classList.add('active');
+    document.getElementById('login-phone-input').value = '';
+    document.getElementById('login-phone-err').textContent = '';
+    document.getElementById('login-phone-err').classList.remove('show');
+    setTimeout(() => document.getElementById('login-phone-input').focus(), 300);
+  }
+
+  function goLoginPinStep() {
     loginPinEntry = '';
     document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
     document.getElementById('reg-step-4').classList.add('active');
     updateLoginPinDots('');
   }
 
+  function submitLoginPhone() {
+    const input = document.getElementById('login-phone-input').value.trim();
+    const err = document.getElementById('login-phone-err');
+    if (input.length < 7) {
+      err.textContent = 'Please enter a valid phone number';
+      err.classList.add('show');
+      return;
+    }
+    err.classList.remove('show');
+    const normalized = input.startsWith('0') ? input : '0' + input;
+    window._loginPhone = normalized;
+    goLoginPinStep();
+  }
+
   function goRegStep3() {
+    // Go to phone step first
+    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('reg-step-phone-reg').classList.add('active');
+    document.getElementById('reg-phone-input').value = '';
+    document.getElementById('reg-phone-err').textContent = '';
+    document.getElementById('reg-phone-err').classList.remove('show');
+    setTimeout(() => document.getElementById('reg-phone-input').focus(), 300);
+  }
+
+  function goRegPinStep() {
     regPinEntry = ''; regPinConfirm = ''; regPinStage = 'enter';
-    document.getElementById('reg-step-2').classList.remove('active');
+    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
     document.getElementById('reg-step-3').classList.add('active');
     document.getElementById('reg-pin-lbl').textContent = 'Enter new PIN';
     updateRegPinDots('');
+  }
+
+  function submitRegPhone() {
+    const input = document.getElementById('reg-phone-input').value.trim();
+    const err = document.getElementById('reg-phone-err');
+    if (input.length < 7) {
+      err.textContent = 'Please enter a valid phone number';
+      err.classList.add('show');
+      return;
+    }
+    err.classList.remove('show');
+    const normalized = input.startsWith('0') ? input : '0' + input;
+    window._regPhone = normalized;
+    goRegPinStep();
   }
 
   function updateRegPinDots(val) {
@@ -1703,7 +1781,8 @@
     try {
       const data = await callEdge('register', {
         cardCode: registeredCard,
-        pin: userPin
+        pin: userPin,
+        phone: window._regPhone || null
       });
 
       if (data.error) {
@@ -1836,12 +1915,13 @@
     try {
       err.textContent = 'Verifying...';
       err.classList.add('show');
-      // If userId not set (My Account via URL QR), find account by PIN alone
+      // Identify account by cardCode + phone + PIN (never PIN alone)
       let vData;
       if (userId) {
         vData = await callEdge('verify-pin', { userId, pin: loginPinEntry });
       } else {
-        vData = await callEdge('login-by-pin', { pin: loginPinEntry });
+        const phone = window._loginPhone || null;
+        vData = await callEdge('login-by-card', { cardCode: registeredCard, phone, pin: loginPinEntry });
         if (vData && vData.valid) {
           userId = vData.userId;
           username = vData.username;

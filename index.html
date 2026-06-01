@@ -1461,7 +1461,7 @@
       try {
         showSpinner('Loading...');
         const data = await callEdge('get-user', { userId: savedUserId });
-        if (data && !data.error && data.userId !== undefined || (data && data.username)) {
+        if (data && !data.error && (data.userId !== undefined || data.username)) {
           // Supabase confirmed the user — restore session
           userId = savedUserId;
           username = data.username || username;
@@ -2565,10 +2565,13 @@
   function logOut() {
     if (!confirm('Log out? You\'ll need to scan your card again.')) return;
     localStorage.removeItem('subsidi_userId');
+    localStorage.removeItem('subsidi_cardExpireAt');
     // Reset all state
     userId = null; username = ''; balance = 300;
     subsidyFund = 700; discountPurchasesLeft = 5;
     registeredCard = null; userPin = null;
+    cardActive = false; cardExpireAt = null;
+    if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
     isGuest = false;
     // Go straight to scan card screen
     show('reg-screen');

@@ -520,25 +520,25 @@
         <div id="scan-bad-overlay" style="
           display:none;
           position:absolute;inset:0;
-          background:rgba(8,8,14,0.82);
-          backdrop-filter:blur(6px);
-          -webkit-backdrop-filter:blur(6px);
+          background:rgba(8,8,14,0.88);
+          backdrop-filter:blur(8px);
+          -webkit-backdrop-filter:blur(8px);
           border-radius:20px;
           flex-direction:column;
           align-items:center;
           justify-content:center;
-          gap:14px;
-          animation:scanBadIn .2s ease;
+          gap:16px;
+          animation:scanBadIn .25s ease;
         ">
-          <!-- SVG warning icon -->
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#F0A500" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="12" y1="9" x2="12" y2="13" stroke="#F0A500" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="12" cy="17" r="1" fill="#F0A500"/>
-          </svg>
-          <div style="text-align:center;padding:0 24px;">
-            <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;letter-spacing:.2px;">Card Not Recognised</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6;">Make sure you're scanning<br>an official Subsidi card</div>
+          <!-- Warning icon card -->
+          <div style="background:rgba(108,43,217,0.12);border:1px solid rgba(108,43,217,0.3);border-radius:18px;padding:20px 28px;display:flex;flex-direction:column;align-items:center;gap:14px;min-width:200px;">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" fill="rgba(108,43,217,0.2)" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="12" y1="9" x2="12" y2="13" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="12" cy="17" r="1" fill="#a78bfa"/>
+            </svg>
+            <div class="scan-bad-title" style="font-size:15px;font-weight:700;color:#fff;letter-spacing:.2px;text-align:center;">Card not recognized!</div>
+            <div class="scan-bad-msg" style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6;text-align:center;">Make sure you're scanning<br>an official Subsidi card</div>
           </div>
         </div>
       </div>
@@ -1573,14 +1573,32 @@
 
   let _scanBadTimer = null;
 
-  function showScanBad() {
+  function showScanBad(title, message) {
     const ov = document.getElementById('scan-bad-overlay');
-    if (ov) { ov.style.display = 'flex'; }
+    if (!ov) return;
+    if (title) {
+      const t = ov.querySelector('.scan-bad-title');
+      const m = ov.querySelector('.scan-bad-msg');
+      if (t) t.textContent = title;
+      if (m) m.innerHTML = (message || '').replace('\n', '<br>');
+    }
+    ov.style.display = 'flex';
+  }
+
+  function resetScanBad() {
+    const ov = document.getElementById('scan-bad-overlay');
+    if (!ov) return;
+    const t = ov.querySelector('.scan-bad-title');
+    const m = ov.querySelector('.scan-bad-msg');
+    if (t) t.textContent = 'Card Not Recognised';
+    if (m) m.innerHTML = "Make sure you're scanning<br>an official Subsidi card";
   }
 
   function hideScanBad() {
     const ov = document.getElementById('scan-bad-overlay');
-    if (ov) { ov.style.display = 'none'; }
+    if (!ov) return;
+    ov.style.display = 'none';
+    resetScanBad();
   }
 
   function scanRegFrame() {
@@ -1696,9 +1714,9 @@
       });
       const rows = await res.json();
       if (!rows || rows.length === 0) {
-        statusEl.textContent = '⚠️ No cards available. Contact support.';
+        showScanBad('No Cards Available', 'All cards are currently taken.\nContact support to get yours.');
         setTimeout(() => {
-          statusEl.textContent = 'Scan your card';
+          hideScanBad();
           startRegScan();
         }, 3000);
         return;

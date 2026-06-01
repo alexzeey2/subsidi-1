@@ -1457,17 +1457,19 @@
 
     const savedUserId = localStorage.getItem('subsidi_userId');
     if (savedUserId) {
-      userId = savedUserId;
-      show('dash');
+      // Always verify against Supabase — localStorage only tells us who to check, not that they're valid
       try {
         showSpinner('Loading...');
-        const data = await callEdge('get-user', { userId });
-        if (data && !data.error) {
+        const data = await callEdge('get-user', { userId: savedUserId });
+        if (data && !data.error && data.userId !== undefined || (data && data.username)) {
+          // Supabase confirmed the user — restore session
+          userId = savedUserId;
           username = data.username || username;
           registeredCard = data.cardCode || null;
           balance = data.balance ?? 0;
           subsidyFund = data.subsidyFund ?? subsidyFund;
           discountPurchasesLeft = data.discountPurchasesLeft ?? 0;
+          isGuest = false;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
           const dec = (balance % 1).toFixed(2).slice(1);
@@ -1478,23 +1480,30 @@
           updateCardGlow();
           startCardTimer(data.renewalDate || null);
           checkWaJoined();
+          show('dash');
         } else {
-          renderBundles();
-          updateSubsidyUI();
+          // Supabase doesn't recognise this userId — clear it and send to login
+          localStorage.removeItem('subsidi_userId');
+          userId = null;
+          isGuest = false;
+          show('reg-screen');
         }
       } catch(e) {
+        // Network error — don't log them out, show dashboard with cached state
+        // They'll get fresh data when connection restores
         console.error('[load] get-user failed:', e);
+        userId = savedUserId;
+        isGuest = false;
         renderBundles();
         updateSubsidyUI();
+        show('dash');
       } finally {
         hideSpinner();
       }
     } else {
-      // No account — show dashboard in guest/preview mode
-      isGuest = true;
-      renderBundles();
-      updateSubsidyUI();
-      show('dash');
+      // No saved session — go to login
+      isGuest = false;
+      show('reg-screen');
     }
 
     // Check if returning from Paystack redirect

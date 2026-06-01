@@ -1603,20 +1603,7 @@
           }
           return;
         }
-        // Legacy: individual numeric code — login only, cannot create new account
-        if (raw.length === 10 && /^\d{10}$/.test(raw)) {
-          clearTimeout(_scanBadTimer);
-          hideScanBad();
-          stopStream(regStream);
-          clearTimeout(regScanLoop);
-          registeredCard = raw;
-          cardSecret = extractSecret(raw);
-          playSuccessSound();
-          document.getElementById('reg-scan-status').textContent = '✓ Card scanned! Checking...';
-          // Only allow login, never registration for 10-digit codes
-          checkCardExistsLoginOnly(raw);
-          return;
-        }
+
         // QR detected but not a Subsidi card — show overlay
         clearTimeout(_scanBadTimer);
         showScanBad();

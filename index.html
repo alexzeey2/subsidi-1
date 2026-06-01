@@ -32,6 +32,7 @@
 
   /* ── REGISTER ── */
   #reg-screen{background:var(--dark);align-items:center;justify-content:center;padding:60px 28px 48px;position:relative;overflow:hidden}
+  .reg-back-wrap{position:absolute;top:20px;left:20px;z-index:10;}
   .bg-glow{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(108,43,217,.18) 0%,transparent 65%);pointer-events:none}
   .wordmark{font-family:'Georgia',serif;font-style:italic;font-size:42px;letter-spacing:-.5px;text-align:center;margin-bottom:6px}
   .wdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--p-light);margin-left:2px;vertical-align:middle;margin-bottom:8px}
@@ -500,7 +501,7 @@
 
     <!-- Step 1: Scan QR card -->
     <div class="reg-step" id="reg-step-2">
-      <button class="reg-back" onclick="backToChoice()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+      <div class="reg-back-wrap"><button class="reg-back" onclick="backToChoice()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button></div>
       <div class="reg-title">Scan your Subsidi card</div>
       <div class="reg-sub">Hold your card up to the camera — we'll set you up automatically</div>
 
@@ -551,7 +552,7 @@
 
     <!-- Step 2b: Phone number (registration) -->
     <div class="reg-step" id="reg-step-phone-reg">
-      <button class="reg-back" onclick="backToScan()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+      <div class="reg-back-wrap"><button class="reg-back" onclick="backToScan()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button></div>
       <div class="reg-title">Your phone number</div>
       <div class="reg-sub">We'll use this to help you recover your account later</div>
       <div style="margin:28px 0 8px;">
@@ -566,7 +567,7 @@
 
     <!-- Step 3: Set PIN -->
     <div class="reg-step" id="reg-step-3">
-      <button class="reg-back" onclick="backToPhoneReg()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+      <div class="reg-back-wrap"><button class="reg-back" onclick="backToPhoneReg()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button></div>
       <div class="reg-title">Create your PIN</div>
       <div class="reg-sub">This 4-digit PIN is how you'll confirm every data purchase</div>
       <div class="reg-pin-lbl" id="reg-pin-lbl">Enter new PIN</div>
@@ -595,7 +596,7 @@
 
     <!-- Step: Phone number (login flow only) -->
     <div class="reg-step" id="reg-step-phone">
-      <button class="reg-back" onclick="backToScan()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+      <div class="reg-back-wrap"><button class="reg-back" onclick="backToScan()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button></div>
       <div class="reg-title">Your phone number</div>
       <div class="reg-sub">Enter the phone number linked to your account</div>
       <div style="margin:28px 0 8px;">
@@ -609,7 +610,7 @@
     </div>
 
     <div class="reg-step" id="reg-step-4">
-      <button class="reg-back" onclick="backToPhoneLogin()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+      <div class="reg-back-wrap"><button class="reg-back" onclick="backToPhoneLogin()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button></div>
       <div class="reg-title">Welcome back</div>
       <div class="reg-sub">This card is already registered. Enter your PIN to continue.</div>
       <div class="reg-pin-lbl" id="login-pin-lbl">Enter PIN</div>

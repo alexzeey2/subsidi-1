@@ -550,10 +550,9 @@
       <div class="reg-sub">We'll use this to help you recover your account later</div>
       <div style="margin:28px 0 8px;">
         <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
-          <span style="padding:16px 12px 16px 16px;font-size:15px;color:var(--w40);border-right:1px solid var(--border);white-space:nowrap;">🇳🇬 +234</span>
-          <input id="reg-phone-input" type="tel" inputmode="numeric" maxlength="10" placeholder="8012345678"
+          <input id="reg-phone-input" type="tel" inputmode="numeric" maxlength="11" placeholder="08012345678"
             style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:16px;color:#fff;font-family:inherit;"
-            oninput="this.value=this.value.replace(/\D/g,'').slice(0,10);if(this.value.length===10)setTimeout(submitRegPhone,300);">
+            oninput="this.value=this.value.replace(/\D/g,'').slice(0,11);if(this.value.length===11)setTimeout(submitRegPhone,300);">
         </div>
         <div class="pin-err" id="reg-phone-err" style="margin-top:10px;"></div>
       </div>
@@ -593,10 +592,9 @@
       <div class="reg-sub">Enter the phone number linked to your account</div>
       <div style="margin:28px 0 8px;">
         <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
-          <span style="padding:16px 12px 16px 16px;font-size:15px;color:var(--w40);border-right:1px solid var(--border);white-space:nowrap;">🇳🇬 +234</span>
-          <input id="login-phone-input" type="tel" inputmode="numeric" maxlength="10" placeholder="8012345678"
+          <input id="login-phone-input" type="tel" inputmode="numeric" maxlength="11" placeholder="08012345678"
             style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:16px;color:#fff;font-family:inherit;"
-            oninput="this.value=this.value.replace(/\D/g,'').slice(0,10);if(this.value.length===10)setTimeout(submitLoginPhone,300);">
+            oninput="this.value=this.value.replace(/\D/g,'').slice(0,11);if(this.value.length===11)setTimeout(submitLoginPhone,300);">
         </div>
         <div class="pin-err" id="login-phone-err" style="margin-top:10px;"></div>
       </div>

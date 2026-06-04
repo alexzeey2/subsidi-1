@@ -1462,7 +1462,27 @@
         showSpinner('Loading...');
         const data = await callEdge('get-user', { userId: savedUserId });
         if (data && !data.error && (data.userId !== undefined || data.username)) {
-          // Supabase confirmed the user — restore session
+          // Supabase confirmed the user — check scan session expiry (30–32 hrs)
+          const lastScan = data.last_scan ? new Date(data.last_scan).getTime() : null;
+          const now = Date.now();
+          // Each user gets a random window between 30 and 32 hours (stays consistent per user via userId hash)
+          const userSeed = savedUserId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+          const windowHrs = 30 + (userSeed % 3); // 30, 31, or 32 hours
+          const windowMs = windowHrs * 60 * 60 * 1000;
+          const scanExpired = !lastScan || (now - lastScan) > windowMs;
+
+          if (scanExpired) {
+            // Session expired — they need to scan card again, but we keep userId in localStorage
+            // so after scanning they go straight to PIN, not full registration
+            userId = savedUserId;
+            username = data.username || username;
+            registeredCard = data.cardCode || null;
+            isGuest = false;
+            show('reg-screen');
+            document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+            document.getElementById('reg-step-2').classList.add('active'); // straight to scan step
+          } else {
+          // Restore session normally
           userId = savedUserId;
           username = data.username || username;
           registeredCard = data.cardCode || null;
@@ -1481,6 +1501,7 @@
           startCardTimer(data.renewalDate || null);
           checkWaJoined();
           show('dash');
+          }
         } else {
           // Supabase doesn't recognise this userId — clear it and send to login
           localStorage.removeItem('subsidi_userId');
@@ -2068,6 +2089,8 @@
         userPin = loginPinEntry;
         isGuest = false;
         localStorage.setItem('subsidi_userId', userId);
+        // Save scan timestamp to Supabase — this is the 30–32hr session clock
+        try { await callEdge('update-last-scan', { userId }); } catch(e) { console.warn('last_scan update failed:', e); }
         show('dash');
         // Fetch authoritative data from Supabase
         try {
@@ -2564,6 +2587,8 @@
 
   function logOut() {
     if (!confirm('Log out? You\'ll need to scan your card again.')) return;
+    // Clear scan session on Supabase
+    if (userId) { try { callEdge('update-last-scan', { userId, clear: true }); } catch(e) {} }
     localStorage.removeItem('subsidi_userId');
     localStorage.removeItem('subsidi_cardExpireAt');
     // Reset all state

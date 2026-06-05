@@ -1482,6 +1482,7 @@
           startCardTimer(data.renewalDate || null);
           checkWaJoined();
           show('dash');
+          fetchUserData(); // pull live balance immediately on restore
         } else {
           // Session expired or invalid — clear storage and send to scan
           localStorage.removeItem('subsidi_userId');
@@ -2846,26 +2847,13 @@
   async function showHistoryOv() {
     document.getElementById('hist-ov').classList.add('open');
     document.getElementById('hist-body').innerHTML = '<div class="hist-loader" id="hist-loader">Loading...</div>';
-    const localTxns = getLocalTxns();
     try {
       const data = await callEdge('get-transactions', { userId });
-      const serverTxns = (data && data.transactions) ? data.transactions : [];
-      // Merge: server is source of truth, but add local entries not already in server results
-      // We key on type+amount+approximate time (within 60s) to avoid duplicates
-      const merged = [...serverTxns];
-      localTxns.forEach(lt => {
-        const ltTime = new Date(lt.created_at).getTime();
-        const alreadyPresent = serverTxns.some(st => {
-          const stTime = new Date(st.created_at || st.inserted_at || 0).getTime();
-          return st.type === lt.type && Number(st.amount) === Number(lt.amount) && Math.abs(stTime - ltTime) < 60000;
-        });
-        if (!alreadyPresent) merged.push(lt);
-      });
-      // Sort newest first
-      merged.sort((a, b) => new Date(b.created_at || b.inserted_at || 0) - new Date(a.created_at || a.inserted_at || 0));
-      renderHistory(merged);
+      const txns = (data && data.transactions) ? data.transactions : [];
+      txns.sort((a, b) => new Date(b.created_at || b.inserted_at || 0) - new Date(a.created_at || a.inserted_at || 0));
+      renderHistory(txns);
     } catch(e) {
-      renderHistory(localTxns);
+      renderHistory([]);
     }
   }
 

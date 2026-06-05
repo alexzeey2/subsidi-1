@@ -1458,8 +1458,8 @@
     const savedUserId = localStorage.getItem('subsidi_userId');
     const savedSessionToken = localStorage.getItem('subsidi_session_token');
     if (savedUserId) {
+      showSpinner('Loading...');
       try {
-        showSpinner('Loading...');
         // Step 1: validate session token if we have one (32hr auto-logout)
         if (savedSessionToken) {
           const tokenCheck = await callEdge('validate-session', { sessionToken: savedSessionToken });
@@ -1472,8 +1472,9 @@
             return;
           }
         }
-        // Step 2: always fetch fresh data from get-user
+        // Step 2: fetch fresh data from get-user
         const data = await callEdge('get-user', { userId: savedUserId });
+        hideSpinner();
         if (data && !data.error) {
           userId = savedUserId;
           username = data.username || username;
@@ -1501,11 +1502,10 @@
         }
       } catch(e) {
         console.error('[load] failed:', e);
+        hideSpinner();
         userId = savedUserId;
         isGuest = false;
         show('dash');
-      } finally {
-        hideSpinner();
       }
     } else {
       // No saved session — go to login

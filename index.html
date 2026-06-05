@@ -1502,10 +1502,18 @@
         }
       } catch(e) {
         console.error('[load] failed:', e);
-        hideSpinner();
         userId = savedUserId;
         isGuest = false;
         show('dash');
+        // Retry the data fetch after a short delay — don't silently show empty dashboard
+        setTimeout(async () => {
+          try {
+            await fetchUserData();
+          } catch(e2) {
+            console.warn('[load] retry failed:', e2);
+            hideSpinner();
+          }
+        }, 1500);
       }
     } else {
       // No saved session — go to login

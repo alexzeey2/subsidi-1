@@ -1482,7 +1482,7 @@
           startCardTimer(data.renewalDate || null);
           checkWaJoined();
           show('dash');
-          refreshDash();
+          await refreshDash();
         } else {
           // Session expired or invalid — clear storage and send to scan
           localStorage.removeItem('subsidi_userId');

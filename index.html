@@ -1457,14 +1457,25 @@
 
     const savedUserId = localStorage.getItem('subsidi_userId');
     const savedSessionToken = localStorage.getItem('subsidi_session_token');
-    if (savedUserId && savedSessionToken) {
-      // Validate session token against Supabase — enforces the 32hr auto-logout
+    if (savedUserId) {
       try {
         showSpinner('Loading...');
-        const data = await callEdge('validate-session', { sessionToken: savedSessionToken });
-        if (data && data.valid) {
-          // Session still valid — restore dashboard
-          userId = data.userId;
+        // Step 1: validate session token if we have one (32hr auto-logout)
+        if (savedSessionToken) {
+          const tokenCheck = await callEdge('validate-session', { sessionToken: savedSessionToken });
+          if (!tokenCheck || !tokenCheck.valid) {
+            localStorage.removeItem('subsidi_userId');
+            localStorage.removeItem('subsidi_session_token');
+            localStorage.removeItem('subsidi_cardExpireAt');
+            hideSpinner();
+            show('reg-screen');
+            return;
+          }
+        }
+        // Step 2: always fetch fresh data from get-user
+        const data = await callEdge('get-user', { userId: savedUserId });
+        if (data && !data.error) {
+          userId = savedUserId;
           username = data.username || username;
           registeredCard = data.cardCode || null;
           balance = data.balance ?? 0;
@@ -1482,35 +1493,20 @@
           startCardTimer(data.renewalDate || null);
           checkWaJoined();
           show('dash');
-          await refreshDash();
         } else {
-          // Session expired or invalid — clear storage and send to scan
           localStorage.removeItem('subsidi_userId');
           localStorage.removeItem('subsidi_session_token');
           localStorage.removeItem('subsidi_cardExpireAt');
-          userId = null;
-          isGuest = false;
           show('reg-screen');
-          document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
-          document.getElementById('reg-step-2').classList.add('active');
         }
       } catch(e) {
-        // Network error — don't log them out, show dashboard with cached state
-        console.error('[load] validate-session failed:', e);
+        console.error('[load] failed:', e);
         userId = savedUserId;
         isGuest = false;
-        renderBundles();
-        updateSubsidyUI();
         show('dash');
       } finally {
         hideSpinner();
       }
-    } else if (savedUserId) {
-      // Has userId but no session token (old install) — force re-scan for a fresh token
-      localStorage.removeItem('subsidi_userId');
-      localStorage.removeItem('subsidi_cardExpireAt');
-      isGuest = false;
-      show('reg-screen');
     } else {
       // No saved session — go to login
       isGuest = false;

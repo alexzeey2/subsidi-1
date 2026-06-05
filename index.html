@@ -1482,21 +1482,7 @@
           startCardTimer(data.renewalDate || null);
           checkWaJoined();
           show('dash');
-          // Silently refresh from get-user in background (no spinner)
-          callEdge('get-user', { userId }).then(fresh => {
-            if (fresh && !fresh.error) {
-              balance = fresh.balance ?? balance;
-              subsidyFund = fresh.subsidyFund ?? subsidyFund;
-              discountPurchasesLeft = fresh.discountPurchasesLeft ?? discountPurchasesLeft;
-              const w = Math.floor(balance).toLocaleString();
-              const d = (balance % 1).toFixed(2).slice(1);
-              document.getElementById('bal-display').innerHTML =
-                '<span class="bal-cur">&#x20A6;</span>' + w + '<span class="bal-dec">' + d + '</span>';
-              updateSubsidyUI();
-              renderBundles();
-              startCardTimer(fresh.renewalDate || null);
-            }
-          }).catch(() => {});
+          refreshDash();
         } else {
           // Session expired or invalid — clear storage and send to scan
           localStorage.removeItem('subsidi_userId');

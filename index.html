@@ -1411,7 +1411,7 @@
       attempts++;
       try {
         const data = await callEdge('get-transactions', { userId });
-        const txn = (data.transactions || []).find(t => t.clubkonnect_ref === ref);
+        const txn = (data.transactions || []).find(t => t.ds_transaction_id === ref);
         if (txn && txn.status === 'success') {
           clearInterval(_pollTimer);
           // Update success screen text
@@ -2216,9 +2216,9 @@
         return; // guests are gated before this point
       }
 
-      // Pending message — balance only debits after ClubKonnect confirms delivery
-      document.getElementById('sbody').textContent = cur.size + ' is being delivered to ' + ph2;
-      document.getElementById('samt').textContent = '₦' + cur.price.toLocaleString() + ' will be deducted on delivery';
+      // DataStation confirms synchronously — balance already deducted
+      document.getElementById('sbody').textContent = cur.size + ' has been delivered to ' + ph2;
+      document.getElementById('samt').textContent = '₦' + cur.price.toLocaleString() + ' deducted';
       show('success');
 
     } else {
@@ -2858,11 +2858,14 @@
     document.getElementById('hist-body').innerHTML = '<div class="hist-loader" id="hist-loader">Loading...</div>';
     try {
       const data = await callEdge('get-transactions', { userId });
-      const txns = (data && data.transactions) ? data.transactions : [];
+      const txns = (data && data.transactions && data.transactions.length > 0)
+        ? data.transactions
+        : getLocalTxns();
       txns.sort((a, b) => new Date(b.created_at || b.inserted_at || 0) - new Date(a.created_at || a.inserted_at || 0));
       renderHistory(txns);
     } catch(e) {
-      renderHistory([]);
+      const local = getLocalTxns();
+      renderHistory(local);
     }
   }
 

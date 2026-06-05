@@ -1382,6 +1382,11 @@
         balance = data.balance ?? 0;
         subsidyFund = data.subsidyFund ?? subsidyFund;
         discountPurchasesLeft = data.discountPurchasesLeft ?? 0;
+        if (data.username) {
+          username = data.username;
+          document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        }
+        if (data.cardCode) registeredCard = data.cardCode;
         const whole = Math.floor(balance).toLocaleString();
         const dec = (balance % 1).toFixed(2).slice(1);
         document.getElementById('bal-display').innerHTML =

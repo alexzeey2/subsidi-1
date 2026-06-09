@@ -2178,6 +2178,8 @@
     }
 
     if (pinValid) {
+      buyPinEntry = '';
+      updateBuyPinDots('');
       document.getElementById('pin-buy-ov').classList.remove('open');
       // Reset subtitle back to default
       const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');

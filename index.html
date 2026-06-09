@@ -817,7 +817,7 @@
     <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:28px;">₦180 will be deducted from your balance to reactivate your card.</div>
     <div style="display:flex;gap:10px;">
       <button onclick="cancelReactivate()" style="flex:1;padding:16px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:rgba(255,255,255,0.5);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">No, Cancel</button>
-      <button onclick="reactivateCard()" style="flex:1;padding:16px;background:var(--p);border:none;border-radius:14px;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Ok, Reactivate</button>
+      <button onclick="askRenewPin()" style="flex:1;padding:16px;background:var(--p);border:none;border-radius:14px;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Ok, Reactivate</button>
     </div>
   </div>
 </div>
@@ -2179,6 +2179,16 @@
 
     if (pinValid) {
       document.getElementById('pin-buy-ov').classList.remove('open');
+      // Reset subtitle back to default
+      const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
+      if (sub) sub.textContent = 'Confirm your identity to continue';
+
+      if (renewPinMode) {
+        renewPinMode = false;
+        reactivateCard();
+        return;
+      }
+
       document.getElementById('ov').classList.remove('open');
 
       if (userId) {
@@ -2235,6 +2245,9 @@
 
   function closePinBuy() {
     document.getElementById('pin-buy-ov').classList.remove('open');
+    renewPinMode = false;
+    const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
+    if (sub) sub.textContent = 'Confirm your identity to continue';
   }
 
   // ── Screen navigation ──
@@ -2452,6 +2465,21 @@
       const lbl = document.getElementById(id);
       if (lbl) lbl.classList.toggle('expired', !cardActive);
     });
+  }
+
+  let renewPinMode = false;
+
+  function askRenewPin() {
+    document.getElementById('expired-ov').classList.remove('open');
+    renewPinMode = true;
+    buyPinEntry = '';
+    updateBuyPinDots('');
+    document.getElementById('buy-pin-err').classList.remove('show');
+    document.getElementById('buy-pin-lbl').textContent = '4-digit PIN';
+    // Show ₦180 renewal message in the subtitle
+    const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
+    if (sub) sub.textContent = '₦180 will be deducted to renew your card';
+    document.getElementById('pin-buy-ov').classList.add('open');
   }
 
   async function reactivateCard() {

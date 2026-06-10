@@ -1381,7 +1381,7 @@
       if (data && !data.error) {
         balance = data.balance ?? 0;
         subsidyFund = data.subsidyFund ?? subsidyFund;
-        discountPurchasesLeft = data.discountPurchasesLeft ?? 0;
+        discountPurchasesLeft = data.discountPurchasesLeft ?? (subsidyFund / 120);
         if (data.username) {
           username = data.username;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
@@ -1486,7 +1486,7 @@
           registeredCard = data.cardCode || null;
           balance = data.balance ?? 0;
           subsidyFund = data.subsidyFund ?? subsidyFund;
-          discountPurchasesLeft = data.discountPurchasesLeft ?? 0;
+          discountPurchasesLeft = data.discountPurchasesLeft ?? (subsidyFund / 120);
           isGuest = false;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
@@ -2178,8 +2178,6 @@
     }
 
     if (pinValid) {
-      buyPinEntry = '';
-      updateBuyPinDots('');
       document.getElementById('pin-buy-ov').classList.remove('open');
       // Reset subtitle back to default
       const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');

@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Subsidi</title>
 
@@ -749,7 +752,7 @@
       </div>
       <span class="ni-lbl" style="color:var(--p-light)">Home</span>
     </div>
-    <div class="ni" id="mycard-nav" onclick="navTo('profile',this)">
+    <div class="ni" id="mycard-nav" onclick="show('my-card')">
       <div class="ni-ico" style="position:relative;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="mycard-icon">
           <rect x="2" y="5" width="20" height="14" rx="2"/>
@@ -780,6 +783,16 @@
 </div>
 
 <!-- ── SUCCESS ── -->
+<div class="screen" id="my-card">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;padding:32px;text-align:center;">
+    <div style="font-size:48px;">🃏</div>
+    <div style="font-size:22px;font-weight:700;color:var(--w90);">My Card</div>
+    <div style="font-size:14px;color:var(--w40);line-height:1.6;">Something exciting is coming here.<br>Stay tuned.</div>
+    <div style="margin-top:8px;padding:6px 18px;border-radius:20px;background:rgba(124,58,237,0.15);color:#a78bfa;font-size:12px;font-weight:600;letter-spacing:1px;">COMING SOON</div>
+    <button onclick="show('dash')" style="margin-top:24px;padding:12px 32px;border-radius:14px;border:none;background:var(--pur);color:#fff;font-size:15px;font-weight:600;cursor:pointer;">Go Back</button>
+  </div>
+</div>
+
 <div class="screen" id="success">
   <div class="s-mark">
     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -963,7 +976,7 @@
       </div>
       <span class="ni-lbl">Home</span>
     </div>
-    <div class="ni" id="mycard-nav-prof" onclick="navTo('profile',this)">
+    <div class="ni" id="mycard-nav-prof" onclick="show('my-card')">
       <div class="ni-ico" style="position:relative;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="5" width="20" height="14" rx="2"/>

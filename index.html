@@ -714,6 +714,11 @@
       <span class="data-market-title">Data Market</span>
       <span class="data-market-count" id="market-count"></span>
     </div>
+    <div class="tabs" style="margin-bottom:12px;">
+      <div class="tab cat-tab on" onclick="selCategory(this,'daily')">Daily</div>
+      <div class="tab cat-tab" onclick="selCategory(this,'weekly')">Weekly</div>
+      <div class="tab cat-tab" onclick="selCategory(this,'monthly')">Monthly</div>
+    </div>
     <div class="bundles" id="bundles-all"></div>
   </div>
 
@@ -786,41 +791,6 @@
 </div>
 
 <!-- ── CARD ACTIVE SHEET ── -->
-<div class="overlay" id="card-active-ov" onclick="closeCardActiveOv(event)">
-  <div class="sheet" style="text-align:center;padding:28px 24px 44px;">
-    <div class="sh-bar"></div>
-    <div style="width:56px;height:56px;border-radius:50%;background:rgba(0,200,150,0.1);border:1.5px solid rgba(0,200,150,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00C896" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="5" width="20" height="14" rx="2"/>
-        <line x1="2" y1="10" x2="22" y2="10"/>
-      </svg>
-    </div>
-    <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;margin-bottom:8px;">Card Active</div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Your Subsidi card is active and working.</div>
-    <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:6px;" id="card-active-purchases"></div>
-    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:28px;">Card expires in <span id="card-active-countdown" style="color:var(--p-light);font-weight:700;">--</span></div>
-    <button onclick="closeCardActiveOv()" style="width:100%;padding:16px;background:var(--p);border:none;border-radius:14px;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Got it</button>
-  </div>
-</div>
-
-<!-- ── CARD EXPIRED MODAL ── -->
-<div class="overlay" id="expired-ov">
-  <div class="sheet" style="text-align:center;padding:28px 24px 44px;">
-    <div style="width:56px;height:56px;border-radius:50%;background:rgba(224,65,90,0.1);border:1.5px solid rgba(224,65,90,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E0415A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-        <line x1="1" y1="10" x2="23" y2="10"/>
-      </svg>
-    </div>
-    <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;margin-bottom:8px;">Card Expired</div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:6px;">Your Subsidi card has expired.</div>
-    <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:28px;">₦180 will be deducted from your balance to reactivate your card.</div>
-    <div style="display:flex;gap:10px;">
-      <button onclick="cancelReactivate()" style="flex:1;padding:16px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:14px;color:rgba(255,255,255,0.5);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">No, Cancel</button>
-      <button onclick="askRenewPin()" style="flex:1;padding:16px;background:var(--p);border:none;border-radius:14px;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">Ok, Reactivate</button>
-    </div>
-  </div>
-</div>
 
 <!-- ── DEPOSIT SHEET ── -->
 <div class="overlay" id="dep-ov" onclick="closeDepOv(event)">
@@ -1286,17 +1256,13 @@
 
   let NET = 'MTN', cur = {};
   let balance = 300;
-  let cardActive = true;
-  let cardTimer = null;
-  let cardTimerTimeout = null;
-  let cardExpireAt = null;
+  let
   let registeredCard = null;
   let cardSecret = null;
   let userPin = null;
   let username = '';
   let subsidyFund = 600;
   let discountPurchasesLeft = 5;
-  let renewDays = 28;
 
   // ── QR Scanner state (registration only) ──
   let regStream = null;
@@ -1393,7 +1359,6 @@
           '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
         updateSubsidyUI();
         renderBundles();
-        startCardTimer(data.renewalDate || null);
       }
     } catch(e) {
       console.warn('fetchUserData failed:', e);
@@ -1456,10 +1421,6 @@
     return true; // blocked
   }
   window.addEventListener("load", async () => {
-    // Always fetch expiry from Supabase — never restore from localStorage
-    localStorage.removeItem('subsidi_cardExpireAt');
-    cardExpireAt = null;
-
     const savedUserId = localStorage.getItem('subsidi_userId');
     const savedSessionToken = localStorage.getItem('subsidi_session_token');
     if (savedUserId) {
@@ -1471,7 +1432,6 @@
           if (!tokenCheck || !tokenCheck.valid) {
             localStorage.removeItem('subsidi_userId');
             localStorage.removeItem('subsidi_session_token');
-            localStorage.removeItem('subsidi_cardExpireAt');
             hideSpinner();
             show('reg-screen');
             return;
@@ -1495,14 +1455,11 @@
             '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
           renderBundles();
           updateSubsidyUI();
-          updateCardGlow();
-          startCardTimer(data.renewalDate || null);
           checkWaJoined();
           show('dash');
         } else {
           localStorage.removeItem('subsidi_userId');
           localStorage.removeItem('subsidi_session_token');
-          localStorage.removeItem('subsidi_cardExpireAt');
           show('reg-screen');
         }
       } catch(e) {
@@ -1989,18 +1946,14 @@
 
     show('dash');
     updateSubsidyUI();
-    updateCardGlow();
 
     // Fetch renewal_date from Supabase immediately so timer starts accurately from day 1
     try {
       const freshData = await callEdge('get-user', { userId });
       if (freshData && !freshData.error && freshData.renewalDate) {
-        startCardTimer(freshData.renewalDate);
       } else {
-        startCardTimer();
       }
     } catch(e) {
-      startCardTimer();
     }
 
     setTimeout(() => {
@@ -2013,11 +1966,12 @@
   // ── Buy: open buy sheet directly ──
   function openSheet(size, val, price, orig, planId, planNetwork, subCostCount) {
     if (gateCheck('Buy data at subsidy prices', 'Create a free account to purchase ' + size + ' for ₦' + price + ' — cheaper than anywhere else.')) return;
-    const actualPrice = cardActive ? price : orig;
-    const subCostNum = subCostCount || (orig >= 1000 ? 2 : 1);
-    const subCost = cardActive ? subCostNum + ' SUB' : '—';
-    const subEarnSheet = (actualPrice * 0.10 / 120).toFixed(3);
-    cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET, subCost, subEarnSheet, subCostNum };
+    const isExpensive = subCostCount === 0; // 0 = expensive (≥₦1k), 1 = cheap
+    const hasSubsidy = !isExpensive && discountPurchasesLeft >= 1;
+    const actualPrice = hasSubsidy ? price : orig;
+    const subCostNum = isExpensive ? 0 : 1;
+    const subEarnSheet = isExpensive ? '0' : '1.00';
+    cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET, subCostNum, subEarnSheet };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
     document.getElementById('shsub').textContent = (planNetwork || NET) + ' · ' + val;
     const origPayRow = document.querySelector('#ov .drow');
@@ -2027,17 +1981,16 @@
     const subToggle = document.getElementById('sheet-sub-toggle');
     const subKnob = document.getElementById('sheet-sub-knob');
     const subCostEl = document.getElementById('sheet-sub-cost');
-    const subOn = cardActive && discountPurchasesLeft >= subCostNum;
     // You pay always visible
     document.getElementById('dprice').textContent = '₦' + actualPrice.toLocaleString();
     if (origPayRow) origPayRow.style.display = '';
-    if (cardActive) {
+    if (!isExpensive) {
       if (subRowEl) subRowEl.style.display = '';
       if (subBalanceEl) subBalanceEl.textContent = '(' + (subsidyFund / 120).toFixed(2) + ' SUB)';
-      if (subCostEl) { subCostEl.textContent = subOn ? '-' + subCostNum + ' SUB' : 'Not enough SUB'; subCostEl.style.color = '#f0c040'; }
-      if (subToggle) subToggle.style.background = subOn ? '#7c3aed' : '#444';
-      if (subKnob) subKnob.style.left = subOn ? '19px' : '3px';
-      if (subEarnEl) subEarnEl.textContent = '+' + subEarnSheet + ' SUB';
+      if (subCostEl) { subCostEl.textContent = hasSubsidy ? '-1 SUB' : 'Not enough SUB'; subCostEl.style.color = '#f0c040'; }
+      if (subToggle) subToggle.style.background = hasSubsidy ? '#7c3aed' : '#444';
+      if (subKnob) subKnob.style.left = hasSubsidy ? '19px' : '3px';
+      if (subEarnEl) subEarnEl.textContent = '+1.00 SUB';
     } else {
       if (subRowEl) subRowEl.style.display = 'none';
     }
@@ -2107,11 +2060,8 @@
             const dec = (balance % 1).toFixed(2).slice(1);
             document.getElementById('bal-display').innerHTML =
               '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-            cardActive = true;
             updateSubsidyUI();
-            updateCardGlow();
             renderBundles();
-            startCardTimer(userData.renewalDate || null);
           }
         } catch(e) {
           console.warn('post-login fetch failed:', e);
@@ -2183,11 +2133,6 @@
       const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
       if (sub) sub.textContent = 'Confirm your identity to continue';
 
-      if (renewPinMode) {
-        renewPinMode = false;
-        reactivateCard();
-        return;
-      }
 
       document.getElementById('ov').classList.remove('open');
 
@@ -2245,7 +2190,6 @@
 
   function closePinBuy() {
     document.getElementById('pin-buy-ov').classList.remove('open');
-    renewPinMode = false;
     const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
     if (sub) sub.textContent = 'Confirm your identity to continue';
   }
@@ -2261,73 +2205,105 @@
 
   // ── Plans data (Datastation — flat list per network) ──
   const PLANS = {
-    MTN: [
-      { size:'230MB', val:'1 Day',   planId:'432', ck:200  },
-      { size:'1GB',   val:'1 Day',   planId:'419', ck:250  },
-      { size:'2.5GB', val:'1 Day',   planId:'420', ck:560  },
-      { size:'2GB',   val:'2 Days',  planId:'328', ck:735  },
-      { size:'2.5GB', val:'2 Days',  planId:'329', ck:882  },
-      { size:'3.2GB', val:'2 Days',  planId:'218', ck:990  },
-      { size:'500MB', val:'7 Days',  planId:'350', ck:490  },
-      { size:'1GB',   val:'7 Days',  planId:'409', ck:560  },
-      { size:'1.2GB', val:'7 Days',  planId:'321', ck:735  },
-      { size:'1GB',   val:'7 Days',  planId:'340', ck:785  },
-      { size:'1.5GB', val:'7 Days',  planId:'360', ck:980  },
-      { size:'3.5GB', val:'7 Days',  planId:'407', ck:1485 },
-      { size:'500MB', val:'5 Days',  planId:'416', ck:400  },
-      { size:'1GB',   val:'30 Days', planId:'417', ck:610  },
-      { size:'2GB',   val:'30 Days', planId:'403', ck:1120 },
-      { size:'2GB',   val:'30 Days', planId:'335', ck:1470 },
-    ],
-    Airtel: [
-      { size:'300MB', val:'2 Days',  planId:'405', ck:145  },
-      { size:'600MB', val:'2 Days',  planId:'404', ck:245  },
-      { size:'1.5GB', val:'1 Day',   planId:'382', ck:545  },
-      { size:'500MB', val:'7 Days',  planId:'375', ck:545  },
-      { size:'1.5GB', val:'2 Days',  planId:'387', ck:645  },
-      { size:'2GB',   val:'2 Days',  planId:'383', ck:645  },
-      { size:'3GB',   val:'2 Days',  planId:'431', ck:800  },
-      { size:'1GB',   val:'7 Days',  planId:'428', ck:850  },
-      { size:'1.5GB', val:'7 Days',  planId:'425', ck:1045 },
-    ],
-    Glo: [
-      { size:'750MB', val:'1 Day',   planId:'275', ck:190  },
-      { size:'500MB', val:'14 Days', planId:'203', ck:212  },
-      { size:'1GB',   val:'3 Days',  planId:'396', ck:255  },
-      { size:'1.5GB', val:'1 Day',   planId:'276', ck:297  },
-      { size:'1GB',   val:'7 Days',  planId:'399', ck:297  },
-      { size:'2.5GB', val:'2 Days',  planId:'277', ck:480  },
-      { size:'3GB',   val:'3 Days',  planId:'397', ck:765  },
-      { size:'3GB',   val:'7 Days',  planId:'400', ck:892  },
-      { size:'5GB',   val:'3 Days',  planId:'398', ck:1275 },
-      { size:'5GB',   val:'7 Days',  planId:'401', ck:1487 },
-    ],
-    '9mobile': [
-      { size:'500MB', val:'30 Days', planId:'221', ck:240  },
-      { size:'1GB',   val:'30 Days', planId:'183', ck:480  },
-      { size:'1.5GB', val:'30 Days', planId:'184', ck:720  },
-      { size:'2GB',   val:'30 Days', planId:'185', ck:960  },
-      { size:'3GB',   val:'30 Days', planId:'186', ck:1440 },
-    ],
+    MTN: {
+      daily: [
+        { size:'1GB',   val:'1 Day',  planId:'419', ck:250  },
+        { size:'2.5GB', val:'1 Day',  planId:'420', ck:580  },
+      ],
+      weekly: [
+        { size:'1.2GB', val:'7 Days', planId:'321', ck:735  },
+        { size:'1.5GB', val:'7 Days', planId:'360', ck:980  },
+        { size:'1GB',   val:'7 Days', planId:'415', ck:785  },
+        { size:'3.5GB', val:'7 Days', planId:'407', ck:1485 },
+        { size:'5GB',   val:'7 Days', planId:'434', ck:1350 },
+        { size:'11GB',  val:'7 Days', planId:'408', ck:3465 },
+      ],
+      monthly: [
+        { size:'1GB',   val:'30 Days', planId:'417', ck:610  },
+        { size:'2GB',   val:'30 Days', planId:'403', ck:1120 },
+        { size:'3GB',   val:'30 Days', planId:'336', ck:1980 },
+        { size:'5GB',   val:'30 Days', planId:'366', ck:2800 },
+        { size:'7GB',   val:'30 Days', planId:'371', ck:3430 },
+      ],
+    },
+    Airtel: {
+      daily: [
+        { size:'1.5GB', val:'1 Day',  planId:'382', ck:545  },
+      ],
+      weekly: [
+        { size:'1GB',   val:'7 Days', planId:'428', ck:850  },
+        { size:'1.5GB', val:'7 Days', planId:'425', ck:1045 },
+        { size:'4GB',   val:'7 Days', planId:'384', ck:1545 },
+        { size:'10GB',  val:'7 Days', planId:'412', ck:3045 },
+      ],
+      monthly: [
+        { size:'2GB',   val:'30 Days', planId:'376', ck:1545 },
+        { size:'3GB',   val:'30 Days', planId:'377', ck:2045 },
+        { size:'4GB',   val:'30 Days', planId:'427', ck:2545 },
+        { size:'8GB',   val:'30 Days', planId:'429', ck:3045 },
+      ],
+    },
+    Glo: {
+      daily: [
+        { size:'1.5GB', val:'1 Day',  planId:'276', ck:297  },
+      ],
+      weekly: [
+        { size:'1GB',   val:'7 Days', planId:'399', ck:320  },
+        { size:'3GB',   val:'7 Days', planId:'400', ck:960  },
+        { size:'5GB',   val:'7 Days', planId:'401', ck:1600 },
+      ],
+      monthly: [
+        { size:'1GB',   val:'30 Days', planId:'194', ck:425  },
+        { size:'2GB',   val:'30 Days', planId:'195', ck:850  },
+        { size:'3GB',   val:'30 Days', planId:'196', ck:1275 },
+        { size:'5GB',   val:'30 Days', planId:'197', ck:2125 },
+        { size:'10GB',  val:'30 Days', planId:'200', ck:4250 },
+      ],
+    },
+    '9mobile': {
+      daily: [],
+      weekly: [],
+      monthly: [
+        { size:'1GB',   val:'30 Days', planId:'183', ck:480  },
+        { size:'1.5GB', val:'30 Days', planId:'184', ck:720  },
+        { size:'2GB',   val:'30 Days', planId:'185', ck:960  },
+        { size:'3GB',   val:'30 Days', planId:'186', ck:1440 },
+        { size:'4GB',   val:'30 Days', planId:'265', ck:1920 },
+        { size:'5GB',   val:'30 Days', planId:'188', ck:2400 },
+        { size:'10GB',  val:'30 Days', planId:'189', ck:4800 },
+      ],
+    },
   };
 
   function fmt(n) { return '₦' + Math.round(n).toLocaleString(); }
 
+  let CATEGORY = 'daily';
+
+  function selCategory(el, cat) {
+    document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('on'));
+    el.classList.add('on');
+    CATEGORY = cat;
+    renderBundles();
+  }
+
   function renderBundles() {
-    const plans = PLANS[NET] || [];
+    const netPlans = PLANS[NET] || { daily: [], weekly: [], monthly: [] };
+    const plans = netPlans[CATEGORY] || [];
     const container = document.getElementById('bundles-all');
     if (!container) return;
     const count = document.getElementById('market-count');
     if (count) count.textContent = plans.length + ' plans';
+    if (plans.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:32px 0;color:var(--w40);font-size:13px;">No plans available</div>';
+      return;
+    }
     container.innerHTML = plans.map(p => {
-      const yours = Math.round(p.ck * 1.10);
-      const subCost = yours >= 1000 ? 2 : 1;
-      const subDrain = subCost * 120;
-      const subsidi = yours - subDrain;
-      const hasDiscount = cardActive && discountPurchasesLeft >= subCost;
-      const displayPrice = hasDiscount ? subsidi : yours;
+      const yours = p.ck + 120;
+      const isExpensive = p.ck >= 1000;
+      const hasDiscount = !isExpensive && discountPurchasesLeft >= 1;
+      const displayPrice = hasDiscount ? p.ck : yours;
       const strikePrice = hasDiscount ? yours : '';
-      return `<div class="bundle" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${hasDiscount ? subsidi : yours},${yours},'${p.planId}','${NET}',${subCost})">
+      return `<div class="bundle" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${yours},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">
         ${hasDiscount ? '<div class="b-sub-dot"></div>' : ''}
         <div class="b-val">${p.val}</div>
         <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
@@ -2369,166 +2345,18 @@
   }
 
   // ── Card expiry ──
-  function startCardTimer(renewalDateISO) {
-    if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
-    if (renewalDateISO) {
-      // Compute fresh expiry: renewalDate + 30s, but only if this is a newer renewal
-      const newExpiry = new Date(renewalDateISO).getTime(); // renewal_date IS the expiry
-      // Only update if this gives us more time (avoids stale renewalDate overwriting a good expiry)
-      if (!cardExpireAt || newExpiry > cardExpireAt) {
-        cardExpireAt = newExpiry;
-      }
-    }
-    if (!cardExpireAt || cardExpireAt <= Date.now()) {
-      cardActive = false;
-      updateCardGlow();
-      renderBundles();
-      if (cardExpireAt && cardExpireAt > 0) showExpiredModal();
-      return;
-    }
-    cardActive = true;
-    renderBundles();
-    const wrapInit = document.getElementById('subsidy-bar-wrap');
-    if (wrapInit) wrapInit.style.display = '';
-    updateCardGlow();
 
-    const msLeft = cardExpireAt - Date.now();
-    const safeMs = Math.min(msLeft, 2147483647);
-    cardTimerTimeout = setTimeout(() => {
-      cardTimerTimeout = null;
-      cardActive = false;
-      cardExpireAt = null;
-      localStorage.removeItem('subsidi_cardExpireAt');
-      const wrap = document.getElementById('subsidy-bar-wrap');
-      if (wrap) wrap.style.display = 'none';
-      updateCardGlow();
-      renderBundles();
-      showExpiredModal();
-    }, safeMs);
-  }
 
-  function badgeTap() { if (!cardActive) showExpiredModal(); }
 
-  let cardActiveCountdownInterval = null;
 
-  function myCardTap() {
-    if (gateCheck('Activate your Subsidi card', 'Create a free account and scan your card to unlock subsidy prices.')) return;
-    if (!cardActive) {
-      showExpiredModal();
-    } else {
-      // Update purchases left text
-      const p = discountPurchasesLeft;
-      document.getElementById('card-active-purchases').textContent =
-        p + ' discount purchase' + (p !== 1 ? 's' : '') + ' remaining';
-      // Start live countdown
-      if (cardActiveCountdownInterval) clearInterval(cardActiveCountdownInterval);
-      function tickCountdown() {
-        if (!cardExpireAt) {
-          document.getElementById('card-active-countdown').textContent = '--';
-          return;
-        }
-        const secsLeft = Math.max(0, Math.round((cardExpireAt - Date.now()) / 1000));
-        const d = Math.floor(secsLeft / 86400);
-        const h = Math.floor((secsLeft % 86400) / 3600);
-        const m = Math.floor((secsLeft % 3600) / 60);
-        const s = secsLeft % 60;
-        document.getElementById('card-active-countdown').textContent =
-          d > 0 ? d + 'd ' + h + 'h ' + m + 'm' :
-          h > 0 ? h + 'h ' + m + 'm ' + s + 's' :
-          m > 0 ? m + 'm ' + s + 's' : s + 's';
-        if (secsLeft <= 0) clearInterval(cardActiveCountdownInterval);
-      }
-      tickCountdown();
-      cardActiveCountdownInterval = setInterval(tickCountdown, 1000);
-      document.getElementById('card-active-ov').classList.add('open');
-    }
-  }
 
-  function closeCardActiveOv(e) {
-    if (!e || e.target === document.getElementById('card-active-ov') || e.type === 'click') {
-      document.getElementById('card-active-ov').classList.remove('open');
-      if (cardActiveCountdownInterval) { clearInterval(cardActiveCountdownInterval); cardActiveCountdownInterval = null; }
-    }
-  }
 
-  function showExpiredModal() {
-    document.getElementById('expired-ov').classList.add('open');
-  }
 
-  function updateCardGlow() {
-    // Apply to both dashboard and profile nav buttons
-    ['mycard-glow','mycard-glow-prof'].forEach(id => {
-      const glow = document.getElementById(id);
-      if (glow) glow.classList.toggle('expired', !cardActive);
-    });
-    ['mycard-lbl','mycard-lbl-prof'].forEach(id => {
-      const lbl = document.getElementById(id);
-      if (lbl) lbl.classList.toggle('expired', !cardActive);
-    });
-  }
 
-  let renewPinMode = false;
 
-  function askRenewPin() {
-    document.getElementById('expired-ov').classList.remove('open');
-    renewPinMode = true;
-    buyPinEntry = '';
-    updateBuyPinDots('');
-    document.getElementById('buy-pin-err').classList.remove('show');
-    document.getElementById('buy-pin-lbl').textContent = '4-digit PIN';
-    // Show ₦180 renewal message in the subtitle
-    const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
-    if (sub) sub.textContent = '₦180 will be deducted to renew your card';
-    document.getElementById('pin-buy-ov').classList.add('open');
-  }
 
-  async function reactivateCard() {
-    document.getElementById('expired-ov').classList.remove('open');
-    try {
-      showSpinner('Renewing card...');
-      const result = await callEdge('Renew-Card', { userId });
-      if (!result || result.error) {
-        alert(result?.error || 'Renewal failed. Please try again.');
-        hideSpinner();
-        return;
-      }
-      // Set a fresh expiry immediately from current time (don't rely on server roundtrip lag)
-      try {
-        const renewed = await callEdge('get-user', { userId });
-        if (renewed && !renewed.error && renewed.renewalDate) {
-          startCardTimer(renewed.renewalDate);
-        }
-      } catch(e) { console.warn('Could not fetch renewal date:', e); }
-      // Log locally so history shows it
-      saveLocalTxn({ type: 'renewal', data_plan: 'card_renewal', amount: 180, status: 'success' });
-      // Log renewal to Supabase transactions table
-      try {
-        await fetch(SUPA_URL + '/rest/v1/transactions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPA_KEY,
-            'Authorization': 'Bearer ' + SUPA_KEY,
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            type: 'renewal',
-            data_plan: 'card_renewal',
-            amount: 180,
-            status: 'success',
-            card_active: true
-          })
-        });
-      } catch(e) { console.warn('Failed to log renewal to Supabase:', e); }
-      // Fetch fresh data from Supabase after renewal
-      await fetchUserData();
-    } catch(e) {
-      alert('Connection error. Please try again.');
-    } finally {
-      hideSpinner();
-    }
-  }
+
+
 
   // ── Profile stats tracking ──
   let totalPurchases = 0;
@@ -2582,22 +2410,17 @@
 
     const badge = document.getElementById('pcv-status-badge');
     if (badge) {
-      if (cardActive) {
-        badge.className = 'pcv-status-badge active';
-        badge.innerHTML = '<span class="pip"></span>Active';
-      } else {
-        badge.className = 'pcv-status-badge expired';
-        badge.innerHTML = '<span class="pip" style="background:var(--red)"></span>Expired';
-      }
+      badge.className = 'pcv-status-badge active';
+      badge.innerHTML = '<span class="pip"></span>Active';
     }
 
     // Card row sub / right
     const cardSubEl = document.getElementById('prof-card-sub');
     const cardRightEl = document.getElementById('prof-card-right');
-    if (cardSubEl) cardSubEl.textContent = cardActive ? 'Subsidy discounts active' : 'Card expired — tap to renew';
+    if (cardSubEl) cardSubEl.textContent = 'Subsidy discounts active';
     if (cardRightEl) {
-      cardRightEl.textContent = cardActive ? 'Active' : 'Expired';
-      cardRightEl.style.color = cardActive ? 'var(--green)' : 'var(--red)';
+      cardRightEl.textContent = 'Active';
+      cardRightEl.style.color = 'var(--green)';
     }
   }
 
@@ -2620,13 +2443,10 @@
     if (userId) { try { callEdge('update-last-scan', { userId, clear: true }); } catch(e) {} }
     localStorage.removeItem('subsidi_userId');
     localStorage.removeItem('subsidi_session_token');
-    localStorage.removeItem('subsidi_cardExpireAt');
     // Reset all state
     userId = null; username = ''; balance = 300;
     subsidyFund = 700; discountPurchasesLeft = 5;
     registeredCard = null; userPin = null;
-    cardActive = false; cardExpireAt = null;
-    if (cardTimerTimeout) { clearTimeout(cardTimerTimeout); cardTimerTimeout = null; }
     isGuest = false;
     // Go straight to scan card screen
     show('reg-screen');
@@ -2750,19 +2570,7 @@
     setTimeout(() => { t.classList.remove('show'); t.textContent = 'Sponsored'; }, 2500);
   }
 
-  function cancelReactivate() {
-    document.getElementById('expired-ov').classList.remove('open');
-    cardActive = false;
-    const wrap = document.getElementById('subsidy-bar-wrap');
-    if (wrap) wrap.style.display = 'none';
-    const badge = document.getElementById('card-badge');
-    badge.innerHTML = '<span class="pip" style="background:var(--red)"></span>Card Expired — Tap to reactivate';
-    badge.style.background = 'rgba(224,65,90,0.08)';
-    badge.style.borderColor = 'rgba(224,65,90,0.18)';
-    badge.style.color = 'var(--red)';
-    badge.style.cursor = 'pointer';
-    renderBundles();
-  }
+
 
   // ── Deposit ──
   let selectedDep = 0;
@@ -2848,18 +2656,18 @@
     if (fill) fill.style.width = pct + '%';
     if (text) text.textContent = subTokens + ' SUB';
     if (amountEl) amountEl.textContent = subTokens + ' SUB';
-    if (wrap) wrap.style.display = cardActive ? '' : 'none';
-    updateCardGlow();
+    if (wrap) wrap.style.display = '';
     renderBundles();
   }
 
   function applySubsidyPurchase() {
-    subsidyFund -= 140;                            // full cost of one discount purchase
-    const commission = Math.round(cur.orig * 0.03);
-    subsidyFund += 20 + commission;                // ₦20 + data margin flows back in
-    subsidyFund = Math.max(0, subsidyFund);
+    if (cur.subCostNum > 0) {
+      subsidyFund -= 120; // spend 1 SUB
+      subsidyFund += 120; // earn back 1 SUB — net zero, balance never drains
+      subsidyFund = Math.max(0, subsidyFund);
+      totalSaved += 120;
+    }
     totalPurchases++;
-    if (cardActive) totalSaved += 120;
     updateSubsidyUI();
   }
 
@@ -3143,14 +2951,14 @@
     navigator.serviceWorker.register('sw.js').catch(()=>{});
   }
 
-  let prompt=null;
+  let installPrompt=null;
   window.addEventListener('beforeinstallprompt',e=>{
-    e.preventDefault(); prompt=e;
+    e.preventDefault(); installPrompt=e;
     setTimeout(showNudge, 9000);
   });
 
   function showNudge(){
-    if(!prompt||document.getElementById('_pwa'))return;
+    if(!installPrompt||document.getElementById('_pwa'))return;
     const d=document.createElement('div');
     d.id='_pwa';
     d.style.cssText='position:fixed;bottom:80px;left:12px;right:12px;background:#161622;border:1px solid rgba(108,43,217,.5);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;z-index:9999;box-shadow:0 0 24px rgba(108,43,217,.25);animation:_ni .4s cubic-bezier(.22,1,.36,1)';
@@ -3165,11 +2973,11 @@
         <button id="_pwa_n" style="background:transparent;border:none;color:rgba(255,255,255,.3);font-size:11px;cursor:pointer">Later</button>
       </div>`;
     document.body.appendChild(d);
-    document.getElementById('_pwa_y').onclick=()=>{d.remove();prompt.prompt();prompt=null;};
+    document.getElementById('_pwa_y').onclick=()=>{d.remove();installPrompt.prompt();installPrompt=null;};
     document.getElementById('_pwa_n').onclick=()=>d.remove();
   }
 
-  window.addEventListener('appinstalled',()=>{prompt=null;const e=document.getElementById('_pwa');if(e)e.remove();});
+  window.addEventListener('appinstalled',()=>{installPrompt=null;const e=document.getElementById('_pwa');if(e)e.remove();});
 })();
 </script>
 </body>

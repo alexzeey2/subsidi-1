@@ -421,6 +421,20 @@
 
 
 
+  /* ── GOLDEN PRICE (discount active) ── */
+  @keyframes goldbeam {
+    0%,100% { text-shadow: 0 0 8px rgba(245,166,35,0.6), 0 0 20px rgba(245,166,35,0.3); }
+    50%      { text-shadow: 0 0 18px rgba(245,166,35,0.9), 0 0 40px rgba(245,166,35,0.5), 0 0 60px rgba(245,166,35,0.2); }
+  }
+  .price-gold {
+    color: #F5A623 !important;
+    animation: goldbeam 1.8s ease-in-out infinite;
+  }
+  .b-price-gold {
+    color: #F5A623 !important;
+    animation: goldbeam 1.8s ease-in-out infinite;
+  }
+
   /* ── SUB TOKEN SYSTEM ── */
   :root { --sub:#F5A623; --sub-glow:rgba(245,166,35,0.2); --sub-bg:rgba(245,166,35,0.08); --sub-border:rgba(245,166,35,0.15); }
 
@@ -660,15 +674,15 @@
 
     <div class="bal-lbl">Wallet Balance</div>
     <div class="bal-amt" id="bal-display"><span class="bal-cur">₦</span>300<span class="bal-dec">.00</span></div>
-    <!-- Subsidy bar -->
+    <!-- Purchase counter bar -->
     <div class="subsidy-bar-wrap" id="subsidy-bar-wrap">
       <div class="sub-bar-header">
-        <div class="sub-bar-label">Sub balance</div>
-        <div class="sub-bar-amount" id="sub-bar-amount">5.00 SUB</div>
+        <div class="sub-bar-label" id="sub-bar-label" style="color:#F5A623;font-weight:700;font-size:11px;letter-spacing:.3px;">Buy 3 times to reduce price again</div>
+        <div class="sub-bar-amount" id="sub-bar-amount" style="color:#F5A623;font-weight:800;font-size:13px;">0 / 3</div>
       </div>
       <div class="subsidy-bar-track">
-        <div class="subsidy-bar-fill" id="subsidy-bar-fill"></div>
-        <div class="subsidy-bar-text" id="subsidy-bar-text">5 discount purchases left</div>
+        <div class="subsidy-bar-fill" id="subsidy-bar-fill" style="background:linear-gradient(90deg,#b87010,#F5A623);"></div>
+        <div class="subsidy-bar-text" id="subsidy-bar-text"></div>
         <div class="subsidy-water" id="subsidy-water"></div>
       </div>
     </div>
@@ -833,18 +847,6 @@
       <input type="tel" placeholder="080xxxxxxxx" id="phinput" maxlength="11">
     </div>
     <div class="drow"><span class="dk">You pay</span><span class="dv ac" id="dprice" style="font-size:22px;font-weight:700;color:var(--w);">₦285</span></div>
-    <div class="sheet-sub-row" id="sheet-sub-row" style="display:none;">
-      <div class="drow" style="margin-top:6px;">
-        <span class="dk" style="color:#f0c040;font-weight:700;">SUB balance <span id="sheet-sub-balance"></span></span>
-        <span class="dv ac sheet-sub-price-combined">
-          <span id="sheet-sub-cost" style="color:#f0c040;font-size:13px;font-weight:700;"></span>
-          <span id="sheet-sub-toggle" style="display:inline-block;width:36px;height:20px;border-radius:10px;margin-left:8px;position:relative;cursor:default;transition:background 0.2s;">
-            <span id="sheet-sub-knob" style="position:absolute;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left 0.2s;"></span>
-          </span>
-        </span>
-      </div>
-
-    </div>
     <button class="cbtn" onclick="confirmBuy()">Confirm Purchase</button>
   </div>
 </div>
@@ -1273,8 +1275,9 @@
   let cardSecret = null;
   let userPin = null;
   let username = '';
-  let subsidyFund = 600;
-  let discountPurchasesLeft = 5;
+  let subsidyFund = 240; // seed for new accounts (invisible to user)
+  let discountPurchasesLeft = 1; // has discount on first purchase
+  let purchaseCount = 0; // tracks cycle: 0=discount available, 1,2,3=full price (3rd goes to Xela)
 
   // ── QR Scanner state (registration only) ──
   let regStream = null;
@@ -1359,7 +1362,7 @@
       if (data && !data.error) {
         balance = data.balance ?? 0;
         subsidyFund = data.subsidyFund ?? subsidyFund;
-        discountPurchasesLeft = data.discountPurchasesLeft ?? (subsidyFund / 120);
+        purchaseCount = data.purchaseCount ?? purchaseCount;
         if (data.username) {
           username = data.username;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
@@ -1458,7 +1461,7 @@
           registeredCard = data.cardCode || null;
           balance = data.balance ?? 0;
           subsidyFund = data.subsidyFund ?? subsidyFund;
-          discountPurchasesLeft = data.discountPurchasesLeft ?? (subsidyFund / 120);
+          purchaseCount = data.purchaseCount ?? purchaseCount;
           isGuest = false;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
@@ -1978,33 +1981,18 @@
   // ── Buy: open buy sheet directly ──
   function openSheet(size, val, price, orig, planId, planNetwork, subCostCount) {
     if (gateCheck('Buy data at subsidy prices', 'Create a free account to purchase ' + size + ' for ₦' + price + ' — cheaper than anywhere else.')) return;
-    const isExpensive = subCostCount === 0; // 0 = expensive (≥₦1k), 1 = cheap
-    const hasSubsidy = !isExpensive && discountPurchasesLeft >= 1;
-    const actualPrice = hasSubsidy ? price : orig;
-    const subCostNum = isExpensive ? 0 : 1;
-    const subEarnSheet = isExpensive ? '0' : '1.00';
-    cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET, subCostNum, subEarnSheet };
+    const isExpensive = subCostCount === 0;
+    const hasDiscount = !isExpensive && purchaseCount === 0;
+    const actualPrice = hasDiscount ? price : orig;
+    cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET, hasDiscount };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
     document.getElementById('shsub').textContent = (planNetwork || NET) + ' · ' + val;
-    const origPayRow = document.querySelector('#ov .drow');
-    const subRowEl = document.getElementById('sheet-sub-row');
-    const subEarnEl = document.getElementById('sheet-sub-earn');
-    const subBalanceEl = document.getElementById('sheet-sub-balance');
-    const subToggle = document.getElementById('sheet-sub-toggle');
-    const subKnob = document.getElementById('sheet-sub-knob');
-    const subCostEl = document.getElementById('sheet-sub-cost');
-    // You pay always visible
-    document.getElementById('dprice').textContent = '₦' + actualPrice.toLocaleString();
-    if (origPayRow) origPayRow.style.display = '';
-    if (!isExpensive) {
-      if (subRowEl) subRowEl.style.display = '';
-      if (subBalanceEl) subBalanceEl.textContent = '(' + (subsidyFund / 120).toFixed(2) + ' SUB)';
-      if (subCostEl) { subCostEl.textContent = hasSubsidy ? '-1 SUB' : 'Not enough SUB'; subCostEl.style.color = '#f0c040'; }
-      if (subToggle) subToggle.style.background = hasSubsidy ? '#7c3aed' : '#444';
-      if (subKnob) subKnob.style.left = hasSubsidy ? '19px' : '3px';
-      if (subEarnEl) subEarnEl.textContent = '+1.00 SUB';
+    const priceEl = document.getElementById('dprice');
+    priceEl.textContent = '₦' + actualPrice.toLocaleString();
+    if (hasDiscount) {
+      priceEl.classList.add('price-gold');
     } else {
-      if (subRowEl) subRowEl.style.display = 'none';
+      priceEl.classList.remove('price-gold');
     }
     document.getElementById('phinput').value = '';
     document.getElementById('ov').classList.add('open');
@@ -2065,7 +2053,7 @@
           if (userData && !userData.error) {
             balance = userData.balance ?? 300;
             subsidyFund = userData.subsidyFund ?? subsidyFund;
-            discountPurchasesLeft = userData.discountPurchasesLeft ?? Math.floor(subsidyFund / 120);
+            purchaseCount = userData.purchaseCount ?? purchaseCount;
             username = userData.username || username;
             document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();
@@ -2173,6 +2161,7 @@
 
           // Log locally
           saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
+          applySubsidyPurchase();
           await fetchUserData();
 
         } catch (e) {
@@ -2321,17 +2310,16 @@
     }
     container.innerHTML = plans.map(p => {
       const yours = p.ck + 120;
-      const isExpensive = p.ck >= 1000;
-      const hasDiscount = !isExpensive && discountPurchasesLeft >= 1;
+      const isExpensive = p.ck >= 1100;
+      const hasDiscount = !isExpensive && purchaseCount === 0;
       const displayPrice = hasDiscount ? p.ck : yours;
       const strikePrice = hasDiscount ? yours : '';
       return `<div class="bundle" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${yours},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">
-        ${hasDiscount ? '<div class="b-sub-dot"></div>' : ''}
         <div class="b-val">${p.val}</div>
         <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
         <div class="b-orig">${strikePrice ? fmt(strikePrice) : ''}</div>
-        <div class="b-price">${fmt(displayPrice)}</div>
-        <div class="b-btn">${hasDiscount ? 'Best Price' : 'Market Price'}</div>
+        <div class="b-price ${hasDiscount ? 'b-price-gold' : ''}">${fmt(displayPrice)}</div>
+        <div class="b-btn" style="${hasDiscount ? 'background:linear-gradient(90deg,#b87010,#F5A623);' : ''}">${hasDiscount ? 'Best Price' : 'Market Price'}</div>
       </div>`;
     }).join('');
   }
@@ -2467,7 +2455,7 @@
     localStorage.removeItem('subsidi_session_token');
     // Reset all state
     userId = null; username = ''; balance = 300;
-    subsidyFund = 700; discountPurchasesLeft = 5;
+    subsidyFund = 240; discountPurchasesLeft = 1; purchaseCount = 0;
     registeredCard = null; userPin = null;
     isGuest = false;
     // Go straight to scan card screen
@@ -2668,26 +2656,35 @@
 
   // ── Subsidy UI ──
   function updateSubsidyUI() {
-    discountPurchasesLeft = subsidyFund / 120; // keep as decimal now
-    const pct = Math.min(100, (subsidyFund / 700) * 100);
     const fill = document.getElementById('subsidy-bar-fill');
-    const text = document.getElementById('subsidy-bar-text');
-    const wrap = document.getElementById('subsidy-bar-wrap');
     const amountEl = document.getElementById('sub-bar-amount');
-    const subTokens = discountPurchasesLeft.toFixed(2);
-    if (fill) fill.style.width = pct + '%';
-    if (text) text.textContent = subTokens + ' SUB';
-    if (amountEl) amountEl.textContent = subTokens + ' SUB';
-    if (wrap) wrap.style.display = '';
+    const labelEl = document.getElementById('sub-bar-label');
+    const wrap = document.getElementById('subsidy-bar-wrap');
+
+    if (purchaseCount === 0) {
+      // Discount available — hide the counter bar, price is already golden
+      if (wrap) wrap.style.display = 'none';
+    } else {
+      // Counting toward next discount
+      if (wrap) wrap.style.display = '';
+      const progress = purchaseCount; // 1, 2, or 3
+      const pct = (progress / 3) * 100;
+      if (fill) fill.style.width = pct + '%';
+      if (amountEl) amountEl.textContent = progress + ' / 3';
+      if (labelEl) labelEl.textContent = 'Buy ' + (3 - progress) + ' more to reduce price again';
+    }
     renderBundles();
   }
 
   function applySubsidyPurchase() {
-    if (cur.subCostNum > 0) {
-      subsidyFund -= 120; // spend 1 SUB
-      subsidyFund += 120; // earn back 1 SUB — net zero, balance never drains
-      subsidyFund = Math.max(0, subsidyFund);
-      totalSaved += 120;
+    if (cur.hasDiscount) {
+      // Used the discount — start counting toward next one
+      purchaseCount = 1;
+      totalSaved += (cur.orig - cur.price);
+    } else {
+      // Full price purchase — advance counter
+      purchaseCount++;
+      if (purchaseCount > 3) purchaseCount = 0; // reset = discount available again
     }
     totalPurchases++;
     updateSubsidyUI();

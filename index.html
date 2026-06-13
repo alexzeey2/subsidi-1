@@ -421,6 +421,42 @@
 
 
 
+  /* ── Rectangular action buttons ── */
+  .act-rect {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 0;
+    background: var(--dark-3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .act-rect:active { background: var(--dark-5); }
+
+  /* ── Earn card ── */
+  .earn-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 20px 16px;
+    padding: 16px 18px;
+    background: var(--dark-3);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .earn-card:active { background: var(--dark-5); }
+  .earn-card-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+  .earn-card-sub { font-size: 11px; color: rgba(255,255,255,0.4); }
+
   /* ── GOLDEN PRICE (discount active) ── */
   @keyframes goldbeam {
     0%,100% { text-shadow: 0 0 8px rgba(245,166,35,0.6), 0 0 20px rgba(245,166,35,0.3); }
@@ -688,32 +724,31 @@
     </div>
   </div>
 
-  <div class="actions">
-    <div class="act main" onclick="showDep()">
-      <div class="act-ico">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
-        </svg>
-      </div>
-      <span class="act-lbl">Add Money</span>
+  <div class="actions" style="display:flex;gap:12px;padding:0 20px;margin-bottom:8px;">
+    <div class="act-rect" onclick="showDep()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+      </svg>
+      <span>Add Money</span>
     </div>
-    <div class="act" onclick="if(gateCheck('Refer & Earn','Create a free account to get your referral link and earn ₦5,000 per friend.'))return;showReferOv()">
-      <div class="act-ico">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-        </svg>
-      </div>
-      <span class="act-lbl" style="font-size:9.5px;">Earn ₦5k</span>
+    <div class="act-rect" onclick="if(gateCheck('Transaction History','Create a free account to view your transaction history.'))return;showHistoryOv()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      <span>History</span>
     </div>
-    <div class="act" onclick="if(gateCheck('Transaction History','Create a free account to view your transaction history.'))return;showHistoryOv()">
-      <div class="act-ico">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-        </svg>
-      </div>
-      <span class="act-lbl">History</span>
+  </div>
+
+  <!-- Earn 5k card -->
+  <div class="earn-card" onclick="if(gateCheck('Refer & Earn','Create a free account to get your referral link and earn ₦5,000 per friend.'))return;showReferOv()">
+    <div class="earn-card-left">
+      <div class="earn-card-title">Earn ₦5,000</div>
+      <div class="earn-card-sub">Refer a friend and earn when they buy their first card</div>
     </div>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+    </svg>
   </div>
 
   <div class="sec">
@@ -755,15 +790,14 @@
       </div>
       <span class="ni-lbl" style="color:var(--p-light)">Home</span>
     </div>
-    <div class="ni" id="mycard-nav" onclick="show('my-card')">
-      <div class="ni-ico" style="position:relative;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="mycard-icon">
-          <rect x="2" y="5" width="20" height="14" rx="2"/>
-          <line x1="2" y1="10" x2="22" y2="10"/>
+    <div class="ni" onclick="if(gateCheck('Refer & Earn','Create a free account to get your referral link and earn ₦5,000 per friend.'))return;showReferOv()">
+      <div class="ni-ico">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
         </svg>
-        <div class="mycard-glow" id="mycard-glow"></div>
       </div>
-      <span class="ni-lbl" id="mycard-lbl">My Card</span>
+      <span class="ni-lbl" style="font-size:9px;">Earn ₦5k</span>
     </div>
     <div class="ni" id="dash-nav-rewards" onclick="navTo('rewards',this)">
       <div class="ni-ico">
@@ -1461,6 +1495,7 @@
           updateSubsidyUI();
           checkWaJoined();
           show('dash');
+          renderBundles(); // safety call after DOM is visible
         } else {
           localStorage.removeItem('subsidi_userId');
           localStorage.removeItem('subsidi_session_token');
@@ -1471,6 +1506,8 @@
         userId = savedUserId;
         isGuest = false;
         show('dash');
+        renderBundles();
+        updateSubsidyUI();
         // Retry the data fetch after a short delay — don't silently show empty dashboard
         setTimeout(async () => {
           try {

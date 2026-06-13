@@ -1383,7 +1383,7 @@
           '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
 
         // Update other fields safely
-        if (data.subsidyFund !== undefined) subsidyFund = data.subsidyFund;
+        if (data.subsidyFund !== undefined && data.subsidyFund !== null) subsidyFund = data.subsidyFund;
         if (data.purchaseCount !== undefined) purchaseCount = data.purchaseCount;
         if (data.showBar !== undefined) showBar = data.showBar;
         else if (data.show_bar !== undefined) showBar = data.show_bar;
@@ -1480,7 +1480,7 @@
           username = data.username || username;
           registeredCard = data.cardCode || null;
           balance = data.balance ?? 0;
-          subsidyFund = data.subsidyFund ?? subsidyFund;
+          subsidyFund = (data.subsidyFund !== undefined && data.subsidyFund !== null) ? data.subsidyFund : subsidyFund;
           purchaseCount = data.purchaseCount ?? purchaseCount;
           if (data.showBar !== undefined) showBar = data.showBar;
           else if (data.show_bar !== undefined) showBar = data.show_bar;
@@ -2340,6 +2340,8 @@
   }
 
   function renderBundles() {
+    // Mirror the subsidyFund<=0 guard so tab switches can't show gold with empty fund
+    if (subsidyFund <= 0 && !showBar) { showBar = true; if (purchaseCount === 0) purchaseCount = -1; }
     const netPlans = PLANS[NET] || { daily: [], weekly: [], monthly: [] };
     const plans = netPlans[CATEGORY] || [];
     const container = document.getElementById('bundles-all');

@@ -2204,7 +2204,7 @@
 
           // Log locally
           saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
-          fetchUserData(); // fetch immediately — ensures showBar/purchaseCount are fresh on every home render // background refresh, no blocking
+          fetchUserData(); // immediate — ensures showBar is fresh from DB before render // background refresh, no blocking
 
         } catch (e) {
           alert('Network error. Please check your connection and try again.');
@@ -2697,6 +2697,9 @@
   }
 
   function updateSubsidyUI() {
+    // If subsidy fund is empty, force bar on — no gold prices without fund
+    if (subsidyFund <= 0) { showBar = true; if (purchaseCount === 0) purchaseCount = -1; }
+
     const fill = document.getElementById('subsidy-bar-fill');
     const amountEl = document.getElementById('sub-bar-amount');
     const labelEl = document.getElementById('sub-bar-label');
@@ -2721,7 +2724,7 @@
   function goHome() {
     if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
     show('dash');
-    fetchUserData(); // fetch immediately — ensures showBar/purchaseCount are fresh on every home render
+    fetchUserData(); // immediate — ensures showBar is fresh from DB before render
   }
 
   // ── Referral Overlay ──

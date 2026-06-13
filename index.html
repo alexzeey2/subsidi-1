@@ -1291,8 +1291,7 @@
   let userPin = null;
   let username = '';
   let subsidyFund = 240; // seed for new accounts (invisible to user)
-  let discountPurchasesLeft = 1; // has discount on first purchase
-  let purchaseCount = 0; // tracks cycle: 0=discount available, 1,2,3=full price (3rd goes to Xela)
+  let purchaseCount = 0; // tracks cycle: 0=discount available, -1=just used, 1-3=counting
 
   // ── QR Scanner state (registration only) ──
   let regStream = null;
@@ -2489,7 +2488,7 @@
     localStorage.removeItem('subsidi_session_token');
     // Reset all state
     userId = null; username = ''; balance = 300;
-    subsidyFund = 240; discountPurchasesLeft = 1; purchaseCount = 0;
+    subsidyFund = 240; purchaseCount = 0;
     registeredCard = null; userPin = null;
     isGuest = false;
     // Go straight to scan card screen
@@ -2709,19 +2708,6 @@
     renderBundles();
   }
 
-  function applySubsidyPurchase() {
-    if (cur.hasDiscount) {
-      // Used the discount — show bar at 0/3
-      purchaseCount = -1;
-      totalSaved += 240;
-    } else {
-      if (purchaseCount === -1) purchaseCount = 1;
-      else purchaseCount++;
-      if (purchaseCount > 3) purchaseCount = 0; // reset — discount available again
-    }
-    totalPurchases++;
-    updateSubsidyUI();
-  }
 
   function goHome() {
     if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }

@@ -695,7 +695,7 @@
           <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
         </svg>
       </div>
-      <span class="act-lbl">Deposit</span>
+      <span class="act-lbl">Add Money</span>
     </div>
     <div class="act" onclick="if(gateCheck('Refer & Earn','Create a free account to get your referral link and earn ₦5,000 per friend.'))return;showReferOv()">
       <div class="act-ico">
@@ -739,20 +739,9 @@
     <div class="bundles" id="bundles-all"></div>
   </div>
 
-  <div class="sec" id="refblock" style="display:none">
-    <div class="ref-card">
-      <div class="ref-title">Refer & Earn ₦500</div>
-      <div class="ref-sub">Share your link. When a friend purchases a Subsidi card, ₦500 is credited to your wallet instantly.</div>
-      <div class="ref-row">
-        <div class="ref-code" id="ref-link">subsidi.app/ref/USER</div>
-        <div class="copy" id="copybtn" onclick="doCopy()">Copy</div>
-      </div>
-    </div>
-  </div>
 
-  <div class="dep-row">
-    <button class="dep-btn" onclick="showDep()">Deposit</button>
-  </div>
+
+
 
   <div class="spc"></div>
 
@@ -2690,8 +2679,8 @@
 
   function goHome() {
     if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
-    fetchUserData(); // always refresh balance when returning home
     show('dash');
+    setTimeout(() => fetchUserData(), 50); // show first, then refresh in background
   }
 
   // ── Referral Overlay ──

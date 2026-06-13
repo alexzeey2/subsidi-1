@@ -2002,7 +2002,7 @@
   function openSheet(size, val, price, orig, planId, planNetwork, subCostCount) {
     if (gateCheck('Buy data at subsidy prices', 'Create a free account to purchase ' + size + ' for ₦' + price + ' — cheaper than anywhere else.')) return;
     const isExpensive = subCostCount === 0;
-    const hasDiscount = !isExpensive && purchaseCount === 0;
+    const hasDiscount = !isExpensive && purchaseCount === 0 && subsidyFund >= 240;
     const actualPrice = hasDiscount ? price : orig;
     cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET, hasDiscount };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
@@ -2344,7 +2344,7 @@
     container.innerHTML = plans.map(p => {
       const yours = p.ck + 120;
       const isExpensive = p.ck >= 1100;
-      const hasDiscount = !isExpensive && purchaseCount === 0;
+      const hasDiscount = !isExpensive && purchaseCount === 0 && subsidyFund >= 240;
       const displayPrice = hasDiscount ? p.ck - 120 : yours; // -₦240 total (₦120 markup removed + ₦120 extra off)
       const strikePrice = hasDiscount ? yours : '';
       return `<div class="bundle" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${yours},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">
@@ -2693,13 +2693,15 @@
     const labelEl = document.getElementById('sub-bar-label');
     const wrap = document.getElementById('subsidy-bar-wrap');
 
-    if (purchaseCount === 0) {
+    const discountReady = purchaseCount === 0 && subsidyFund >= 240;
+
+    if (discountReady) {
       // Discount available — hide bar, prices are gold
       if (wrap) wrap.style.display = 'none';
     } else {
-      // purchaseCount: -1=just used discount (show 0/3), 1,2,3=counting
+      // Show bar — counting or fund insufficient
       if (wrap) wrap.style.display = '';
-      const display = purchaseCount === -1 ? 0 : purchaseCount;
+      const display = purchaseCount <= 0 ? 0 : purchaseCount;
       const pct = (display / 3) * 100;
       if (fill) fill.style.width = pct + '%';
       if (amountEl) amountEl.textContent = display + ' / 3';

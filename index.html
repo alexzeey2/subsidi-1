@@ -2187,11 +2187,15 @@
             document.getElementById('bal-display').innerHTML =
               '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
           }
-          if (pData.purchaseCount !== undefined) purchaseCount = pData.purchaseCount;
+          if (pData.purchaseCount !== undefined) {
+            purchaseCount = pData.purchaseCount;
+            totalSaved += cur.hasDiscount ? 240 : 0;
+            totalPurchases++;
+            updateSubsidyUI();
+          }
 
           // Log locally
           saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
-          applySubsidyPurchase();
           requestIdleCallback(() => fetchUserData()); // background refresh, no blocking
 
         } catch (e) {

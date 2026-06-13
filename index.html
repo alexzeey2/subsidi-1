@@ -430,7 +430,7 @@
     gap: 8px;
     padding: 14px 0;
     background: var(--dark-3);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255,255,255,0.25);
     border-radius: 14px;
     color: #fff;
     font-size: 13px;
@@ -713,14 +713,14 @@
     <div class="bal-lbl">Wallet Balance</div>
     <div class="bal-amt" id="bal-display"><span class="bal-cur">₦</span>300<span class="bal-dec">.00</span></div>
 
-    <div style="display:flex;gap:10px;margin:16px 20px 4px;">
-      <div class="act-rect" onclick="showDep()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 20px 4px;">
+      <div class="act-rect" onclick="showDep()" style="flex:0 0 auto;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
         </svg>
         <span>Add Money</span>
       </div>
-      <div class="act-rect" onclick="if(gateCheck('Transaction History','Create a free account to view your transaction history.'))return;showHistoryOv()">
+      <div class="act-rect" onclick="if(gateCheck('Transaction History','Create a free account to view your transaction history.'))return;showHistoryOv()" style="flex:0 0 auto;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>

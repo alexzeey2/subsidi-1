@@ -1481,6 +1481,7 @@
           balance = data.balance ?? 0;
           subsidyFund = data.subsidyFund ?? subsidyFund;
           purchaseCount = data.purchaseCount ?? purchaseCount;
+          if (data.showBar !== undefined) showBar = data.showBar;
           isGuest = false;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
@@ -2076,6 +2077,7 @@
             balance = userData.balance ?? 300;
             subsidyFund = userData.subsidyFund ?? subsidyFund;
             purchaseCount = userData.purchaseCount ?? purchaseCount;
+            if (userData.showBar !== undefined) showBar = userData.showBar;
             username = userData.username || username;
             document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();

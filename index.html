@@ -2172,7 +2172,6 @@
             dataPlan: cur.size,
             amount: cur.price,
             origPrice: cur.orig,
-            subCostNum: cur.subCostNum || 1,
           });
 
           if (pData.error) {
@@ -2180,10 +2179,20 @@
             return;
           }
 
+          // Update local state immediately from response
+          if (pData.newBalance !== undefined) {
+            balance = pData.newBalance;
+            const whole = Math.floor(balance).toLocaleString();
+            const dec = (balance % 1).toFixed(2).slice(1);
+            document.getElementById('bal-display').innerHTML =
+              '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+          }
+          if (pData.purchaseCount !== undefined) purchaseCount = pData.purchaseCount;
+
           // Log locally
           saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
           applySubsidyPurchase();
-          await fetchUserData();
+          requestIdleCallback(() => fetchUserData()); // background refresh, no blocking
 
         } catch (e) {
           alert('Network error. Please check your connection and try again.');
@@ -2675,7 +2684,6 @@
     if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
   }
 
-  // ── Subsidy UI ──
   function updateSubsidyUI() {
     const fill = document.getElementById('subsidy-bar-fill');
     const amountEl = document.getElementById('sub-bar-amount');
@@ -2686,11 +2694,12 @@
       // Discount available — hide bar, prices are gold
       if (wrap) wrap.style.display = 'none';
     } else {
-      // Counting toward next discount (1, 2, 3 then reset)
+      // purchaseCount: -1=just used discount (show 0/3), 1,2,3=counting
       if (wrap) wrap.style.display = '';
-      const pct = (purchaseCount / 3) * 100;
+      const display = purchaseCount === -1 ? 0 : purchaseCount;
+      const pct = (display / 3) * 100;
       if (fill) fill.style.width = pct + '%';
-      if (amountEl) amountEl.textContent = purchaseCount + ' / 3';
+      if (amountEl) amountEl.textContent = display + ' / 3';
       if (labelEl) labelEl.textContent = 'Buy 3 times to reduce price again';
     }
     renderBundles();
@@ -2698,12 +2707,13 @@
 
   function applySubsidyPurchase() {
     if (cur.hasDiscount) {
-      // Used the discount — start counting 1, 2, 3
-      purchaseCount = 1;
+      // Used the discount — show bar at 0/3
+      purchaseCount = -1;
       totalSaved += 240;
     } else {
-      purchaseCount++;
-      if (purchaseCount > 3) purchaseCount = 0; // after 3 full-price buys, next is gold
+      if (purchaseCount === -1) purchaseCount = 1;
+      else purchaseCount++;
+      if (purchaseCount > 3) purchaseCount = 0; // reset — discount available again
     }
     totalPurchases++;
     updateSubsidyUI();

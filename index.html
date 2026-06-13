@@ -1386,6 +1386,7 @@
         if (data.subsidyFund !== undefined) subsidyFund = data.subsidyFund;
         if (data.purchaseCount !== undefined) purchaseCount = data.purchaseCount;
         if (data.showBar !== undefined) showBar = data.showBar;
+        else if (data.show_bar !== undefined) showBar = data.show_bar;
         if (data.username) {
           username = data.username;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
@@ -1482,6 +1483,7 @@
           subsidyFund = data.subsidyFund ?? subsidyFund;
           purchaseCount = data.purchaseCount ?? purchaseCount;
           if (data.showBar !== undefined) showBar = data.showBar;
+          else if (data.show_bar !== undefined) showBar = data.show_bar;
           isGuest = false;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
@@ -2078,6 +2080,7 @@
             subsidyFund = userData.subsidyFund ?? subsidyFund;
             purchaseCount = userData.purchaseCount ?? purchaseCount;
             if (userData.showBar !== undefined) showBar = userData.showBar;
+            else if (userData.show_bar !== undefined) showBar = userData.show_bar;
             username = userData.username || username;
             document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();
@@ -2193,6 +2196,7 @@
           if (pData.purchaseCount !== undefined) {
             purchaseCount = pData.purchaseCount;
             if (pData.showBar !== undefined) showBar = pData.showBar;
+            else if (pData.show_bar !== undefined) showBar = pData.show_bar;
             totalSaved += cur.hasDiscount ? 240 : 0;
             totalPurchases++;
             updateSubsidyUI();

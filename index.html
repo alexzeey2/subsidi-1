@@ -712,6 +712,22 @@
 
     <div class="bal-lbl">Wallet Balance</div>
     <div class="bal-amt" id="bal-display"><span class="bal-cur">₦</span>300<span class="bal-dec">.00</span></div>
+
+    <div style="display:flex;gap:10px;margin:16px 20px 4px;">
+      <div class="act-rect" onclick="showDep()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+        </svg>
+        <span>Add Money</span>
+      </div>
+      <div class="act-rect" onclick="if(gateCheck('Transaction History','Create a free account to view your transaction history.'))return;showHistoryOv()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <span>History</span>
+      </div>
+    </div>
+
     <!-- Purchase counter bar -->
     <div class="subsidy-bar-wrap" id="subsidy-bar-wrap" style="display:none;">
       <div class="sub-bar-header">
@@ -723,21 +739,6 @@
         <div class="subsidy-bar-text" id="subsidy-bar-text"></div>
         <div class="subsidy-water" id="subsidy-water"></div>
       </div>
-    </div>
-  </div>
-
-  <div class="actions" style="display:flex;gap:12px;padding:0 20px;margin-bottom:8px;">
-    <div class="act-rect" onclick="showDep()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
-      </svg>
-      <span>Add Money</span>
-    </div>
-    <div class="act-rect" onclick="if(gateCheck('Transaction History','Create a free account to view your transaction history.'))return;showHistoryOv()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-      </svg>
-      <span>History</span>
     </div>
   </div>
 
@@ -1374,18 +1375,21 @@
       showSpinner('Refreshing...');
       const data = await callEdge('get-user', { userId });
       if (data && !data.error) {
-        balance = data.balance ?? 0;
-        subsidyFund = data.subsidyFund ?? subsidyFund;
-        purchaseCount = data.purchaseCount ?? purchaseCount;
+        // Always update balance first — independent of other fields
+        balance = data.balance ?? balance;
+        const whole = Math.floor(balance).toLocaleString();
+        const dec = (balance % 1).toFixed(2).slice(1);
+        document.getElementById('bal-display').innerHTML =
+          '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+
+        // Update other fields safely
+        if (data.subsidyFund !== undefined) subsidyFund = data.subsidyFund;
+        if (data.purchaseCount !== undefined) purchaseCount = data.purchaseCount;
         if (data.username) {
           username = data.username;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
         }
         if (data.cardCode) registeredCard = data.cardCode;
-        const whole = Math.floor(balance).toLocaleString();
-        const dec = (balance % 1).toFixed(2).slice(1);
-        document.getElementById('bal-display').innerHTML =
-          '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
         updateSubsidyUI();
         renderBundles();
       }

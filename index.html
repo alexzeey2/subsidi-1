@@ -2312,7 +2312,7 @@
       const yours = p.ck + 120;
       const isExpensive = p.ck >= 1100;
       const hasDiscount = !isExpensive && purchaseCount === 0;
-      const displayPrice = hasDiscount ? p.ck : yours;
+      const displayPrice = hasDiscount ? p.ck - 120 : yours; // -₦240 total (₦120 markup removed + ₦120 extra off)
       const strikePrice = hasDiscount ? yours : '';
       return `<div class="bundle" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${yours},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">
         <div class="b-val">${p.val}</div>
@@ -2662,29 +2662,27 @@
     const wrap = document.getElementById('subsidy-bar-wrap');
 
     if (purchaseCount === 0) {
-      // Discount available — hide the counter bar, price is already golden
+      // Discount available — hide bar, prices are gold
       if (wrap) wrap.style.display = 'none';
     } else {
-      // Counting toward next discount
+      // Counting toward next discount (1, 2, 3 then reset)
       if (wrap) wrap.style.display = '';
-      const progress = purchaseCount; // 1, 2, or 3
-      const pct = (progress / 3) * 100;
+      const pct = (purchaseCount / 3) * 100;
       if (fill) fill.style.width = pct + '%';
-      if (amountEl) amountEl.textContent = progress + ' / 3';
-      if (labelEl) labelEl.textContent = 'Buy ' + (3 - progress) + ' more to reduce price again';
+      if (amountEl) amountEl.textContent = purchaseCount + ' / 3';
+      if (labelEl) labelEl.textContent = 'Buy 3 times to reduce price again';
     }
     renderBundles();
   }
 
   function applySubsidyPurchase() {
     if (cur.hasDiscount) {
-      // Used the discount — start counting toward next one
+      // Used the discount — start counting 1, 2, 3
       purchaseCount = 1;
-      totalSaved += (cur.orig - cur.price);
+      totalSaved += 240;
     } else {
-      // Full price purchase — advance counter
       purchaseCount++;
-      if (purchaseCount > 3) purchaseCount = 0; // reset = discount available again
+      if (purchaseCount > 3) purchaseCount = 0; // after 3 full-price buys, next is gold
     }
     totalPurchases++;
     updateSubsidyUI();

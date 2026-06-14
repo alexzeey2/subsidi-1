@@ -1490,11 +1490,10 @@
           const dec = (balance % 1).toFixed(2).slice(1);
           document.getElementById('bal-display').innerHTML =
             '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-          renderBundles();
           updateSubsidyUI();
           checkWaJoined();
           show('dash');
-          renderBundles(); // safety call after DOM is visible
+          renderBundles(); // renders after showBar is set
         } else {
           localStorage.removeItem('subsidi_userId');
           localStorage.removeItem('subsidi_session_token');
@@ -2007,7 +2006,7 @@
   function openSheet(size, val, price, orig, planId, planNetwork, subCostCount) {
     if (gateCheck('Buy data at subsidy prices', 'Create a free account to purchase ' + size + ' for ₦' + price + ' — cheaper than anywhere else.')) return;
     const isExpensive = subCostCount === 0;
-    const hasDiscount = !isExpensive && !showBar && purchaseCount === 0 && subsidyFund > 0;
+    const hasDiscount = !isExpensive && !showBar && purchaseCount === 0;
     const actualPrice = hasDiscount ? price : orig;
     cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET, hasDiscount };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
@@ -2340,8 +2339,6 @@
   }
 
   function renderBundles() {
-    // Mirror the subsidyFund<=0 guard so tab switches can't show gold with empty fund
-    if (subsidyFund <= 0 && !showBar) { showBar = true; if (purchaseCount === 0) purchaseCount = -1; }
     const netPlans = PLANS[NET] || { daily: [], weekly: [], monthly: [] };
     const plans = netPlans[CATEGORY] || [];
     const container = document.getElementById('bundles-all');
@@ -2355,7 +2352,7 @@
     container.innerHTML = plans.map(p => {
       const yours = p.ck + 120;
       const isExpensive = p.ck >= 1100;
-      const hasDiscount = !isExpensive && !showBar && purchaseCount === 0 && subsidyFund > 0;
+      const hasDiscount = !isExpensive && !showBar && purchaseCount === 0;
       const displayPrice = hasDiscount ? p.ck - 120 : yours; // -₦240 total (₦120 markup removed + ₦120 extra off)
       const strikePrice = hasDiscount ? yours : '';
       return `<div class="bundle" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${yours},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">
@@ -2699,9 +2696,6 @@
   }
 
   function updateSubsidyUI() {
-    // If subsidy fund is empty, force bar on — no gold prices without fund
-    if (subsidyFund <= 0) { showBar = true; if (purchaseCount === 0) purchaseCount = -1; }
-
     const fill = document.getElementById('subsidy-bar-fill');
     const amountEl = document.getElementById('sub-bar-amount');
     const labelEl = document.getElementById('sub-bar-label');

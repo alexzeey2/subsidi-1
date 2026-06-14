@@ -1389,7 +1389,7 @@
         else if (data.show_bar !== undefined) showBar = data.show_bar;
         if (data.username) {
           username = data.username;
-          document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+          (document.getElementById('ref-link') || {}).textContent = 'subsidi.app/ref/' + username;
         }
         if (data.cardCode) registeredCard = data.cardCode;
         updateSubsidyUI();
@@ -1485,7 +1485,7 @@
           if (data.showBar !== undefined) showBar = data.showBar;
           else if (data.show_bar !== undefined) showBar = data.show_bar;
           isGuest = false;
-          document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+          (document.getElementById('ref-link') || {}).textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
           const dec = (balance % 1).toFixed(2).slice(1);
           document.getElementById('bal-display').innerHTML =
@@ -1683,12 +1683,12 @@
         userId = data.userId;
         username = data.username;
         balance = 300;
-        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        (document.getElementById('ref-link') || {}).textContent = 'subsidi.app/ref/' + username;
         goLoginStep();
       } else {
         // New card — go to PIN creation
         username = generateUsername(cardCode);
-        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        (document.getElementById('ref-link') || {}).textContent = 'subsidi.app/ref/' + username;
         goRegStep3();
       }
     } catch (e) {
@@ -1704,7 +1704,7 @@
       if (data && data.exists) {
         userId = data.userId;
         username = data.username;
-        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        (document.getElementById('ref-link') || {}).textContent = 'subsidi.app/ref/' + username;
         goLoginStep();
       } else {
         // 10-digit code not found — reject, cannot register with it
@@ -1763,7 +1763,8 @@
       cardSecret = typeof extractSecret === 'function' ? extractSecret(raw_code) : raw_code;
       statusEl.textContent = '✓ Card claimed! Set your PIN.';
       username = generateUsername(raw_code);
-      document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+      const refEl = document.getElementById('ref-link');
+      if (refEl) refEl.textContent = 'subsidi.app/ref/' + username;
       goRegStep3();
     } catch(e) {
       statusEl.textContent = '⚠️ Connection error. Try again.';
@@ -1956,7 +1957,7 @@
       userId = data.userId;
       username = data.username;
       balance = 300;
-      document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+      (document.getElementById('ref-link') || {}).textContent = 'subsidi.app/ref/' + username;
 
       // Link the claimed card code to this userId in Supabase
       if (userId && registeredCard) {
@@ -2081,7 +2082,7 @@
             if (userData.showBar !== undefined) showBar = userData.showBar;
             else if (userData.show_bar !== undefined) showBar = userData.show_bar;
             username = userData.username || username;
-            document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+            (document.getElementById('ref-link') || {}).textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();
             const dec = (balance % 1).toFixed(2).slice(1);
             document.getElementById('bal-display').innerHTML =

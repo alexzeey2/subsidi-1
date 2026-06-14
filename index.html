@@ -2006,7 +2006,7 @@
   function openSheet(size, val, price, orig, planId, planNetwork, subCostCount) {
     if (gateCheck('Buy data at subsidy prices', 'Create a free account to purchase ' + size + ' for ₦' + price + ' — cheaper than anywhere else.')) return;
     const isExpensive = subCostCount === 0;
-    const hasDiscount = !isExpensive && !showBar && purchaseCount === 0;
+    const hasDiscount = !isExpensive && !showBar && purchaseCount === 0 && subsidyFund > 0;
     const actualPrice = hasDiscount ? price : orig;
     cur = { size, val, price: actualPrice, orig, planId: planId || '', planNetwork: planNetwork || NET, hasDiscount };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
@@ -2352,7 +2352,7 @@
     container.innerHTML = plans.map(p => {
       const yours = p.ck + 120;
       const isExpensive = p.ck >= 1100;
-      const hasDiscount = !isExpensive && !showBar && purchaseCount === 0;
+      const hasDiscount = !isExpensive && !showBar && purchaseCount === 0 && subsidyFund > 0;
       const displayPrice = hasDiscount ? p.ck - 120 : yours; // -₦240 total (₦120 markup removed + ₦120 extra off)
       const strikePrice = hasDiscount ? yours : '';
       return `<div class="bundle" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${yours},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">

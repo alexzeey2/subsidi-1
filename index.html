@@ -1423,7 +1423,8 @@
 
         // Update other fields safely
         if (data.subsidyFund !== undefined && data.subsidyFund !== null) subsidyFund = data.subsidyFund;
-        // showBar/purchaseCount no longer used
+        if (data.purchaseCount !== undefined) purchaseCount = data.purchaseCount;
+        if (data.showBar !== undefined) showBar = data.showBar;
         if (data.username) {
           username = data.username;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
@@ -1518,7 +1519,8 @@
           registeredCard = data.cardCode || null;
           balance = data.balance ?? 0;
           subsidyFund = (data.subsidyFund !== undefined && data.subsidyFund !== null) ? data.subsidyFund : subsidyFund;
-          // showBar/purchaseCount no longer used
+          purchaseCount = data.purchaseCount ?? 0;
+          showBar = data.showBar ?? false;
           isGuest = false;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();

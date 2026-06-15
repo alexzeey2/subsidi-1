@@ -2044,7 +2044,7 @@
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
     document.getElementById('shsub').textContent = (planNetwork || NET) + ' · ' + val;
     const priceEl = document.getElementById('dprice');
-    priceEl.textContent = '₦' + actualPrice.toLocaleString();
+    priceEl.textContent = '₦' + price.toLocaleString();
     if (hasDiscount) {
       priceEl.classList.add('price-gold');
     } else {

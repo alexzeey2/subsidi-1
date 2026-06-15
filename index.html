@@ -2535,13 +2535,15 @@
     localStorage.removeItem('subsidi_session_token');
     // Reset all state
     userId = null; username = ''; balance = 300;
-    subsidyFund = 0;
+    subsidyFund = 0; purchaseCount = 0; showBar = false;
     registeredCard = null; userPin = null;
-    isGuest = false;
-    // Go straight to scan card screen
-    show('reg-screen');
+    isGuest = true;
+    // Go straight to registration screen
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
     document.getElementById('reg-step-choice').classList.add('active');
+    document.getElementById('reg-screen').classList.add('active');
+    window.scrollTo(0, 0);
   }
 
   // ── Change PIN ──

@@ -2386,7 +2386,7 @@
 
       // Card styling
       const bundleClass = isExpensive ? (isLow ? 'bundle bundle-golden-red' : 'bundle bundle-golden') : 'bundle';
-      const btnLabel = isExpensive ? 'Golden Plan' : (hasDiscount ? 'Best Price' : 'Market Price');
+      const btnLabel = isExpensive ? 'Golden Plan' : 'Best Price';
       const priceClass = hasDiscount ? 'b-price b-price-gold' : 'b-price';
 
       return `<div class="${bundleClass}" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${basePrice},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">

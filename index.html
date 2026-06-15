@@ -467,6 +467,47 @@
     will-change: transform;
     animation: goldbeam 1.8s ease-in-out infinite;
   }
+  /* ── Subsidy bar glow animations ── */
+  @keyframes goldGlow {
+    0%,100% { box-shadow: 0 0 6px #F5A623, 0 0 12px #F5A623; }
+    50%      { box-shadow: 0 0 14px #F5A623, 0 0 28px #F5A623; }
+  }
+  @keyframes redGlow {
+    0%,100% { box-shadow: 0 0 6px #ff3b30, 0 0 12px #ff3b30; }
+    50%      { box-shadow: 0 0 14px #ff3b30, 0 0 28px #ff3b30; }
+  }
+  @keyframes goldTextPulse {
+    0%,100% { text-shadow: 0 0 6px #F5A623; opacity:1; }
+    50%      { text-shadow: 0 0 16px #F5A623; opacity:.7; }
+  }
+  @keyframes redTextPulse {
+    0%,100% { text-shadow: 0 0 6px #ff3b30; opacity:1; }
+    50%      { text-shadow: 0 0 16px #ff3b30; opacity:.7; }
+  }
+  .glow-gold { animation: goldGlow 2s ease-in-out infinite; }
+  .glow-red  { animation: redGlow 1.2s ease-in-out infinite; }
+  .text-glow-gold { animation: goldTextPulse 2s ease-in-out infinite; color:#F5A623; }
+  .text-glow-red  { animation: redTextPulse 1.2s ease-in-out infinite; color:#ff3b30; }
+
+  /* ── Golden plan card ── */
+  .bundle-golden {
+    border: 1px solid #F5A623 !important;
+    background: linear-gradient(160deg,#1a1400,#2a1f00) !important;
+  }
+  .bundle-golden .b-btn {
+    background: linear-gradient(90deg,#b87010,#F5A623) !important;
+    color: #000 !important;
+  }
+  .bundle-golden-red {
+    border: 1px solid #ff3b30 !important;
+    background: linear-gradient(160deg,#1a0000,#2a0a00) !important;
+    animation: redGlow 1.2s ease-in-out infinite;
+  }
+  .bundle-golden-red .b-btn {
+    background: linear-gradient(90deg,#8b0000,#ff3b30) !important;
+    color: #fff !important;
+  }
+
   .b-price-gold {
     color: #F5A623 !important;
     will-change: transform;
@@ -728,16 +769,15 @@
       </div>
     </div>
 
-    <!-- Pool Card -->
-    <div onclick="showPoolPage()" style="margin:16px 0 0;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid #F5A623;border-radius:16px;padding:16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
-      <div>
-        <div style="color:#F5A623;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Community Pool</div>
-        <div style="color:#fff;font-size:20px;font-weight:800;margin-top:2px;">Get Free <span style="color:#F5A623;">₦5,000</span></div>
-        <div style="color:#aaa;font-size:11px;margin-top:4px;">Collect cash when your balance is low</div>
+    <!-- Subsidy Tank Bar -->
+    <div id="subsidy-bar-wrap" style="display:none;margin:16px 0 0;">
+      <div id="subsidy-bar-label" style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;color:#F5A623;">⚡ Buy more Golden Plans!</div>
+      <div style="position:relative;height:18px;background:#1a1a1a;border-radius:99px;overflow:visible;border:1px solid #F5A623;">
+        <div id="subsidy-bar-fill" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#b87010,#F5A623);transition:width .4s ease;width:0%;"></div>
+        <!-- End circle -->
+        <div id="subsidy-bar-circle" style="position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#b87010,#F5A623);border:2px solid #F5A623;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000;box-shadow:0 0 8px #F5A623;"></div>
       </div>
-      <div style="width:44px;height:44px;background:linear-gradient(135deg,#b87010,#F5A623);border-radius:50%;display:flex;align-items:center;justify-content:center;">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      </div>
+      <div id="subsidy-bar-sub" style="font-size:10px;color:#aaa;margin-top:5px;text-align:right;"></div>
     </div>
   </div>
 
@@ -1078,14 +1118,6 @@
 </div>
 
 <!-- ── REWARDS SCREEN ── -->
-<div class="screen" id="pool-screen" style="background:var(--dark);padding-bottom:90px;overflow-y:auto;">
-  <div style="display:flex;align-items:center;gap:12px;padding:20px 20px 8px;">
-    <div onclick="show('dash')" style="cursor:pointer;color:#aaa;font-size:22px;line-height:1;">&#8592;</div>
-    <div style="font-size:18px;font-weight:800;color:#fff;">Community Pool</div>
-  </div>
-  <div style="padding:0 20px;" id="pool-content"></div>
-</div>
-
 <div class="screen" id="rewards" style="background:var(--dark);padding-bottom:90px;overflow-y:auto">
 
   <!-- Header -->
@@ -1297,7 +1329,7 @@
   let cardSecret = null;
   let userPin = null;
   let username = '';
-  let poolBalance = 0; // community pool balance
+  let subsidyFund = 0; // funded by expensive plan purchases
 
   // ── QR Scanner state (registration only) ──
   let regStream = null;
@@ -1388,13 +1420,14 @@
           '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
 
         // Update other fields safely
-        if (data.poolBalance !== undefined) poolBalance = data.poolBalance;
+        if (data.subsidyFund !== undefined && data.subsidyFund !== null) subsidyFund = data.subsidyFund;
+        // showBar/purchaseCount no longer used
         if (data.username) {
           username = data.username;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
         }
         if (data.cardCode) registeredCard = data.cardCode;
-        renderBundles();
+        updateSubsidyUI();
         renderBundles();
       }
     } catch(e) {
@@ -1482,14 +1515,15 @@
           username = data.username || username;
           registeredCard = data.cardCode || null;
           balance = data.balance ?? 0;
-          if (data.poolBalance !== undefined) poolBalance = data.poolBalance;
+          subsidyFund = (data.subsidyFund !== undefined && data.subsidyFund !== null) ? data.subsidyFund : subsidyFund;
+          // showBar/purchaseCount no longer used
           isGuest = false;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
           const dec = (balance % 1).toFixed(2).slice(1);
           document.getElementById('bal-display').innerHTML =
             '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-          renderBundles();
+          updateSubsidyUI();
           checkWaJoined();
           show('dash');
           renderBundles(); // renders after showBar is set
@@ -1504,7 +1538,7 @@
         isGuest = false;
         show('dash');
         renderBundles();
-        renderBundles();
+        updateSubsidyUI();
         // Retry the data fetch after a short delay — don't silently show empty dashboard
         setTimeout(async () => {
           try {
@@ -1983,7 +2017,7 @@
     if (data && data.sessionToken) localStorage.setItem('subsidi_session_token', data.sessionToken);
 
     show('dash');
-    renderBundles();
+    updateSubsidyUI();
 
     // Fetch renewal_date from Supabase immediately so timer starts accurately from day 1
     try {
@@ -2005,12 +2039,17 @@
   function openSheet(size, val, price, orig, planId, planNetwork, subCostCount) {
     if (gateCheck('Buy data at subsidy prices', 'Create a free account to purchase ' + size + ' for ₦' + price + ' — cheaper than anywhere else.')) return;
     const isExpensive = subCostCount === 0;
-    cur = { size, val, price, orig, planId: planId || '', planNetwork: planNetwork || NET, hasDiscount: false };
+    const hasDiscount = !isExpensive && subsidyFund > 0;
+    cur = { size, val, price, orig, planId: planId || '', planNetwork: planNetwork || NET, hasDiscount };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
     document.getElementById('shsub').textContent = (planNetwork || NET) + ' · ' + val;
     const priceEl = document.getElementById('dprice');
     priceEl.textContent = '₦' + actualPrice.toLocaleString();
-    priceEl.classList.remove('price-gold');
+    if (hasDiscount) {
+      priceEl.classList.add('price-gold');
+    } else {
+      priceEl.classList.remove('price-gold');
+    }
     document.getElementById('phinput').value = '';
     document.getElementById('ov').classList.add('open');
   }
@@ -2069,14 +2108,15 @@
           const userData = await callEdge('get-user', { userId });
           if (userData && !userData.error) {
             balance = userData.balance ?? 300;
-            if (userData.poolBalance !== undefined) poolBalance = userData.poolBalance;
+            subsidyFund = userData.subsidyFund ?? subsidyFund;
+            // showBar/purchaseCount no longer used
             username = userData.username || username;
             document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();
             const dec = (balance % 1).toFixed(2).slice(1);
             document.getElementById('bal-display').innerHTML =
               '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-            renderBundles();
+            updateSubsidyUI();
             renderBundles();
           }
         } catch(e) {
@@ -2182,11 +2222,9 @@
             document.getElementById('bal-display').innerHTML =
               '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
           }
-          if (pData.newBalance !== undefined) {
-            if (pData.poolBalance !== undefined) poolBalance = pData.poolBalance;
-            totalPurchases++;
-            renderBundles();
-          }
+          if (pData.subsidyFund !== undefined) subsidyFund = pData.subsidyFund;
+          totalPurchases++;
+          updateSubsidyUI();
 
           // Log locally
           saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
@@ -2338,14 +2376,25 @@
     }
     container.innerHTML = plans.map(p => {
       const isExpensive = p.ck >= 1100;
-      const markup = isExpensive ? 120 : 50;
-      const displayPrice = p.ck + markup;
-      return `<div class="bundle" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${displayPrice},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">
+      const hasDiscount = !isExpensive && subsidyFund > 0; // cheap plan with fund = discounted
+      const isLow = subsidyFund <= 0; // fund empty — red alert
+
+      // Pricing
+      const basePrice = isExpensive ? p.ck + 240 : p.ck; // expensive: +₦240 margin, cheap: no margin
+      const displayPrice = hasDiscount ? basePrice - 120 : basePrice; // ₦120 subsidy off cheap plans
+      const strikePrice = hasDiscount ? basePrice : '';
+
+      // Card styling
+      const bundleClass = isExpensive ? (isLow ? 'bundle bundle-golden-red' : 'bundle bundle-golden') : 'bundle';
+      const btnLabel = isExpensive ? 'Golden Plan' : (hasDiscount ? 'Best Price' : 'Market Price');
+      const priceClass = hasDiscount ? 'b-price b-price-gold' : 'b-price';
+
+      return `<div class="${bundleClass}" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${basePrice},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">
         <div class="b-val">${p.val}</div>
         <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
-        <div class="b-orig"></div>
-        <div class="b-price">${fmt(displayPrice)}</div>
-        <div class="b-btn">Buy Now</div>
+        <div class="b-orig">${strikePrice ? fmt(strikePrice) : ''}</div>
+        <div class="${priceClass}">${fmt(displayPrice)}</div>
+        <div class="b-btn">${btnLabel}</div>
       </div>`;
     }).join('');
   }
@@ -2481,7 +2530,7 @@
     localStorage.removeItem('subsidi_session_token');
     // Reset all state
     userId = null; username = ''; balance = 300;
-    poolBalance = 0;
+    subsidyFund = 0;
     registeredCard = null; userPin = null;
     isGuest = false;
     // Go straight to scan card screen
@@ -2680,7 +2729,55 @@
     if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
   }
 
+  function updateSubsidyUI() {
+    const wrap   = document.getElementById('subsidy-bar-wrap');
+    const fill   = document.getElementById('subsidy-bar-fill');
+    const circle = document.getElementById('subsidy-bar-circle');
+    const label  = document.getElementById('subsidy-bar-label');
+    const sub    = document.getElementById('subsidy-bar-sub');
+    if (!wrap) { renderBundles(); return; }
 
+    // Always show the bar
+    wrap.style.display = '';
+
+    const isLow = subsidyFund <= 0;
+    const maxFund = 360; // ₦120 × 3 initial seed
+    const pct = Math.min(100, Math.max(0, (subsidyFund / maxFund) * 100));
+    const purchases = subsidyFund > 0 ? Math.floor(subsidyFund / 120) : 0;
+
+    // Fill bar
+    fill.style.width = pct + '%';
+
+    if (isLow) {
+      // Red alert mode
+      wrap.querySelector('#subsidy-bar-fill') && (fill.style.background = 'linear-gradient(90deg,#8b0000,#ff3b30)');
+      label.className = 'text-glow-red';
+      label.textContent = '🔴 Buy Golden Plans to refill discounts!';
+      circle.className = 'glow-red';
+      circle.style.background = 'linear-gradient(135deg,#8b0000,#ff3b30)';
+      circle.style.borderColor = '#ff3b30';
+      circle.style.boxShadow = '0 0 8px #ff3b30';
+      circle.style.color = '#fff';
+      circle.textContent = '0';
+      sub.textContent = 'Cheap plans are now at market price';
+      sub.style.color = '#ff3b30';
+    } else {
+      // Golden mode
+      fill.style.background = 'linear-gradient(90deg,#b87010,#F5A623)';
+      label.className = 'text-glow-gold';
+      label.textContent = '⚡ Buy more Golden Plans!';
+      circle.className = 'glow-gold';
+      circle.style.background = 'linear-gradient(135deg,#b87010,#F5A623)';
+      circle.style.borderColor = '#F5A623';
+      circle.style.boxShadow = '0 0 8px #F5A623';
+      circle.style.color = '#000';
+      circle.textContent = purchases;
+      sub.textContent = purchases + ' discounted purchase' + (purchases !== 1 ? 's' : '') + ' remaining';
+      sub.style.color = '#aaa';
+    }
+
+    renderBundles();
+  }
 
 
   function goHome() {
@@ -2701,63 +2798,6 @@
   }
 
   // ── History Overlay ──
-  function showPoolPage() {
-    if (gateCheck('Community Pool', 'Create a free account to access the community pool.')) return;
-    show('pool-screen');
-    renderPoolPage();
-  }
-
-  function renderPoolPage() {
-    const eligible = balance < 200;
-    const el = document.getElementById('pool-content');
-    if (!el) return;
-    el.innerHTML = `
-      <div style="text-align:center;padding:32px 0 16px;">
-        <div style="font-size:13px;color:#F5A623;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Community Pool</div>
-        <div style="font-size:40px;font-weight:900;color:#fff;margin:8px 0;">₦${poolBalance.toLocaleString()}</div>
-        <div style="color:#aaa;font-size:13px;">Total available in pool</div>
-      </div>
-      <div style="background:#1a1a2e;border-radius:16px;padding:20px;margin:16px 0;border:1px solid #333;">
-        <div style="color:#fff;font-weight:700;font-size:15px;margin-bottom:12px;">How it works</div>
-        <div style="color:#aaa;font-size:13px;line-height:1.7;">Every time anyone buys data, a small amount goes into this pool. When your wallet balance is below ₦200, you can collect from the pool once per day.</div>
-      </div>
-      <div style="background:#1a1a2e;border-radius:16px;padding:20px;margin:16px 0;border:1px solid ${eligible ? '#F5A623' : '#333'};">
-        <div style="color:#fff;font-weight:700;font-size:15px;margin-bottom:8px;">Your eligibility</div>
-        <div style="color:${eligible ? '#4CAF50' : '#F5A623'};font-size:13px;margin-bottom:16px;">${eligible ? '✓ You qualify — your balance is below ₦200' : '✗ Your balance must be below ₦200 to collect'}</div>
-        <div style="color:#aaa;font-size:12px;">Current balance: ₦${balance.toLocaleString()}</div>
-      </div>
-      ${eligible ? `
-      <div style="background:#1a1a2e;border-radius:16px;padding:20px;margin:16px 0;border:1px solid #333;">
-        <div style="color:#fff;font-weight:700;font-size:15px;margin-bottom:12px;">Collect amount</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          ${[200,300,500,1000].map(amt => `
-          <div onclick="collectFromPool(${amt})" style="background:#111;border:1px solid #333;border-radius:12px;padding:16px;text-align:center;cursor:pointer;">
-            <div style="color:#F5A623;font-size:18px;font-weight:800;">₦${amt}</div>
-            <div style="color:#aaa;font-size:11px;margin-top:4px;">Tap to collect</div>
-          </div>`).join('')}
-        </div>
-      </div>` : ''}
-    `;
-  }
-
-  async function collectFromPool(amount) {
-    if (balance >= 200) { alert('Your balance must be below ₦200 to collect.'); return; }
-    if (!confirm('Collect ₦' + amount + ' from the pool?')) return;
-    try {
-      const res = await callEdge('collect-pool', { userId, amount });
-      if (res.error) { alert(res.error); return; }
-      balance = res.newBalance;
-      poolBalance = res.newPoolBalance;
-      const whole = Math.floor(balance).toLocaleString();
-      const dec = (balance % 1).toFixed(2).slice(1);
-      document.getElementById('bal-display').innerHTML = '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-      renderPoolPage();
-      alert('✓ ₦' + amount + ' added to your wallet!');
-    } catch(e) {
-      alert('Error: ' + e.message);
-    }
-  }
-
   async function showHistoryOv() {
     document.getElementById('hist-ov').classList.add('open');
     document.getElementById('hist-body').innerHTML = '<div class="hist-loader" id="hist-loader">Loading...</div>';

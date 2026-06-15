@@ -1555,7 +1555,9 @@
       }
     } else {
       isGuest = true;
-      show('dash-screen');
+      show('reg-screen');
+      document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+      document.getElementById('reg-step-choice').classList.add('active');
       renderBundles();
       setTimeout(() => showGate('Welcome to Subsidi', 'Create a free account to buy data, earn discounts, and manage your wallet.'), 800);
     }

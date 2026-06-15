@@ -772,7 +772,7 @@
     <!-- Subsidy Tank Bar -->
     <div id="subsidy-bar-wrap" style="display:none;margin:16px 0 0;">
       <div id="subsidy-bar-label" style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;color:#F5A623;">⚡ Buy more Golden Plans!</div>
-      <div style="position:relative;height:10px;background:#1a1a1a;border-radius:99px;overflow:visible;border:1px solid #F5A623;">
+      <div id="subsidy-bar-track" style="position:relative;height:10px;background:#1a1a1a;border-radius:99px;overflow:visible;border:1px solid #F5A623;">
         <div id="subsidy-bar-fill" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#b87010,#F5A623);transition:width .4s ease;width:0%;"></div>
         <!-- End circle -->
         <div id="subsidy-bar-circle" style="position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#b87010,#F5A623);border:2px solid #F5A623;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#000;box-shadow:0 0 8px #F5A623;"></div>
@@ -2735,6 +2735,7 @@
     const circle = document.getElementById('subsidy-bar-circle');
     const label  = document.getElementById('subsidy-bar-label');
     const sub    = document.getElementById('subsidy-bar-sub');
+    const track  = document.getElementById('subsidy-bar-track');
     if (!wrap) { renderBundles(); return; }
 
     // Always show the bar
@@ -2759,6 +2760,7 @@
       circle.style.boxShadow = '0 0 8px #ff3b30';
       circle.style.color = '#fff';
       circle.textContent = '0';
+      if (track) { track.style.borderColor = '#ff3b30'; track.style.boxShadow = '0 0 8px rgba(255,59,48,0.4)'; track.style.background = 'rgba(139,0,0,0.2)'; }
       sub.textContent = 'Cheap plans are now at market price';
       sub.style.color = '#ff3b30';
     } else {
@@ -2771,6 +2773,7 @@
       circle.style.borderColor = '#F5A623';
       circle.style.boxShadow = '0 0 8px #F5A623';
       circle.style.color = '#000';
+      if (track) { track.style.borderColor = '#F5A623'; track.style.boxShadow = '0 0 6px rgba(245,166,35,0.3)'; track.style.background = '#1a1a1a'; }
       circle.textContent = purchases;
       sub.textContent = purchases + ' discounted purchase' + (purchases !== 1 ? 's' : '') + ' remaining';
       sub.style.color = '#aaa';

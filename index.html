@@ -1430,7 +1430,7 @@
           '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
 
         // Update other fields safely
-        if (data.subsidyFund !== undefined && data.subsidyFund !== null) subsidyFund = data.subsidyFund;
+        subsidyFund = data.subsidyFund ?? 0;
         if (data.purchaseCount !== undefined) purchaseCount = data.purchaseCount;
         if (data.showBar !== undefined) showBar = data.showBar;
         if (data.username) {
@@ -2431,8 +2431,8 @@
     }
     container.innerHTML = plans.map(p => {
       const isExpensive = p.ck >= 1100;
-      const hasDiscount = !isExpensive && subsidyFund > 0; // cheap plan with fund = discounted
-      const isLow = subsidyFund <= 0; // fund empty — red alert
+      const hasDiscount = !isExpensive; // cheap plans always show discount styling
+      const isLow = !isGuest && subsidyFund <= 0; // red only when logged in and fund empty
 
       // Pricing
       const basePrice = isExpensive ? p.ck + 240 : p.ck; // expensive: +₦240 margin, cheap: no margin

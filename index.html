@@ -231,44 +231,7 @@
   .dep-opt.sel{background:var(--p-subtle);border-color:var(--p);color:var(--p-light)}
 
   .spc{height:28px}
-  /* ── Subsidy bar ── */
-  .subsidy-bar-wrap{margin:16px 0 0;padding-bottom:4px;}
-  .subsidy-bar-track{
-    position:relative;height:36px;border-radius:18px;
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.1);
-    overflow:hidden;
-  }
-  .subsidy-bar-fill{
-    position:absolute;inset:0;
-    background:linear-gradient(90deg,#1a9e3f,#2ecc71);
-    border-radius:18px;
-    width:100%;
-    transition:width 1.2s cubic-bezier(.4,0,.2,1);
-    transform-origin:left;
-  }
-  .subsidy-water{
-    position:absolute;inset:0;
-    background:linear-gradient(90deg,
-      transparent 0%,
-      rgba(255,255,255,0.15) 30%,
-      rgba(255,255,255,0.25) 50%,
-      rgba(255,255,255,0.15) 70%,
-      transparent 100%);
-    animation:waterflow 2s linear infinite;
-    border-radius:18px;
-  }
-  @keyframes waterflow{
-    from{transform:translateX(-100%);}
-    to{transform:translateX(100%);}
-  }
-  .subsidy-bar-text{
-    position:absolute;inset:0;
-    display:flex;align-items:center;justify-content:center;
-    font-size:12px;font-weight:800;color:#0a3d1f;
-    letter-spacing:.3px;z-index:2;
-    text-shadow:0 1px 2px rgba(255,255,255,0.3);
-  }
+
 
   /* ── My Card nav glow ── */
   .mycard-glow{
@@ -2087,7 +2050,8 @@
   function openSheet(size, val, price, orig, planId, planNetwork, subCostCount) {
     if (gateCheck('Buy data at subsidy prices', 'Create a free account to purchase ' + size + ' for ₦' + price + ' — cheaper than anywhere else.')) return;
     const isExpensive = subCostCount === 0;
-    const hasDiscount = !isExpensive && subsidyFund > 0;
+    const effectiveFund = isGuest ? 360 : subsidyFund;
+      const hasDiscount = !isExpensive && effectiveFund > 0;
     cur = { size, val, price, orig, planId: planId || '', planNetwork: planNetwork || NET, hasDiscount };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
     document.getElementById('shsub').textContent = (planNetwork || NET) + ' · ' + val;
@@ -2426,13 +2390,14 @@
     }
     container.innerHTML = plans.map(p => {
       const isExpensive = p.ck >= 1100;
-      const hasDiscount = !isExpensive; // cheap plans always show discount styling
+      const effectiveFund = isGuest ? 360 : subsidyFund;
+      const hasDiscount = !isExpensive && effectiveFund > 0;
       const isLow = !isGuest && subsidyFund <= 0; // red only when logged in and fund empty
 
       // Pricing
       const basePrice = isExpensive ? p.ck + 240 : p.ck; // expensive: +₦240 margin, cheap: no margin
-      const displayPrice = (hasDiscount && subsidyFund > 0) ? basePrice - 120 : basePrice; // ₦120 subsidy off cheap plans only when fund > 0
-      const strikePrice = (hasDiscount && subsidyFund > 0) ? basePrice : '';
+      const displayPrice = (hasDiscount && effectiveFund > 0) ? basePrice - 120 : basePrice; // ₦120 subsidy off cheap plans only when fund > 0
+      const strikePrice = (hasDiscount && effectiveFund > 0) ? basePrice : '';
 
       // Card styling
       const bundleClass = isExpensive ? (isLow ? 'bundle bundle-golden-red' : 'bundle bundle-golden') : 'bundle';
@@ -2790,10 +2755,11 @@
     // Always show the bar
     wrap.style.display = '';
 
+    const displayFund = isGuest ? 360 : subsidyFund;
     const isLow = !isGuest && subsidyFund <= 0;
     const maxFund = 1200;
-    const pct = Math.min(100, Math.max(0, (subsidyFund / maxFund) * 100));
-    const purchases = subsidyFund > 0 ? Math.floor(subsidyFund / 120) : 0;
+    const pct = Math.min(100, Math.max(0, (displayFund / maxFund) * 100));
+    const purchases = displayFund > 0 ? Math.floor(displayFund / 120) : 0;
 
     // Fill bar
     fill.style.width = pct + '%';

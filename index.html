@@ -1428,7 +1428,9 @@
           '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
 
         // Update other fields safely
+        console.log("[debug] get-user response:", JSON.stringify(data));
         subsidyFund = data.subsidyFund ?? 0;
+        console.log("[debug] subsidyFund set to:", subsidyFund);
         if (data.username) {
           username = data.username;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;

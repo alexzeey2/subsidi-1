@@ -1260,7 +1260,7 @@
     <div class="gate-title" id="gate-title">Create a free account</div>
     <div class="gate-sub" id="gate-sub">Register to unlock deposits, purchases, your card, and profile.</div>
     <button class="gate-btn" onclick="goRegister()">Get Started — It's Free</button>
-    <button class="gate-skip" onclick="closeGate(); goLoginStep();" style="background:transparent;border:1px solid var(--p);border-radius:16px;color:var(--p-light);font-size:13px;font-weight:600;padding:14px;width:100%;cursor:pointer;margin-bottom:10px;">Already have an account? Login</button>
+    <button class="gate-skip" onclick="closeGate(); chooseMyAccount();" style="background:transparent;border:1px solid var(--p);border-radius:16px;color:var(--p-light);font-size:13px;font-weight:600;padding:14px;width:100%;cursor:pointer;margin-bottom:10px;">Already have an account? Login</button>
     <button class="gate-skip" onclick="closeGate()">Maybe later</button>
   </div>
 </div>
@@ -1842,7 +1842,8 @@
     setTimeout(() => document.getElementById('login-phone-input').focus(), 300);
   }
   function goLoginStep() {
-    // Go to phone number step first
+    // Switch to reg-screen first so the form is visible
+    show('reg-screen');
     document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
     document.getElementById('reg-step-phone').classList.add('active');
     document.getElementById('login-phone-input').value = '';
@@ -2113,7 +2114,8 @@
           if (userData && !userData.error) {
             balance = userData.balance ?? 300;
             subsidyFund = userData.subsidyFund ?? subsidyFund;
-            // showBar/purchaseCount no longer used
+            purchaseCount = userData.purchaseCount ?? 0;
+            showBar = userData.showBar ?? false;
             username = userData.username || username;
             document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();
@@ -2537,7 +2539,6 @@
     subsidyFund = 0; purchaseCount = 0; showBar = false;
     registeredCard = null; userPin = null;
     isGuest = true;
-    // Go to guest dashboard preview
     show('dash');
     window.scrollTo(0, 0);
   }

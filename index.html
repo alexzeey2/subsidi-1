@@ -2832,6 +2832,7 @@
   function goHome() {
     if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
     show('dash');
+    renderBundles();
     fetchUserData();
   }
 

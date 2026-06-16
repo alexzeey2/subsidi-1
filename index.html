@@ -1429,6 +1429,7 @@
 
         // Update other fields safely
         console.log("[debug] get-user response:", JSON.stringify(data));
+        alert("DEBUG: " + JSON.stringify({ balance: data.balance, subsidyFund: data.subsidyFund }));
         subsidyFund = data.subsidyFund ?? 0;
         console.log("[debug] subsidyFund set to:", subsidyFund);
         if (data.username) {

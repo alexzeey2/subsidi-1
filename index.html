@@ -2212,22 +2212,25 @@
     const err = document.getElementById('buy-pin-err');
     const ph2 = document.getElementById('phinput').value || 'your number';
 
-    // If we have a userId, verify PIN server-side; otherwise fallback to local check
+    // Verify PIN server-side
     let pinValid = false;
-    if (userId) {
-      try {
-        err.textContent = 'Verifying...';
-        err.classList.add('show');
-        const vData = await callEdge('verify-pin', { userId, pin: buyPinEntry });
-        err.classList.remove('show');
-        pinValid = vData.valid === true;
-      } catch (e) {
-        err.classList.remove('show');
-        // Fallback to local PIN check
-        pinValid = buyPinEntry === userPin;
-      }
-    } else {
-      pinValid = buyPinEntry === userPin;
+    try {
+      err.textContent = 'Verifying...';
+      err.classList.add('show');
+      const vData = await callEdge('verify-pin', { userId, pin: buyPinEntry });
+      err.classList.remove('show');
+      pinValid = vData.valid === true;
+    } catch (e) {
+      err.classList.remove('show');
+      pinValid = false;
+    }
+
+    if (!pinValid) {
+      err.textContent = 'Incorrect PIN. Try again.';
+      err.classList.add('show');
+      buyPinEntry = '';
+      updateBuyPinDots('');
+      return;
     }
 
     if (pinValid) {

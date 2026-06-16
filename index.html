@@ -2269,7 +2269,7 @@
             document.getElementById('bal-display').innerHTML =
               '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
           }
-          if (pData.subsidyFund !== undefined) subsidyFund = pData.subsidyFund;
+          if (pData.newSubsidyFund !== undefined) subsidyFund = pData.newSubsidyFund;
           totalPurchases++;
           updateSubsidyUI();
 
@@ -2787,7 +2787,7 @@
     // Always show the bar
     wrap.style.display = '';
 
-    const isLow = subsidyFund <= 0;
+    const isLow = !isGuest && subsidyFund <= 0;
     const maxFund = 1200;
     const pct = Math.min(100, Math.max(0, (subsidyFund / maxFund) * 100));
     const purchases = subsidyFund > 0 ? Math.floor(subsidyFund / 120) : 0;

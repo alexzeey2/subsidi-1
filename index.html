@@ -1429,7 +1429,6 @@
 
         // Update other fields safely
         console.log("[debug] get-user response:", JSON.stringify(data));
-        alert("DEBUG: " + JSON.stringify({ balance: data.balance, subsidyFund: data.subsidyFund }));
         subsidyFund = data.subsidyFund ?? 0;
         console.log("[debug] subsidyFund set to:", subsidyFund);
         if (data.username) {
@@ -1544,10 +1543,11 @@
       } catch(e) {
         console.error('[load] failed:', e);
         userId = savedUserId;
-        isGuest = false;
+        isGuest = true; // treat as guest until real data loads so bar doesn't go red
         show('dash');
-        renderBundles();
         updateSubsidyUI();
+        renderBundles();
+        isGuest = false; // restore so retry fetch works correctly
         // Retry the data fetch after a short delay — don't silently show empty dashboard
         setTimeout(async () => {
           try {

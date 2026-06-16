@@ -1393,6 +1393,7 @@
         // Update other fields safely
         console.log("[debug] get-user response:", JSON.stringify(data));
         subsidyFund = data.subsidyFund ?? 0;
+        isGuest = false;
         console.log("[debug] subsidyFund set to:", subsidyFund);
         if (data.username) {
           username = data.username;

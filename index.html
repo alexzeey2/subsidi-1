@@ -2275,6 +2275,11 @@
           saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
           fetchUserData(); // immediate — ensures showBar is fresh from DB before render // background refresh, no blocking
 
+    // Refresh data when user comes back to the tab (e.g. after admin edits)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && userId && !isGuest) fetchUserData();
+    });
+
         } catch (e) {
           alert('Network error. Please check your connection and try again.');
           return;
@@ -2497,6 +2502,7 @@
     if (screenId === 'profile' && gateCheck('Your account profile', 'Create a free account to access your profile, referral link, and settings.')) return;
     show(screenId);
     if (screenId === 'profile') updateProfileUI();
+    if (screenId === 'dash' && userId && !isGuest) fetchUserData();
   }
 
   function updateProfileUI() {

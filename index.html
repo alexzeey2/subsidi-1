@@ -1524,7 +1524,7 @@
     } else {
       isGuest = true;
       show('dash');
-      renderBundles();
+      updateSubsidyUI();
     }
 
     // Refresh bar and balance when user comes back to the tab
@@ -2550,6 +2550,7 @@
     registeredCard = null; userPin = null;
     isGuest = true;
     show('dash');
+    updateSubsidyUI();
     window.scrollTo(0, 0);
   }
 

@@ -2145,10 +2145,9 @@
         if (vData.sessionToken) localStorage.setItem('subsidi_session_token', vData.sessionToken);
         // Save scan timestamp to Supabase — this is the 30–32hr session clock
         try { await callEdge('update-last-scan', { userId }); } catch(e) { console.warn('last_scan update failed:', e); }
-        show('dash');
-        // Fetch authoritative data from Supabase
+        // Fetch authoritative data BEFORE showing dashboard
         try {
-          showSpinner('Loading...');
+          showSpinner('Loading your account...');
           const userData = await callEdge('get-user', { userId });
           if (userData && !userData.error) {
             balance = userData.balance ?? 300;
@@ -2161,14 +2160,15 @@
             const dec = (balance % 1).toFixed(2).slice(1);
             document.getElementById('bal-display').innerHTML =
               '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-            updateSubsidyUI();
-            renderBundles();
           }
         } catch(e) {
           console.warn('post-login fetch failed:', e);
         } finally {
           hideSpinner();
         }
+        show('dash');
+        updateSubsidyUI();
+        renderBundles();
       } else {
         err.textContent = 'Incorrect PIN. Try again.';
         err.classList.add('show');

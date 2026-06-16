@@ -1555,11 +1555,8 @@
       }
     } else {
       isGuest = true;
-      show('reg-screen');
-      document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
-      document.getElementById('reg-step-choice').classList.add('active');
+      show('dash');
       renderBundles();
-      setTimeout(() => showGate('Welcome to Subsidi', 'Create a free account to buy data, earn discounts, and manage your wallet.'), 800);
     }
 
     // Check if returning from Paystack redirect
@@ -2540,11 +2537,8 @@
     subsidyFund = 0; purchaseCount = 0; showBar = false;
     registeredCard = null; userPin = null;
     isGuest = true;
-    // Go straight to registration screen
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
-    document.getElementById('reg-step-choice').classList.add('active');
-    document.getElementById('reg-screen').classList.add('active');
+    // Go to guest dashboard preview
+    show('dash');
     window.scrollTo(0, 0);
   }
 

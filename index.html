@@ -1338,8 +1338,6 @@
   let userPin = null;
   let username = '';
   let subsidyFund = 0;
-  let purchaseCount = 0;
-  let showBar = true;
 
   // ── QR Scanner state (registration only) ──
   let regStream = null;
@@ -1431,8 +1429,6 @@
 
         // Update other fields safely
         subsidyFund = data.subsidyFund ?? 0;
-        if (data.purchaseCount !== undefined) purchaseCount = data.purchaseCount;
-        if (data.showBar !== undefined) showBar = data.showBar;
         if (data.username) {
           username = data.username;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
@@ -1527,8 +1523,6 @@
           registeredCard = data.cardCode || null;
           balance = data.balance ?? 0;
           subsidyFund = data.subsidyFund ?? 0;
-          purchaseCount = data.purchaseCount ?? 0;
-          showBar = data.showBar ?? false;
           isGuest = false;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
@@ -1538,7 +1532,7 @@
           updateSubsidyUI();
           checkWaJoined();
           show('dash');
-          renderBundles(); // renders after showBar is set
+          renderBundles();
         } else {
           localStorage.removeItem('subsidi_userId');
           localStorage.removeItem('subsidi_session_token');
@@ -2159,8 +2153,6 @@
           if (userData && !userData.error) {
             balance = userData.balance ?? 300;
             subsidyFund = userData.subsidyFund ?? 0;
-            purchaseCount = userData.purchaseCount ?? 0;
-            showBar = userData.showBar ?? false;
             username = userData.username || username;
             document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();
@@ -2586,7 +2578,7 @@
     localStorage.removeItem('subsidi_session_token');
     // Reset all state
     userId = null; username = ''; balance = 300;
-    subsidyFund = 0; purchaseCount = 0; showBar = false;
+    subsidyFund = 0;
     registeredCard = null; userPin = null;
     isGuest = true;
     show('dash');
@@ -2840,7 +2832,7 @@
   function goHome() {
     if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
     show('dash');
-    fetchUserData(); // immediate — ensures showBar is fresh from DB before render
+    fetchUserData();
   }
 
   // ── Referral Overlay ──

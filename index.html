@@ -1537,10 +1537,10 @@
         console.error('[load] failed:', e);
         userId = savedUserId;
         isGuest = true; // treat as guest until real data loads so bar doesn't go red
+        isGuest = false;
         show('dash');
         updateSubsidyUI();
-        renderBundles();
-        isGuest = false; // restore so retry fetch works correctly
+        renderBundles(); // restore so retry fetch works correctly
         // Retry the data fetch after a short delay — don't silently show empty dashboard
         setTimeout(async () => {
           try {
@@ -1556,6 +1556,7 @@
       subsidyFund = 360;
       show('dash');
       updateSubsidyUI();
+      renderBundles();
     }
 
     // Refresh bar and balance when user comes back to the tab
@@ -2060,6 +2061,7 @@
 
     show('dash');
     updateSubsidyUI();
+    renderBundles();
 
     // Fetch renewal_date from Supabase immediately so timer starts accurately from day 1
     try {
@@ -2580,6 +2582,7 @@
     subsidyFund = 360;
     show('dash');
     updateSubsidyUI();
+    renderBundles();
     window.scrollTo(0, 0);
   }
 

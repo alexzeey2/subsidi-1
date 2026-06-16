@@ -1323,9 +1323,9 @@
   let userId = null;
 
   async function callEdge(fnName, body) {
-    const res = await fetch(SUPA_URL + '/functions/v1/' + fnName + '?t=' + Date.now(), {
+    const res = await fetch(SUPA_URL + '/functions/v1/' + fnName, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Cache-Control': 'no-cache' },
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY },
       body: JSON.stringify(body)
     });
     return res.json();
@@ -1429,23 +1429,10 @@
         document.getElementById('bal-display').innerHTML =
           '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
 
-        // Update other fields safely — fetch subsidy_fund directly from DB
-        try {
-          const freshUser = await fetch(SUPA_URL + '/rest/v1/users?id=eq.' + userId + '&select=subsidy_fund,purchase_count,show_bar', {
-            headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
-          });
-          const freshData = await freshUser.json();
-          if (freshData && freshData[0]) {
-            subsidyFund = freshData[0].subsidy_fund ?? subsidyFund;
-            purchaseCount = freshData[0].purchase_count ?? purchaseCount;
-            showBar = freshData[0].show_bar ?? showBar;
-          }
-        } catch(e) {
-          // fallback to edge function data
-          if (data.subsidyFund !== undefined && data.subsidyFund !== null) subsidyFund = data.subsidyFund;
-          if (data.purchaseCount !== undefined) purchaseCount = data.purchaseCount;
-          if (data.showBar !== undefined) showBar = data.showBar;
-        }
+        // Update other fields safely
+        if (data.subsidyFund !== undefined && data.subsidyFund !== null) subsidyFund = data.subsidyFund;
+        if (data.purchaseCount !== undefined) purchaseCount = data.purchaseCount;
+        if (data.showBar !== undefined) showBar = data.showBar;
         if (data.username) {
           username = data.username;
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;

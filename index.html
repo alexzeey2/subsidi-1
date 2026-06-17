@@ -1145,6 +1145,12 @@
         </div>
       </div>
 
+      <div style="display:flex;justify-content:center;margin-bottom:14px;">
+        <button id="collect-torch-btn" onclick="toggleCollectTorch()" style="display:flex;align-items:center;gap:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:12px;padding:10px 20px;color:var(--w70);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;">
+          <svg id="collect-torch-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6l-2 4h10l-2-4V2"/><line x1="12" y1="12" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+          <span id="collect-torch-label">Flash Off</span>
+        </button>
+      </div>
       <div id="collect-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:8px;">Starting camera...</div>
       <div style="text-align:center;">
         <button class="reg-back" onclick="closeCollectOv()" style="display:inline-flex;">Cancel</button>
@@ -2931,6 +2937,37 @@
     if (collectStream) {
       collectStream.getTracks().forEach(t => t.stop());
       collectStream = null;
+    }
+    collectTorchOn = false;
+    const label = document.getElementById('collect-torch-label');
+    const btn = document.getElementById('collect-torch-btn');
+    if (label) label.textContent = 'Flash Off';
+    if (btn) { btn.style.background = 'var(--dark-3)'; btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--w70)'; }
+  }
+
+  let collectTorchOn = false;
+  async function toggleCollectTorch() {
+    if (!collectStream) return;
+    const track = collectStream.getVideoTracks()[0];
+    if (!track) return;
+    try {
+      collectTorchOn = !collectTorchOn;
+      await track.applyConstraints({ advanced: [{ torch: collectTorchOn }] });
+      const btn = document.getElementById('collect-torch-btn');
+      const label = document.getElementById('collect-torch-label');
+      if (collectTorchOn) {
+        btn.style.background = 'rgba(245,166,35,0.2)';
+        btn.style.borderColor = '#F5A623';
+        btn.style.color = '#fff';
+        label.textContent = 'Flash On';
+      } else {
+        btn.style.background = 'var(--dark-3)';
+        btn.style.borderColor = 'var(--border)';
+        btn.style.color = 'var(--w70)';
+        label.textContent = 'Flash Off';
+      }
+    } catch(e) {
+      console.warn('Torch not supported on this device');
     }
   }
 

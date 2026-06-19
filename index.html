@@ -555,6 +555,7 @@
       <div style="display:flex;flex-direction:column;gap:12px;margin-top:24px;">
         <button class="reg-btn" onclick="chooseNewAccount()">New Account</button>
         <button class="reg-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);" onclick="chooseMyAccount()">My Account</button>
+        <button class="reg-btn" style="background:transparent;border:none;color:rgba(255,255,255,0.3);font-size:13px;margin-top:4px;" onclick="chooseNoCard()">I don't have a card</button>
       </div>
     </div>
 
@@ -700,6 +701,50 @@
         <div class="key" onclick="loginPinDel()">⌫</div>
       </div>
       <div class="pin-err" id="login-pin-err"></div>
+    </div>
+
+    <!-- No-card login: phone number -->
+    <div class="reg-step" id="reg-step-nocard-phone">
+      <div class="reg-back-wrap"><button class="reg-back" onclick="backToChoice()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button></div>
+      <div class="reg-title">Your phone number</div>
+      <div class="reg-sub">Enter the phone number linked to your account</div>
+      <div style="margin:28px 0 8px;">
+        <div style="display:flex;align-items:center;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+          <input id="nocard-phone-input" type="tel" inputmode="numeric" maxlength="11" placeholder="08012345678"
+            style="flex:1;background:transparent;border:none;outline:none;padding:16px;font-size:16px;color:#fff;font-family:inherit;"
+            oninput="this.value=this.value.replace(/\D/g,'').slice(0,11);if(this.value.length===11)setTimeout(submitNocardPhone,300);">
+        </div>
+        <div class="pin-err" id="nocard-phone-err" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <!-- No-card login: PIN -->
+    <div class="reg-step" id="reg-step-nocard-pin">
+      <div class="reg-back-wrap"><button class="reg-back" onclick="backToNocardPhone()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button></div>
+      <div class="reg-title">Welcome back</div>
+      <div class="reg-sub">Enter your PIN to continue</div>
+      <div class="reg-pin-lbl" id="nocard-pin-lbl">Enter PIN</div>
+      <div class="reg-dots" id="nocard-pin-dots">
+        <div class="dot" id="npd0"></div>
+        <div class="dot" id="npd1"></div>
+        <div class="dot" id="npd2"></div>
+        <div class="dot" id="npd3"></div>
+      </div>
+      <div class="keypad">
+        <div class="key" onclick="nocardPinKey('1')">1</div>
+        <div class="key" onclick="nocardPinKey('2')">2</div>
+        <div class="key" onclick="nocardPinKey('3')">3</div>
+        <div class="key" onclick="nocardPinKey('4')">4</div>
+        <div class="key" onclick="nocardPinKey('5')">5</div>
+        <div class="key" onclick="nocardPinKey('6')">6</div>
+        <div class="key" onclick="nocardPinKey('7')">7</div>
+        <div class="key" onclick="nocardPinKey('8')">8</div>
+        <div class="key" onclick="nocardPinKey('9')">9</div>
+        <div class="key ghost"></div>
+        <div class="key" onclick="nocardPinKey('0')">0</div>
+        <div class="key" onclick="nocardPinDel()">⌫</div>
+      </div>
+      <div class="pin-err" id="nocard-pin-err"></div>
     </div>
 
   </div>
@@ -1122,15 +1167,81 @@
   </div>
 </div>
 
-<!-- ── COLLECT (SAFE WALLET) SCAN OVERLAY ── -->
-<div class="refer-ov" id="collect-ov">
+<!-- ── COLLECT: REFERRAL GATE SHEET ── -->
+<div class="refer-ov" id="collect-gate-ov">
+  <div class="refer-sheet">
+    <div class="sh-bar"></div>
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="width:56px;height:56px;border-radius:50%;background:rgba(245,166,35,.12);border:1.5px solid rgba(245,166,35,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+      </div>
+      <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;color:#F5A623;margin-bottom:6px;">Refer 2 friends to unlock</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;">When your friends buy a Subsidi card,<br>you unlock the Safe Wallet collect feature.</div>
+    </div>
+
+    <!-- Referral progress -->
+    <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:16px 20px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:13px;color:var(--w40);">Referrals</span>
+        <span id="collect-gate-count" style="font-size:13px;font-weight:700;color:#F5A623;">0 / 2</span>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">
+        <div id="collect-gate-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#b87010,#F5A623);border-radius:3px;transition:width .4s ease;"></div>
+      </div>
+    </div>
+
+    <!-- Referral link box -->
+    <div class="refer-link-box" onclick="copyCollectReferLink()" style="cursor:pointer;margin-bottom:16px;">
+      <span class="refer-link-text" id="collect-gate-link">subsidi.app/ref/—</span>
+      <span class="refer-link-copy" id="collect-gate-copy-btn">Copy</span>
+    </div>
+
+    <div style="font-size:12px;color:var(--w40);text-align:center;margin-bottom:20px;line-height:1.6;">
+      Share your link. When they buy a card and activate it,<br>your referral is counted automatically.
+    </div>
+
+    <button class="refer-close" onclick="closeCollectGateOv()">Close</button>
+  </div>
+</div>
+
+<!-- ── COLLECT: ELIGIBLE SHEET ── -->
+<div class="refer-ov" id="collect-eligible-ov">
+  <div class="refer-sheet">
+    <div class="sh-bar"></div>
+
+    <div id="collect-eligible-view">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="font-family:'Georgia',serif;font-size:13px;font-style:italic;color:var(--w40);margin-bottom:6px;">Available to collect</div>
+        <div style="font-size:56px;font-weight:800;letter-spacing:-2px;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">₦600</div>
+        <div id="collect-pool-status" style="font-size:12px;color:var(--w40);margin-top:6px;">Checking pool...</div>
+        <div id="collect-cooldown-msg" style="display:none;font-size:12px;color:rgba(245,166,35,0.7);margin-top:6px;"></div>
+      </div>
+
+      <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:14px 18px;margin-bottom:20px;font-size:12px;color:var(--w40);line-height:1.7;">
+        • First come, first served — pool is shared<br>
+        • Once collected, wait 7 days to collect again<br>
+        • Credited instantly to your main wallet
+      </div>
+
+      <button id="collect-claim-btn" class="reg-btn" onclick="openCollectScanner()" style="width:100%;background:linear-gradient(135deg,#b87010,#F5A623);color:#000;font-weight:700;">Collect ₦600</button>
+      <button class="refer-close" onclick="closeCollectEligibleOv()" style="margin-top:10px;">Close</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── COLLECT: SCANNER SHEET ── -->
+<div class="refer-ov" id="collect-scanner-ov">
   <div class="refer-sheet">
     <div class="sh-bar"></div>
 
     <div id="collect-scan-view">
       <div style="text-align:center;margin-bottom:16px;">
         <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:#F5A623;margin-bottom:4px;">Scan your card</div>
-        <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold your Subsidi card up to the camera</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold your Subsidi card up to the camera to claim</div>
       </div>
 
       <div style="position:relative;width:100%;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
@@ -1153,17 +1264,28 @@
       </div>
       <div id="collect-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:8px;">Starting camera...</div>
       <div style="text-align:center;">
-        <button class="reg-back" onclick="closeCollectOv()" style="display:inline-flex;">Cancel</button>
+        <button class="reg-back" onclick="closeCollectScannerOv()" style="display:inline-flex;">Cancel</button>
       </div>
     </div>
 
-    <div id="collect-result-view" style="display:none;text-align:center;">
-      <div style="width:56px;height:56px;border-radius:50%;background:rgba(245,166,35,.12);border:1.5px solid rgba(245,166,35,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
-        <span style="font-size:24px;">🔒</span>
+    <!-- Success view after claim -->
+    <div id="collect-success-view" style="display:none;text-align:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(245,166,35,.12);border:1.5px solid rgba(245,166,35,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <span style="font-size:28px;">✅</span>
       </div>
-      <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;color:#F5A623;margin-bottom:8px;">Coming Soon</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">Soon you'll be able to collect rewards<br>directly to your card.</div>
-      <button class="reg-btn" onclick="closeCollectOv()" style="width:100%;background:linear-gradient(135deg,#b87010,#F5A623);color:#000;">OK</button>
+      <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;color:#F5A623;margin-bottom:6px;">₦600 Collected!</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">Added to your wallet balance.<br>Come back in 7 days to collect again.</div>
+      <button class="reg-btn" onclick="closeAllCollectOvs()" style="width:100%;background:linear-gradient(135deg,#b87010,#F5A623);color:#000;font-weight:700;">Done</button>
+    </div>
+
+    <!-- Error view -->
+    <div id="collect-error-view" style="display:none;text-align:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,80,80,.08);border:1.5px solid rgba(255,80,80,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <span style="font-size:28px;">⚠️</span>
+      </div>
+      <div id="collect-error-msg" style="font-size:14px;color:#ff6b6b;margin-bottom:20px;line-height:1.6;"></div>
+      <button class="reg-btn" onclick="retryCollectScan()" style="width:100%;margin-bottom:10px;">Try Again</button>
+      <button class="refer-close" onclick="closeAllCollectOvs()">Close</button>
     </div>
 
   </div>
@@ -1544,6 +1666,20 @@
     return true; // blocked
   }
   window.addEventListener("load", async () => {
+    // Capture referral code from a shared link like subsidi.app/ref/username
+    // Stored in localStorage so it survives through the scan + PIN steps of signup
+    (function captureReferral() {
+      const path = window.location.pathname;
+      const refMatch = path.match(/\/ref\/([^\/?#]+)/);
+      const urlP = new URLSearchParams(window.location.search);
+      const refFromQuery = urlP.get('ref');
+      const refUsername = refMatch ? decodeURIComponent(refMatch[1]) : refFromQuery;
+      if (refUsername && !localStorage.getItem('subsidi_userId')) {
+        // Only capture for someone who isn't already a logged-in user
+        localStorage.setItem('subsidi_pending_ref', refUsername);
+      }
+    })();
+
     const savedUserId = localStorage.getItem('subsidi_userId');
     const savedSessionToken = localStorage.getItem('subsidi_session_token');
     if (savedUserId) {
@@ -2057,10 +2193,12 @@
     const err2 = document.getElementById('reg-err-2');
 
     try {
+      const referrerUsername = localStorage.getItem('subsidi_pending_ref') || null;
       const data = await callEdge('register', {
         cardCode: registeredCard,
         pin: userPin,
-        phone: window._regPhone || null
+        phone: window._regPhone || null,
+        referrerUsername
       });
 
       if (data.error) {
@@ -2084,6 +2222,7 @@
       username = data.username;
       balance = 300;
       document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+      localStorage.removeItem('subsidi_pending_ref');
 
       // Link the claimed card code to this userId in Supabase
       if (userId && registeredCard) {
@@ -2901,21 +3040,103 @@
     document.getElementById('refer-ov').classList.remove('open');
   }
 
-  // ── Collect (Safe Wallet) teaser scan — isolated from registration/login scan flow ──
+  // ── COLLECT FLOW ──────────────────────────────────────────────
   let collectStream = null;
   let collectScanLoop = null;
+  let collectTorchOn = false;
 
-  function showCollectOv() {
-    document.getElementById('collect-ov').classList.add('open');
+  // Entry point: decide which sheet to show
+  async function showCollectOv() {
+    if (gateCheck('Safe Wallet', 'Create a free account to collect rewards to your card.')) return;
+
+    // Check referral count
+    const data = await callEdge('get-referral-status', { userId });
+    const count = data.count ?? 0;
+
+    if (count < 2) {
+      // Show referral gate
+      const link = 'subsidi.app/ref/' + (username || userId.slice(0, 8));
+      document.getElementById('collect-gate-link').textContent = link;
+      document.getElementById('collect-gate-count').textContent = count + ' / 2';
+      document.getElementById('collect-gate-bar').style.width = (count / 2 * 100) + '%';
+      document.getElementById('collect-gate-ov').classList.add('open');
+    } else {
+      // Show eligible sheet
+      await openCollectEligibleOv();
+    }
+  }
+
+  function closeCollectGateOv() {
+    document.getElementById('collect-gate-ov').classList.remove('open');
+  }
+
+  function copyCollectReferLink() {
+    const link = document.getElementById('collect-gate-link').textContent;
+    navigator.clipboard.writeText(link).then(() => {
+      const btn = document.getElementById('collect-gate-copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    });
+  }
+
+  async function openCollectEligibleOv() {
+    const ov = document.getElementById('collect-eligible-ov');
+    const poolStatus = document.getElementById('collect-pool-status');
+    const claimBtn = document.getElementById('collect-claim-btn');
+    const cooldownMsg = document.getElementById('collect-cooldown-msg');
+
+    poolStatus.textContent = 'Checking pool...';
+    claimBtn.disabled = true;
+    cooldownMsg.style.display = 'none';
+    ov.classList.add('open');
+
+    try {
+      const data = await callEdge('get-collect-status', { userId });
+
+      if (data.pool_balance <= 0) {
+        poolStatus.textContent = '⚠️ Pool is currently empty. Check back soon.';
+        claimBtn.disabled = true;
+      } else if (data.on_cooldown) {
+        const next = new Date(data.next_eligible);
+        const days = Math.ceil((next - Date.now()) / (1000 * 60 * 60 * 24));
+        poolStatus.textContent = 'Pool balance: ₦' + data.pool_balance.toLocaleString();
+        cooldownMsg.style.display = 'block';
+        cooldownMsg.textContent = 'You can collect again in ' + days + ' day' + (days !== 1 ? 's' : '') + '.';
+        claimBtn.disabled = true;
+      } else {
+        poolStatus.textContent = 'Pool balance: ₦' + data.pool_balance.toLocaleString();
+        claimBtn.disabled = false;
+      }
+    } catch(e) {
+      poolStatus.textContent = 'Could not load pool status.';
+    }
+  }
+
+  function closeCollectEligibleOv() {
+    document.getElementById('collect-eligible-ov').classList.remove('open');
+  }
+
+  function openCollectScanner() {
+    document.getElementById('collect-eligible-ov').classList.remove('open');
+    const ov = document.getElementById('collect-scanner-ov');
     document.getElementById('collect-scan-view').style.display = 'block';
-    document.getElementById('collect-result-view').style.display = 'none';
+    document.getElementById('collect-success-view').style.display = 'none';
+    document.getElementById('collect-error-view').style.display = 'none';
     document.getElementById('collect-scan-status').textContent = 'Starting camera...';
+    ov.classList.add('open');
     startCollectScan();
   }
 
-  function closeCollectOv() {
+  function closeCollectScannerOv() {
     stopCollectScan();
-    document.getElementById('collect-ov').classList.remove('open');
+    document.getElementById('collect-scanner-ov').classList.remove('open');
+  }
+
+  function closeAllCollectOvs() {
+    stopCollectScan();
+    ['collect-gate-ov', 'collect-eligible-ov', 'collect-scanner-ov'].forEach(id => {
+      document.getElementById(id).classList.remove('open');
+    });
   }
 
   async function startCollectScan() {
@@ -2926,7 +3147,7 @@
       video.play();
       document.getElementById('collect-scan-status').textContent = 'Camera active — scan your card';
       collectScanFrame();
-    } catch (e) {
+    } catch(e) {
       document.getElementById('collect-scan-status').textContent = '⚠️ Camera blocked. Allow camera access and try again.';
     }
   }
@@ -2945,7 +3166,6 @@
     if (btn) { btn.style.background = 'var(--dark-3)'; btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--w70)'; }
   }
 
-  let collectTorchOn = false;
   async function toggleCollectTorch() {
     if (!collectStream) return;
     const track = collectStream.getVideoTracks()[0];
@@ -2986,16 +3206,161 @@
         const isValidCard = raw === 'SUBSIDI_ACTIVATE_CARD_V1' || raw === 'https://subsidi-1.vercel.app/' || raw.startsWith('https://subsidi-1.vercel.app');
         if (isValidCard) {
           stopCollectScan();
-          document.getElementById('collect-scan-view').style.display = 'none';
-          document.getElementById('collect-result-view').style.display = 'block';
-          return; // stop the loop — result is shown until OK is tapped
+          submitCollectClaim(raw);
+          return;
         }
       }
     }
     collectScanLoop = setTimeout(collectScanFrame, 200);
   }
 
+  async function submitCollectClaim(cardCode) {
+    document.getElementById('collect-scan-view').style.display = 'none';
+    document.getElementById('collect-scan-status').textContent = 'Verifying...';
+
+    try {
+      const data = await callEdge('claim-reward', { user_id: userId, card_code: cardCode });
+
+      if (data.success) {
+        // Update main wallet balance in UI
+        balance += 600;
+        const whole = Math.floor(balance).toLocaleString();
+        const dec = (balance % 1).toFixed(2).slice(1);
+        document.getElementById('bal-display').innerHTML =
+          '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+        // Show success
+        document.getElementById('collect-success-view').style.display = 'block';
+        document.getElementById('collect-error-view').style.display = 'none';
+      } else {
+        const msgs = {
+          'Pool empty': 'The pool is currently empty. Check back soon.',
+          'Cooldown active': 'You already collected recently. Wait 7 days.',
+          'Not enough referrals': 'You need 2 referrals to collect.',
+          'Card does not match account': 'This card doesn\'t match your account.',
+        };
+        document.getElementById('collect-error-msg').textContent = msgs[data.error] || 'Something went wrong. Please try again.';
+        document.getElementById('collect-error-view').style.display = 'block';
+      }
+    } catch(e) {
+      document.getElementById('collect-error-msg').textContent = 'Network error. Please try again.';
+      document.getElementById('collect-error-view').style.display = 'block';
+    }
+  }
+
+  function retryCollectScan() {
+    document.getElementById('collect-error-view').style.display = 'none';
+    document.getElementById('collect-scan-view').style.display = 'block';
+    document.getElementById('collect-scan-status').textContent = 'Starting camera...';
+    startCollectScan();
+  }
+
+  // ── NO-CARD LOGIN ──────────────────────────────────────────────
+  let nocardPhone = '';
+  let nocardPinEntry = '';
+
+  function chooseNoCard() {
+    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('reg-step-nocard-phone').classList.add('active');
+    document.getElementById('nocard-phone-input').value = '';
+    document.getElementById('nocard-phone-err').textContent = '';
+  }
+
+  function backToNocardPhone() {
+    nocardPinEntry = '';
+    updateNocardDots();
+    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('reg-step-nocard-phone').classList.add('active');
+  }
+
+  async function submitNocardPhone() {
+    const phone = document.getElementById('nocard-phone-input').value.trim();
+    const err = document.getElementById('nocard-phone-err');
+    if (phone.length !== 11) { err.textContent = 'Enter a valid 11-digit number'; return; }
+    nocardPhone = phone;
+    err.textContent = '';
+    nocardPinEntry = '';
+    updateNocardDots();
+    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('reg-step-nocard-pin').classList.add('active');
+  }
+
+  function nocardPinKey(k) {
+    if (nocardPinEntry.length >= 4) return;
+    nocardPinEntry += k;
+    updateNocardDots();
+    if (nocardPinEntry.length === 4) setTimeout(submitNocardPin, 300);
+  }
+
+  function nocardPinDel() {
+    nocardPinEntry = nocardPinEntry.slice(0, -1);
+    updateNocardDots();
+  }
+
+  function updateNocardDots() {
+    for (let i = 0; i < 4; i++) {
+      const d = document.getElementById('npd' + i);
+      d.classList.toggle('on', i < nocardPinEntry.length);
+      d.classList.remove('err');
+    }
+  }
+
+  async function submitNocardPin() {
+    const err = document.getElementById('nocard-pin-err');
+    try {
+      err.textContent = 'Verifying...';
+      err.classList.add('show');
+      const vData = await callEdge('login-by-card', { phone: nocardPhone, pin: nocardPinEntry });
+      err.classList.remove('show');
+
+      if (vData && vData.valid) {
+        userId = vData.userId;
+        username = vData.username;
+        userPin = nocardPinEntry;
+        isGuest = false;
+        localStorage.setItem('subsidi_userId', userId);
+        if (vData.sessionToken) localStorage.setItem('subsidi_session_token', vData.sessionToken);
+        try { await callEdge('update-last-scan', { userId }); } catch(e) { console.warn('last_scan update failed:', e); }
+
+        try {
+          showSpinner('Loading your account...');
+          const userData = await callEdge('get-user', { userId });
+          if (userData && !userData.error) {
+            balance = userData.balance ?? 300;
+            subsidyFund = userData.subsidyFund ?? 0;
+            username = userData.username || username;
+            document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+            const whole = Math.floor(balance).toLocaleString();
+            const dec = (balance % 1).toFixed(2).slice(1);
+            document.getElementById('bal-display').innerHTML =
+              '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+          }
+        } catch(e) {
+          console.warn('post-login fetch failed:', e);
+        } finally {
+          hideSpinner();
+        }
+        show('dash');
+        updateSubsidyUI();
+        renderBundles();
+      } else {
+        err.textContent = 'Incorrect phone or PIN.';
+        err.classList.add('show');
+        for (let i = 0; i < 4; i++) document.getElementById('npd' + i).classList.add('err');
+        setTimeout(() => {
+          err.classList.remove('show');
+          nocardPinEntry = '';
+          updateNocardDots();
+        }, 1500);
+      }
+    } catch(e) {
+      err.textContent = 'Connection error. Try again.';
+      err.classList.add('show');
+      setTimeout(() => { err.classList.remove('show'); nocardPinEntry = ''; updateNocardDots(); }, 2000);
+    }
+  }
+
   // ── History Overlay ──
+
   async function showHistoryOv() {
     document.getElementById('hist-ov').classList.add('open');
     document.getElementById('hist-body').innerHTML = '<div class="hist-loader" id="hist-loader">Loading...</div>';

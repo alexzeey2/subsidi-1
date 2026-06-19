@@ -3050,8 +3050,15 @@
     if (gateCheck('Safe Wallet', 'Create a free account to collect rewards to your card.')) return;
 
     // Check referral count
-    const data = await callEdge('get-referral-status', { userId });
-    const count = data.count ?? 0;
+    let count = 0;
+    try {
+      const data = await callEdge('get-referral-status', { userId });
+      count = data?.count ?? 0;
+    } catch (e) {
+      console.warn('get-referral-status failed:', e);
+      alert('Network error. Please check your connection and try again.');
+      return;
+    }
 
     if (count < 2) {
       // Show referral gate

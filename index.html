@@ -2938,14 +2938,20 @@
     // Save pending order so we can verify + finish after the Paystack redirect
     localStorage.setItem('pendingCardOrder', JSON.stringify({ ref, phone, address, amount }));
 
-    const initResult = await callEdge('order-card-init', {
-      phone,
-      address,
-      amount,
-      email,
-      ref,
-      callbackUrl: window.location.href
-    });
+    let initResult;
+    try {
+      initResult = await callEdge('order-card-init', {
+        phone,
+        address,
+        amount,
+        email,
+        ref,
+        callbackUrl: window.location.href
+      });
+    } catch (e) {
+      console.warn('order-card-init failed:', e);
+      initResult = null;
+    }
 
     if (initResult && initResult.authorization_url) {
       window.location.href = initResult.authorization_url;

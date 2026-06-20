@@ -313,7 +313,8 @@
   .refer-sheet{background:var(--dark-2);border:1px solid var(--border);border-radius:28px 28px 0 0;padding:10px 24px 48px;width:100%;animation:up .32s cubic-bezier(.22,1,.36,1)}
   .refer-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(108,43,217,.12);border:1px solid rgba(108,43,217,.25);border-radius:20px;padding:5px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--p-light);margin-bottom:16px}
   .refer-link-box{background:var(--dark-4);border:1.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;opacity:.45;cursor:not-allowed;margin-bottom:8px}
-  .refer-link-text{font-size:13px;font-weight:600;color:var(--w40);letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .refer-link-text{font-size:13px;font-weight:600;color:var(--p-light);letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #prof-ref-link{color:var(--p-light)}
   .refer-link-copy{background:var(--dark-5);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;color:var(--w40);letter-spacing:.3px;text-transform:uppercase;flex-shrink:0}
   .refer-coming{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--w40);font-weight:600;letter-spacing:.8px;text-transform:uppercase;margin-bottom:24px}
   .refer-coming-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2)}
@@ -555,7 +556,7 @@
       <div style="display:flex;flex-direction:column;gap:12px;margin-top:24px;">
         <button class="reg-btn" onclick="chooseNewAccount()">New Account</button>
         <button class="reg-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);" onclick="chooseMyAccount()">My Account</button>
-        <button class="reg-btn" style="background:transparent;border:none;color:rgba(255,255,255,0.3);font-size:13px;margin-top:4px;" onclick="chooseNoCard()">I don't have a card</button>
+        <button class="reg-btn" style="background:transparent;border:none;color:var(--p-light);font-size:13px;margin-top:4px;" onclick="chooseNoCard()">I don't have a card</button>
       </div>
     </div>
 
@@ -612,7 +613,10 @@
           <span id="torch-label">Flash Off</span>
         </button>
       </div>
-      <div id="reg-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:20px;">Starting camera...</div>
+      <div id="reg-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:14px;">Starting camera...</div>
+      <div style="display:flex;justify-content:center;margin-bottom:20px;">
+        <button class="reg-btn" style="background:transparent;border:none;color:var(--p-light);font-size:13px;width:auto;padding:0;" onclick="chooseNoCard()">I don't have a card</button>
+      </div>
       <div class="reg-err" id="reg-err-2"></div>
     </div>
 
@@ -872,22 +876,14 @@
       </div>
       <span class="ni-lbl" style="color:var(--p-light)">Home</span>
     </div>
-    <div class="ni" onclick="if(gateCheck('Refer & Earn','Create a free account to get your referral link and earn ₦5,000 per friend.'))return;showReferOv()">
+    <div class="ni" id="dash-nav-rewards" onclick="navTo('ordercard',this)">
       <div class="ni-ico">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
         </svg>
       </div>
-      <span class="ni-lbl" style="font-size:9px;">Earn ₦5k</span>
-    </div>
-    <div class="ni" id="dash-nav-rewards" onclick="navTo('rewards',this)">
-      <div class="ni-ico">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-        </svg>
-      </div>
-      <span class="ni-lbl">Rewards</span>
+      <span class="ni-lbl">Order Card</span>
     </div>
     <div class="ni" onclick="navTo('profile',this)">
       <div class="ni-ico">
@@ -1083,22 +1079,14 @@
       </div>
       <span class="ni-lbl">Home</span>
     </div>
-    <div class="ni" onclick="if(gateCheck('Refer & Earn','Create a free account to get your referral link and earn ₦5,000 per friend.'))return;showReferOv()">
+    <div class="ni" onclick="navTo('ordercard',this)">
       <div class="ni-ico">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
         </svg>
       </div>
-      <span class="ni-lbl" style="font-size:9px;">Earn ₦5k</span>
-    </div>
-    <div class="ni" onclick="navTo('rewards',this)">
-      <div class="ni-ico">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-        </svg>
-      </div>
-      <span class="ni-lbl">Rewards</span>
+      <span class="ni-lbl">Order Card</span>
     </div>
     <div class="ni on" onclick="navTo('profile',this)">
       <div class="ni-ico">
@@ -1109,61 +1097,6 @@
       </div>
       <span class="ni-lbl" style="color:var(--p-light)">Account</span>
     </div>
-  </div>
-</div>
-
-<!-- ── REFERRAL OVERLAY ── -->
-<div class="refer-ov" id="refer-ov">
-  <div class="refer-sheet">
-    <div class="sh-bar"></div>
-    <div style="text-align:center;margin-bottom:20px;">
-      <div style="width:56px;height:56px;border-radius:50%;background:rgba(108,43,217,.12);border:1.5px solid rgba(108,43,217,.28);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B4FE8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-        </svg>
-      </div>
-      <div style="font-family:'Georgia',serif;font-size:24px;font-style:italic;margin-bottom:4px;">Earn ₦5,000</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;">Invite friends to Subsidi.<br>When they buy their first card, you both get rewarded.</div>
-    </div>
-
-    <!-- Link box — greyed out, coming soon -->
-    <div class="refer-link-box">
-      <span class="refer-link-text" id="refer-ov-link">subsidi.app/ref/—</span>
-      <span class="refer-link-copy">Copy</span>
-    </div>
-    <div class="refer-coming">
-      <div class="refer-coming-dot"></div>
-      Coming Soon
-      <div class="refer-coming-dot"></div>
-    </div>
-
-    <!-- How it works steps -->
-    <div class="refer-steps">
-      <div class="refer-step">
-        <div class="refer-step-num">1</div>
-        <div class="refer-step-body">
-          <div class="refer-step-title">Share your link</div>
-          <div class="refer-step-sub">Send your unique referral link to friends via WhatsApp, Instagram, anywhere.</div>
-        </div>
-      </div>
-      <div class="refer-step">
-        <div class="refer-step-num">2</div>
-        <div class="refer-step-body">
-          <div class="refer-step-title">They buy a Subsidi card</div>
-          <div class="refer-step-sub">Your friend scans their card and creates an account using your link.</div>
-        </div>
-      </div>
-      <div class="refer-step">
-        <div class="refer-step-num">3</div>
-        <div class="refer-step-body">
-          <div class="refer-step-title">You both earn ₦5,000</div>
-          <div class="refer-step-sub">₦5,000 is added to your wallet instantly. Your friend gets ₦5,000 too.</div>
-        </div>
-      </div>
-    </div>
-
-    <button class="refer-close" onclick="closeReferOv()">Close</button>
   </div>
 </div>
 
@@ -1292,73 +1225,52 @@
 </div>
 
 <!-- ── REWARDS SCREEN ── -->
-<div class="screen" id="rewards" style="background:var(--dark);padding-bottom:90px;overflow-y:auto">
+<div class="screen" id="ordercard" style="background:var(--dark);padding-bottom:90px;overflow-y:auto">
 
   <!-- Header -->
   <div style="padding:28px 24px 20px;position:relative;overflow:hidden">
     <div style="position:absolute;top:-80px;right:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(108,43,217,.12) 0%,transparent 65%);pointer-events:none"></div>
-    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:6px">Daily SUB</div>
-    <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px">Rewards Pool</div>
-    <div style="font-size:13px;color:var(--w40);line-height:1.5">Random SUB drops. Real savings. No daily guarantee.</div>
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:6px">Get Your Card</div>
+    <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px">Order a Subsidi Card</div>
+    <div style="font-size:13px;color:var(--w40);line-height:1.5">Your physical card unlocks discounted data and wallet access. Delivered to your address.</div>
   </div>
 
-  <!-- Main reward card -->
-  <div style="margin:0 20px 16px">
-    <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:20px;padding:36px 24px;text-align:center;position:relative;overflow:hidden">
-      <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(108,43,217,.08) 0%,transparent 70%);pointer-events:none"></div>
-      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px">Daily Reward</div>
-      <div style="font-size:52px;font-weight:800;letter-spacing:-2px;color:var(--w)">4 SUB</div>
+  <!-- Card image -->
+  <div style="margin:0 20px 20px">
+    <img src="data:image/webp;base64,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" alt="Subsidi membership card" style="width:100%;display:block;border-radius:16px;box-shadow:0 12px 32px rgba(108,43,217,.18)">
+  </div>
+
+  <!-- Price -->
+  <div style="margin:0 20px 28px;text-align:center">
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:6px">Price</div>
+    <div style="font-size:40px;font-weight:800;letter-spacing:-1px;color:var(--w)">₦3,800</div>
+    <div style="font-size:12px;color:var(--w40);margin-top:4px">One-time payment · Delivered nationwide</div>
+  </div>
+
+  <!-- Form -->
+  <div style="margin:0 20px 16px" id="order-card-form">
+    <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:10px;padding-left:4px">Delivery details</div>
+
+    <div style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+        <input id="order-phone-input" type="tel" inputmode="numeric" maxlength="11" placeholder="Phone number (08012345678)"
+          style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit"
+          oninput="this.value=this.value.replace(/\D/g,'').slice(0,11)">
+      </div>
     </div>
-  </div>
 
-  <!-- How it works -->
-  <div style="margin:0 20px 16px">
-    <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;padding-left:4px">How it works</div>
-    <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:20px;overflow:hidden">
-
-      <div style="display:flex;align-items:flex-start;gap:14px;padding:18px 20px;border-bottom:1px solid var(--border)">
-        <div style="width:32px;height:32px;border-radius:10px;background:var(--p-subtle);border:1px solid rgba(108,43,217,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <div>
-          <div style="font-size:13px;font-weight:700;margin-bottom:3px">Everyone gets a turn</div>
-          <div style="font-size:12px;color:var(--w40);line-height:1.6">The pool cycles through all members before anyone is selected twice. Fair rotation, no favourites.</div>
-        </div>
+    <div style="margin-bottom:8px">
+      <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+        <textarea id="order-address-input" placeholder="Delivery address (street, city, state)" rows="3"
+          style="width:100%;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit;resize:none;box-sizing:border-box"></textarea>
       </div>
-
-      <div style="display:flex;align-items:flex-start;gap:14px;padding:18px 20px;border-bottom:1px solid var(--border)">
-        <div style="width:32px;height:32px;border-radius:10px;background:var(--p-subtle);border:1px solid rgba(108,43,217,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
-        <div>
-          <div style="font-size:13px;font-weight:700;margin-bottom:3px">Not every day — but guaranteed</div>
-          <div style="font-size:12px;color:var(--w40);line-height:1.6">Only a few members receive SUB each day. You won't know when your day is — but your day will come.</div>
-        </div>
-      </div>
-
-      <div style="display:flex;align-items:flex-start;gap:14px;padding:18px 20px">
-        <div style="width:32px;height:32px;border-radius:10px;background:var(--p-subtle);border:1px solid rgba(108,43,217,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div>
-          <div style="font-size:13px;font-weight:700;margin-bottom:3px">Instant 4 SUB on joining</div>
-          <div style="font-size:12px;color:var(--w40);line-height:1.6">The moment you join the pool, 4 SUB drops to your account instantly — before the rotation even starts.</div>
-        </div>
-      </div>
-
     </div>
+    <div class="reg-err" id="order-card-err" style="margin-bottom:4px"></div>
   </div>
 
-  <!-- Coming Soon -->
+  <!-- Proceed / WhatsApp button -->
   <div style="margin:0 20px 24px">
-    <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:20px;padding:28px 24px;text-align:center">
-      <div style="width:44px;height:44px;border-radius:50%;background:var(--w08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--w40)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      </div>
-      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w40);font-weight:700;margin-bottom:8px">Coming Soon</div>
-      <div style="font-size:14px;font-weight:600;margin-bottom:6px">Reward Pool launching soon</div>
-      <div style="font-size:12px;color:var(--w40);line-height:1.6">We're setting up the pool. When it goes live, you'll be able to join from right here.</div>
-    </div>
+    <button class="reg-btn" id="order-card-btn" onclick="submitCardOrder()">Proceed to Pay ₦3,800</button>
   </div>
 
   <!-- Bottom nav -->
@@ -1372,22 +1284,14 @@
       </div>
       <span class="ni-lbl">Home</span>
     </div>
-    <div class="ni" onclick="if(gateCheck('Refer & Earn','Create a free account to get your referral link and earn ₦5,000 per friend.'))return;showReferOv()">
-      <div class="ni-ico">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-        </svg>
-      </div>
-      <span class="ni-lbl" style="font-size:9px;">Earn ₦5k</span>
-    </div>
     <div class="ni on">
       <div class="ni-ico">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B4FE8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
         </svg>
       </div>
-      <span class="ni-lbl" style="color:var(--p-light)">Rewards</span>
+      <span class="ni-lbl" style="color:var(--p-light)">Order Card</span>
     </div>
     <div class="ni" onclick="navTo('profile',this)">
       <div class="ni-ico">
@@ -1781,6 +1685,36 @@
       } catch(e) {
         hideSpinner();
         console.error('Deposit verify error:', e);
+      }
+    }
+
+    // Check if returning from a card-order Paystack redirect
+    const pendingOrder = localStorage.getItem('pendingCardOrder');
+    if (paystackRef && pendingOrder) {
+      try {
+        const { ref, phone, address, amount } = JSON.parse(pendingOrder);
+        if (paystackRef === ref) {
+          localStorage.removeItem('pendingCardOrder');
+          showSpinner('Verifying payment...');
+          const result = await callEdge('order-card-verify', {
+            reference: paystackRef,
+            phone,
+            address,
+            amount
+          });
+          hideSpinner();
+          if (result && result.success) {
+            localStorage.setItem('subsidiCardOrder', JSON.stringify({ phone, address }));
+            renderOrderCardDone(phone, address);
+            navTo('ordercard');
+          } else {
+            alert('Payment verification failed. Contact support with ref: ' + paystackRef);
+          }
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      } catch(e) {
+        hideSpinner();
+        console.error('Card order verify error:', e);
       }
     }
   });
@@ -2947,6 +2881,83 @@
     if (e.target === document.getElementById('dep-ov')) document.getElementById('dep-ov').classList.remove('open');
   }
 
+  // ── Order a Card ──
+  const WHATSAPP_NUMBER = '2349058150220';
+
+  function buildWaOrderLink(phone, address) {
+    const msg = 'Hi, I just paid for a Subsidi card.\nPhone: ' + phone + '\nAddress: ' + address;
+    return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
+  }
+
+  function renderOrderCardDone(phone, address) {
+    const formEl = document.getElementById('order-card-form');
+    const btn = document.getElementById('order-card-btn');
+    if (!btn) return;
+    if (formEl) formEl.style.display = 'none';
+    btn.textContent = 'Chat on WhatsApp';
+    btn.style.background = '#25D366';
+    btn.onclick = () => { window.open(buildWaOrderLink(phone, address), '_blank'); };
+  }
+
+  // If a card was already ordered on this device, show the WhatsApp button immediately
+  (function restoreCardOrderState() {
+    const saved = localStorage.getItem('subsidiCardOrder');
+    if (saved) {
+      try {
+        const { phone, address } = JSON.parse(saved);
+        renderOrderCardDone(phone, address);
+      } catch (e) {}
+    }
+  })();
+
+  async function submitCardOrder() {
+    const phone = document.getElementById('order-phone-input').value.trim();
+    const address = document.getElementById('order-address-input').value.trim();
+    const err = document.getElementById('order-card-err');
+
+    if (phone.length !== 11 || !phone.startsWith('0')) {
+      err.textContent = 'Enter a valid 11-digit phone number.';
+      err.classList.add('show');
+      return;
+    }
+    if (address.length < 8) {
+      err.textContent = 'Enter a delivery address.';
+      err.classList.add('show');
+      return;
+    }
+    err.classList.remove('show');
+
+    const amount = 3800;
+    const ref = 'subsidi-card-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    const email = phone + '@subsidi.app';
+
+    const btn = document.getElementById('order-card-btn');
+    btn.textContent = 'Processing...';
+    btn.style.pointerEvents = 'none';
+
+    // Save pending order so we can verify + finish after the Paystack redirect
+    localStorage.setItem('pendingCardOrder', JSON.stringify({ ref, phone, address, amount }));
+
+    const initResult = await callEdge('order-card-init', {
+      phone,
+      address,
+      amount,
+      email,
+      ref,
+      callbackUrl: window.location.href
+    });
+
+    if (initResult && initResult.authorization_url) {
+      window.location.href = initResult.authorization_url;
+    } else {
+      btn.textContent = 'Proceed to Pay ₦3,800';
+      btn.style.pointerEvents = 'auto';
+      err.textContent = 'Could not start payment: ' + (initResult?.error || 'Please try again.');
+      err.classList.add('show');
+      localStorage.removeItem('pendingCardOrder');
+    }
+  }
+
   // ── Scan success sound (loud) ──
   function playSuccessSound() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -3027,17 +3038,6 @@
     show('dash');
     renderBundles();
     fetchUserData();
-  }
-
-  // ── Referral Overlay ──
-  function showReferOv() {
-    const link = 'subsidi.app/ref/' + (username || '—');
-    document.getElementById('refer-ov-link').textContent = link;
-    document.getElementById('refer-ov').classList.add('open');
-  }
-
-  function closeReferOv() {
-    document.getElementById('refer-ov').classList.remove('open');
   }
 
   // ── COLLECT FLOW ──────────────────────────────────────────────
@@ -3543,7 +3543,7 @@
     },
     {
       q: "How do I get more SUB points?",
-      a: "You earn SUB by buying data through Subsidi — the more you buy, the more SUB you accumulate. You can also join the daily SUB reward pool, where members get randomly selected to receive free SUB points."
+      a: "You earn SUB by buying data through Subsidi — the more you buy, the more SUB you accumulate."
     },
     {
       q: "Is my money safe?",
@@ -3555,7 +3555,7 @@
     },
     {
       q: "Why can't I log back in after logging out?",
-      a: "Access to Subsidi is tied to your physical or digital card. If you log out and don't have a card, you'll need to order a physical card (₦3,000) to regain access."
+      a: "Access to Subsidi is tied to your physical or digital card. If you log out and don't have a card, you'll need to order a physical card (₦3,800) to regain access."
     },
     {
       q: "How do I report a problem?",

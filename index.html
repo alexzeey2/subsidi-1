@@ -774,7 +774,7 @@
       <div class="bal-lbl" id="wallet-label">Wallet Balance</div>
 
       <!-- Swipeable balance strip -->
-      <div id="card-swipe-wrap" style="overflow:hidden;position:relative;padding-right:54px;box-sizing:border-box;">
+      <div id="card-swipe-wrap" style="overflow:hidden;position:relative;padding-right:54px;box-sizing:border-box;cursor:pointer;">
         <div id="card-swipe-inner" style="display:flex;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
 
           <!-- Balance 0: Main Wallet -->
@@ -1112,7 +1112,7 @@
         </svg>
       </div>
       <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;color:#F5A623;margin-bottom:6px;">Refer 2 friends to unlock</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;">When your friends buy a Subsidi card,<br>you unlock the Safe Wallet collect feature.</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;">When your friends sign up and deposit ₦1,000,<br>you unlock the Safe Wallet collect feature.</div>
     </div>
 
     <!-- Referral progress -->
@@ -1133,7 +1133,7 @@
     </div>
 
     <div style="font-size:12px;color:var(--w40);text-align:center;margin-bottom:20px;line-height:1.6;">
-      Share your link. When they buy a card and activate it,<br>your referral is counted automatically.
+      Share your link. When they sign up and deposit ₦1,000,<br>your referral is counted automatically.
     </div>
 
     <button class="refer-close" onclick="closeCollectGateOv()">Close</button>
@@ -1270,7 +1270,7 @@
 
   <!-- Proceed / WhatsApp button -->
   <div style="margin:0 20px 24px">
-    <button class="reg-btn" id="order-card-btn" onclick="submitCardOrder()">Proceed to Pay ₦3,800</button>
+    <button class="reg-btn" id="order-card-btn" onclick="submitCardOrder()">Pay ₦3,800</button>
   </div>
 
   <!-- Bottom nav -->
@@ -2550,7 +2550,7 @@
       const isLow = !isGuest && subsidyFund <= 0; // red only when logged in and fund empty
 
       // Pricing
-      const basePrice = isExpensive ? p.ck + 240 : p.ck; // expensive: +₦240 margin, cheap: no margin
+      const basePrice = isExpensive ? p.ck + 240 : p.ck + 5; // expensive: +₦240 margin, cheap: +₦5 margin
       const displayPrice = hasDiscount ? basePrice - 120 : basePrice; // ₦120 subsidy off cheap plans only when fund > 0
       const strikePrice = hasDiscount ? basePrice : '';
 
@@ -2950,7 +2950,7 @@
     if (initResult && initResult.authorization_url) {
       window.location.href = initResult.authorization_url;
     } else {
-      btn.textContent = 'Proceed to Pay ₦3,800';
+      btn.textContent = 'Pay ₦3,800';
       btn.style.pointerEvents = 'auto';
       err.textContent = 'Could not start payment: ' + (initResult?.error || 'Please try again.');
       err.classList.add('show');
@@ -3527,23 +3527,15 @@
   const FAQ_ITEMS = [
     {
       q: "What is Subsidi?",
-      a: "Subsidi is a membership that lets you buy mobile data at a discount. You get a card (physical or digital), load SUB points, and use them to buy data cheaper than market price."
+      a: "Subsidi is a membership that gets you mobile data cheaper than market price. You get a card, and buying Golden Plans keeps a discount fund topped up so your regular data purchases stay cheap."
     },
     {
-      q: "What are SUB points?",
-      a: "SUB is Subsidi's discount currency. Instead of paying full price for data, you spend SUB points and get data at a reduced rate. Think of it as cashback you can only use on data."
+      q: "What is a Golden Plan?",
+      a: "Golden Plans are the bigger data plans (₦1,100 and above). Buying one tops up your discount fund. That fund is what makes your regular, smaller plans cheaper — so buy a Golden Plan now and then to keep the discount going."
     },
     {
-      q: "How do I keep my card active?",
-      a: "Pay ₦180 every 7 days to keep your card active. If your card lapses, you can still buy data through the app but at market price — the discount only works with an active card."
-    },
-    {
-      q: "What happens if my card expires?",
-      a: "You lose access to discounted data until you renew. Your SUB balance stays safe — it doesn't disappear. Just renew your card and your points are ready to use again."
-    },
-    {
-      q: "How do I get more SUB points?",
-      a: "You earn SUB by buying data through Subsidi — the more you buy, the more SUB you accumulate."
+      q: "How do I keep my discount active?",
+      a: "Your discount fund goes down a little each time you use it on a cheap plan. When it runs out, regular plans go back to full price until you buy a Golden Plan to refill it."
     },
     {
       q: "Is my money safe?",
@@ -3551,7 +3543,7 @@
     },
     {
       q: "How do I refer someone?",
-      a: "Go to your profile and copy your referral link. Share it with friends — when they sign up and activate, you both benefit."
+      a: "Share your referral link from your profile. Once 2 of your friends sign up and fund their wallet with at least ₦1,000, you unlock the Safe Wallet collect feature."
     },
     {
       q: "Why can't I log back in after logging out?",
@@ -3694,6 +3686,14 @@
       }, 360);
     }
 
+    let lastAdvanceAt = 0;
+    function safeAdvance() {
+      const now = Date.now();
+      if (now - lastAdvanceAt < 400) return; // avoid double-advance from a swipe's synthesized click
+      lastAdvanceAt = now;
+      advance();
+    }
+
     wrap.addEventListener('touchstart', function(e) {
       startX = e.touches[0].clientX;
     }, { passive: true });
@@ -3701,8 +3701,13 @@
     wrap.addEventListener('touchend', function(e) {
       const diff = startX - e.changedTouches[0].clientX;
       // Only a left swipe (finger moves left, diff > 0) advances; right swipe does nothing
-      if (diff > 40) advance();
+      if (diff > 40) safeAdvance();
     }, { passive: true });
+
+    // Tap (no meaningful swipe distance) also advances — same direction as swipe
+    wrap.addEventListener('click', function(e) {
+      safeAdvance();
+    });
 
     // Initial state
     applySettledUI(0);

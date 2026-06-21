@@ -34,16 +34,16 @@
   @keyframes reveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
   /* ── REGISTER ── */
-  #reg-screen{background:var(--dark);align-items:center;justify-content:center;padding:60px 28px 48px;position:relative;overflow:hidden}
+  #reg-screen{background:var(--dark);align-items:center;justify-content:center;padding:32px 28px 32px;position:relative;overflow:hidden}
   .reg-back-wrap{position:absolute;top:20px;left:20px;z-index:10;}
   .bg-glow{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(108,43,217,.18) 0%,transparent 65%);pointer-events:none}
   .wordmark{font-family:'Georgia',serif;font-style:italic;font-size:42px;letter-spacing:-.5px;text-align:center;margin-bottom:6px}
   .wdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--p-light);margin-left:2px;vertical-align:middle;margin-bottom:8px}
-  .tagline{font-size:11px;color:var(--w40);text-align:center;letter-spacing:2px;text-transform:uppercase;margin-bottom:40px;font-weight:500}
+  .tagline{font-size:11px;color:var(--w40);text-align:center;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;font-weight:500}
 
   .reg-box{width:100%;max-width:360px}
   .reg-title{font-size:20px;font-weight:700;text-align:center;margin-bottom:6px}
-  .reg-sub{font-size:13px;color:var(--w40);text-align:center;margin-bottom:32px;line-height:1.5}
+  .reg-sub{font-size:13px;color:var(--w40);text-align:center;margin-bottom:22px;line-height:1.5}
 
   .reg-field{background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:14px;transition:border-color .15s}
   .reg-field:focus-within{border-color:var(--p)}
@@ -553,7 +553,7 @@
     <div class="reg-step active" id="reg-step-choice">
       <div class="reg-title">Get started</div>
       <div class="reg-sub">Do you have an existing Subsidi account?</div>
-      <div style="display:flex;flex-direction:column;gap:12px;margin-top:24px;">
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px;">
         <button class="reg-btn" onclick="chooseNewAccount()">New Account</button>
         <button class="reg-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);" onclick="chooseMyAccount()">My Account</button>
         <button class="reg-btn" style="background:transparent;border:none;color:var(--p-light);font-size:13px;margin-top:4px;" onclick="chooseNoCard()">I don't have a card</button>

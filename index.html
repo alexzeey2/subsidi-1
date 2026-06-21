@@ -710,8 +710,8 @@
     <!-- No-card login: phone number -->
     <div class="reg-step" id="reg-step-nocard-phone">
       <div class="reg-back-wrap"><button class="reg-back" onclick="backToChoice()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button></div>
-      <div class="reg-title">Your phone number</div>
-      <div class="reg-sub">Enter the phone number linked to your account</div>
+      <div class="reg-title" id="nocard-phone-title">Your phone number</div>
+      <div class="reg-sub" id="nocard-phone-sub">Enter the phone number linked to your account</div>
       <div style="margin:28px 0 8px;">
         <div style="display:flex;align-items:center;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
           <input id="nocard-phone-input" type="tel" inputmode="numeric" maxlength="11" placeholder="08012345678"
@@ -725,8 +725,8 @@
     <!-- No-card login: PIN -->
     <div class="reg-step" id="reg-step-nocard-pin">
       <div class="reg-back-wrap"><button class="reg-back" onclick="backToNocardPhone()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button></div>
-      <div class="reg-title">Welcome back</div>
-      <div class="reg-sub">Enter your PIN to continue</div>
+      <div class="reg-title" id="nocard-pin-title">Welcome back</div>
+      <div class="reg-sub" id="nocard-pin-sub">Enter your PIN to continue</div>
       <div class="reg-pin-lbl" id="nocard-pin-lbl">Enter PIN</div>
       <div class="reg-dots" id="nocard-pin-dots">
         <div class="dot" id="npd0"></div>
@@ -3276,6 +3276,13 @@
     document.getElementById('reg-step-nocard-phone').classList.add('active');
     document.getElementById('nocard-phone-input').value = '';
     document.getElementById('nocard-phone-err').textContent = '';
+    if (scanIntent === 'new') {
+      document.getElementById('nocard-phone-title').textContent = 'Your phone number';
+      document.getElementById('nocard-phone-sub').textContent = "We'll use this to set up your new account";
+    } else {
+      document.getElementById('nocard-phone-title').textContent = 'Your phone number';
+      document.getElementById('nocard-phone-sub').textContent = 'Enter the phone number linked to your account';
+    }
   }
 
   function backToNocardPhone() {
@@ -3293,6 +3300,13 @@
     err.textContent = '';
     nocardPinEntry = '';
     updateNocardDots();
+    if (scanIntent === 'new') {
+      document.getElementById('nocard-pin-title').textContent = 'Set your PIN';
+      document.getElementById('nocard-pin-sub').textContent = "Choose a 4-digit PIN for your new account";
+    } else {
+      document.getElementById('nocard-pin-title').textContent = 'Welcome back';
+      document.getElementById('nocard-pin-sub').textContent = 'Enter your PIN to continue';
+    }
     document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
     document.getElementById('reg-step-nocard-pin').classList.add('active');
   }
@@ -3318,6 +3332,59 @@
   }
 
   async function submitNocardPin() {
+    if (scanIntent === 'new') {
+      return submitNocardSignup();
+    }
+    return submitNocardLogin();
+  }
+
+  async function submitNocardSignup() {
+    const err = document.getElementById('nocard-pin-err');
+    try {
+      err.textContent = 'Creating your account...';
+      err.classList.add('show');
+      const referrerUsername = localStorage.getItem('subsidi_pending_ref') || null;
+      const rData = await callEdge('register-no-card', { phone: nocardPhone, pin: nocardPinEntry, referrerUsername });
+      err.classList.remove('show');
+
+      if (rData && rData.success) {
+        localStorage.removeItem('subsidi_pending_ref');
+        userId = rData.userId;
+        username = rData.username;
+        userPin = nocardPinEntry;
+        isGuest = false;
+        localStorage.setItem('subsidi_userId', userId);
+        if (rData.sessionToken) localStorage.setItem('subsidi_session_token', rData.sessionToken);
+
+        balance = 300;
+        subsidyFund = 360;
+        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        const whole = Math.floor(balance).toLocaleString();
+        const dec = (balance % 1).toFixed(2).slice(1);
+        document.getElementById('bal-display').innerHTML =
+          '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+
+        show('dash');
+        updateSubsidyUI();
+        renderBundles();
+      } else {
+        err.textContent = (rData && rData.error) || 'Could not create account. Try again.';
+        err.classList.add('show');
+        for (let i = 0; i < 4; i++) document.getElementById('npd' + i).classList.add('err');
+        setTimeout(() => {
+          err.classList.remove('show');
+          nocardPinEntry = '';
+          updateNocardDots();
+        }, 2000);
+      }
+    } catch(e) {
+      err.textContent = 'Connection error. Try again.';
+      err.classList.add('show');
+      setTimeout(() => { err.classList.remove('show'); nocardPinEntry = ''; updateNocardDots(); }, 2000);
+    }
+  }
+
+  async function submitNocardLogin() {
     const err = document.getElementById('nocard-pin-err');
     try {
       err.textContent = 'Verifying...';

@@ -1253,6 +1253,13 @@
 
     <div style="margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+        <input id="order-name-input" type="text" placeholder="Full name"
+          style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit">
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
         <input id="order-phone-input" type="tel" inputmode="numeric" maxlength="11" placeholder="Phone number (08012345678)"
           style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit"
           oninput="this.value=this.value.replace(/\D/g,'').slice(0,11)">
@@ -1301,6 +1308,29 @@
         </svg>
       </div>
       <span class="ni-lbl">Account</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── WHATSAPP ORDER PREVIEW SHEET ── -->
+<div class="overlay" id="wa-order-ov" onclick="closeWaOrderSheet(event)" style="display:none;align-items:flex-end;">
+  <div class="sheet" style="padding-bottom:32px;" onclick="event.stopPropagation()">
+    <div class="sh-bar"></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:0 20px 4px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.998 2.003C6.476 2.003 2 6.48 2 12.001a9.95 9.95 0 0 0 1.394 5.147L2 22l4.984-1.308A9.953 9.953 0 0 0 11.999 22C17.52 22 22 17.522 22 12.001 22 6.48 17.52 2.003 11.998 2.003z"/></svg>
+      <div style="font-size:16px;font-weight:800;color:#fff;">Send Order to WhatsApp</div>
+    </div>
+    <div style="font-size:13px;color:var(--w40);padding:0 20px 16px;">Review your order details before sending</div>
+
+    <div style="margin:0 20px 20px;background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:16px;">
+      <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:10px;">Message Preview</div>
+      <div id="wa-order-preview" style="font-size:14px;color:var(--w70);line-height:1.7;white-space:pre-line;"></div>
+    </div>
+
+    <div style="margin:0 20px;">
+      <button class="reg-btn" style="background:#25D366;font-size:15px;font-weight:800;" onclick="sendWaOrderMessage()">
+        Send on WhatsApp
+      </button>
     </div>
   </div>
 </div>
@@ -1699,7 +1729,7 @@
     const pendingOrder = localStorage.getItem('pendingCardOrder');
     if (paystackRef && pendingOrder) {
       try {
-        const { ref, phone, address, amount } = JSON.parse(pendingOrder);
+        const { ref, name, phone, address, amount } = JSON.parse(pendingOrder);
         if (paystackRef === ref) {
           localStorage.removeItem('pendingCardOrder');
           showSpinner('Verifying payment...');
@@ -1711,9 +1741,11 @@
           });
           hideSpinner();
           if (result && result.success) {
-            localStorage.setItem('subsidiCardOrder', JSON.stringify({ phone, address }));
-            renderOrderCardDone(phone, address);
+            localStorage.setItem('subsidiCardOrder', JSON.stringify({ name: name || '', phone, address }));
+            renderOrderCardDone(name || '', phone, address);
             navTo('ordercard');
+            // Auto-open the WA preview sheet
+            setTimeout(() => openWaOrderSheet(name || '', phone, address), 400);
           } else {
             alert('Payment verification failed. Contact support with ref: ' + paystackRef);
           }
@@ -2891,19 +2923,43 @@
   // ── Order a Card ──
   const WHATSAPP_NUMBER = '2349058150220';
 
-  function buildWaOrderLink(phone, address) {
-    const msg = 'Hi, I just paid for a Subsidi card.\nPhone: ' + phone + '\nAddress: ' + address;
+  function buildWaOrderLink(name, phone, address) {
+    const msg = buildWaOrderMessage(name, phone, address);
     return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
   }
 
-  function renderOrderCardDone(phone, address) {
+  function buildWaOrderMessage(name, phone, address) {
+    return 'Hi, I just paid for a Subsidi card 🃏\nName: ' + name + '\nPhone: ' + phone + '\nAddress: ' + address;
+  }
+
+  function renderOrderCardDone(name, phone, address) {
     const formEl = document.getElementById('order-card-form');
     const btn = document.getElementById('order-card-btn');
     if (!btn) return;
     if (formEl) formEl.style.display = 'none';
-    btn.textContent = 'Chat on WhatsApp';
+    btn.textContent = 'Send Order on WhatsApp';
     btn.style.background = '#25D366';
-    btn.onclick = () => { window.open(buildWaOrderLink(phone, address), '_blank'); };
+    btn.onclick = () => openWaOrderSheet(name, phone, address);
+  }
+
+  function openWaOrderSheet(name, phone, address) {
+    const preview = document.getElementById('wa-order-preview');
+    if (preview) preview.textContent = buildWaOrderMessage(name, phone, address);
+    const ov = document.getElementById('wa-order-ov');
+    if (ov) { ov.style.display = 'flex'; setTimeout(() => ov.classList.add('open'), 10); }
+    // Store for send button
+    ov._waName = name; ov._waPhone = phone; ov._waAddress = address;
+  }
+
+  function closeWaOrderSheet(e) {
+    const ov = document.getElementById('wa-order-ov');
+    if (ov) { ov.classList.remove('open'); setTimeout(() => { ov.style.display = 'none'; }, 300); }
+  }
+
+  function sendWaOrderMessage() {
+    const ov = document.getElementById('wa-order-ov');
+    window.open(buildWaOrderLink(ov._waName, ov._waPhone, ov._waAddress), '_blank');
+    closeWaOrderSheet();
   }
 
   // If a card was already ordered on this device, show the WhatsApp button immediately
@@ -2911,17 +2967,23 @@
     const saved = localStorage.getItem('subsidiCardOrder');
     if (saved) {
       try {
-        const { phone, address } = JSON.parse(saved);
-        renderOrderCardDone(phone, address);
+        const { name, phone, address } = JSON.parse(saved);
+        renderOrderCardDone(name || '', phone, address);
       } catch (e) {}
     }
   })();
 
   async function submitCardOrder() {
+    const name = document.getElementById('order-name-input').value.trim();
     const phone = document.getElementById('order-phone-input').value.trim();
     const address = document.getElementById('order-address-input').value.trim();
     const err = document.getElementById('order-card-err');
 
+    if (name.length < 2) {
+      err.textContent = 'Enter your full name.';
+      err.classList.add('show');
+      return;
+    }
     if (phone.length !== 11 || !phone.startsWith('0')) {
       err.textContent = 'Enter a valid 11-digit phone number.';
       err.classList.add('show');
@@ -2943,7 +3005,7 @@
     btn.style.pointerEvents = 'none';
 
     // Save pending order so we can verify + finish after the Paystack redirect
-    localStorage.setItem('pendingCardOrder', JSON.stringify({ ref, phone, address, amount }));
+    localStorage.setItem('pendingCardOrder', JSON.stringify({ ref, name, phone, address, amount }));
 
     let initResult;
     try {

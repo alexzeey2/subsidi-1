@@ -2940,6 +2940,28 @@
     btn.textContent = 'Send Order on WhatsApp';
     btn.style.background = '#25D366';
     btn.onclick = () => openWaOrderSheet(name, phone, address);
+
+    // Add "Order a new card" link if not already there
+    if (!document.getElementById('reorder-card-link')) {
+      const link = document.createElement('div');
+      link.id = 'reorder-card-link';
+      link.textContent = 'Lost your card? Order a new one';
+      link.style.cssText = 'text-align:center;margin-top:14px;font-size:13px;color:var(--w40);text-decoration:underline;cursor:pointer;padding-bottom:8px;';
+      link.onclick = () => {
+        localStorage.removeItem('subsidiCardOrder');
+        if (formEl) formEl.style.display = '';
+        btn.textContent = 'Pay ₦3,800';
+        btn.style.background = '';
+        btn.onclick = submitCardOrder;
+        link.remove();
+        // Clear inputs
+        ['order-name-input','order-phone-input','order-address-input'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+      };
+      btn.parentNode.insertBefore(link, btn.nextSibling);
+    }
   }
 
   function openWaOrderSheet(name, phone, address) {

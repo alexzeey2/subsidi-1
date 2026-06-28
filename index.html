@@ -1468,6 +1468,7 @@
   let premiumToggleOn = false;   // current toggle state (on/off)
   let premiumLastUsed = 0;       // timestamp of last premium purchase
   let premDemoActive = false;    // is the demo blur/animation running
+  let premDemoSeen = false;      // demo has been shown to logged-in non-premium user
 
   async function callEdge(fnName, body) {
     const res = await fetch(SUPA_URL + '/functions/v1/' + fnName, {
@@ -2294,8 +2295,8 @@
 
     const isExpensive = subCostCount === 0;
 
-    // Logged-in non-premium user taps cheap plan during demo → show unlock sheet
-    if (!isExpensive && premDemoActive && !premiumUnlocked && !isGuest) {
+    // Logged-in non-premium user taps cheap plan after seeing demo → show unlock sheet
+    if (!isExpensive && (premDemoActive || premDemoSeen) && !premiumUnlocked && !isGuest) {
       showPremUnlockSheet(true);
       return;
     }
@@ -4128,7 +4129,7 @@
           el.classList.remove('prem-counting');
           el.classList.add('prem-final');
         });
-        // After animation: guests keep blur + prices dropped + toggle ON, logged-in non-premium show unlock sheet
+        // After animation: guests keep blur + prices dropped + toggle ON, logged-in non-premium wait for plan tap
         setTimeout(() => {
           premDemoActive = false;
           if (isGuest) {
@@ -4138,10 +4139,12 @@
             renderBundles();
             // Note: prem-demo-active class stays on dash to keep blur
           } else if (!premiumUnlocked) {
-            // Logged-in, not paid: lift blur, show the unlock sheet, toggle stays OFF
+            // Logged-in, not paid: lift blur, prices restore, toggle OFF
+            // Sheet will appear when they tap a plan
+            premDemoSeen = true;
             const dash = document.getElementById('dash');
             if (dash) dash.classList.remove('prem-demo-active');
-            showPremUnlockSheet();
+            renderBundles();
           }
         }, 500);
       }
@@ -4151,6 +4154,7 @@
 
   function cancelPremDemo() {
     premDemoActive = false;
+    premDemoSeen = false;
     // Only remove blur for non-guests, or guests who are cancelling mid-animation
     if (!isGuest || !premiumToggleOn) {
       const dash = document.getElementById('dash');

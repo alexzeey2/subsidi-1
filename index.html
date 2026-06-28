@@ -866,7 +866,7 @@
     <div id="subsidy-bar-sub" style="font-size:10px;color:#aaa;margin-top:5px;text-align:right;"></div>
   </div>
 
-  <div class="sec prem-blur-target">
+  <div class="sec">
     <div class="sec-title">Network</div>
     <div class="net-grid">
       <div class="net sel" onclick="selNet(this,'MTN')"><div class="net-logo mtn">MTN</div><div class="net-n">MTN</div></div>
@@ -2300,8 +2300,8 @@
       return;
     }
 
-    // Logged-in, non-premium user taps a cheap plan during demo → show unlock sheet
-    if (!isExpensive && premDemoActive && !premiumUnlocked && !isGuest) {
+    // Any user taps a cheap plan during demo → show unlock sheet
+    if (!isExpensive && premDemoActive && !premiumUnlocked) {
       showPremUnlockSheet(true);
       return;
     }
@@ -4030,10 +4030,12 @@
       return;
     }
 
-    // Guest with toggle already ON → turn it off
+    // Guest with toggle already ON → turn it off and restore
     if (isGuest && premiumToggleOn) {
       premiumToggleOn = false;
       setPremToggleUI(false);
+      const dash = document.getElementById('dash');
+      if (dash) dash.classList.remove('prem-demo-active');
       renderBundles();
       return;
     }
@@ -4132,17 +4134,13 @@
           el.classList.remove('prem-counting');
           el.classList.add('prem-final');
         });
-        // For guests: lift the blur and let them browse at premium prices freely
-        // For logged-in users: wait for them to tap a plan card (sheet appears on tap)
+        // Clear the demo flag so tab/network switching works
+        // But keep prem-demo-active class on dash so blur stays for everyone
         setTimeout(() => {
-          if (isGuest) {
-            premDemoActive = false;
-            premiumToggleOn = true;
-            const dash = document.getElementById('dash');
-            if (dash) dash.classList.remove('prem-demo-active');
-            setPremToggleUI(true);
-            renderBundles();
-          }
+          premDemoActive = false;
+          premiumToggleOn = true;
+          setPremToggleUI(true);
+          renderBundles();
         }, 500);
       }
     }
@@ -4189,7 +4187,7 @@
   async function payPremiumUnlock() {
     if (isGuest) {
       _closePremUnlockOv();
-      alert('Please create an account first to unlock Premium.');
+      showGate('Create an account to unlock Premium', 'Register for free, then activate Premium for ₦3,000/month.');
       return;
     }
     if (balance < 3000) {
@@ -4211,7 +4209,7 @@
         premiumToggleOn = true;
         premiumLastUsed = 0;
         savePremiumState();
-        balance = result.newBalance ?? (balance - 12000);
+        balance = result.newBalance ?? (balance - 3000);
         // Update balance UI
         const whole = Math.floor(balance).toLocaleString();
         const dec = (balance % 1).toFixed(2).slice(1);

@@ -2632,12 +2632,6 @@
     document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('on'));
     el.classList.add('on');
     CATEGORY = cat;
-    // If demo blur is still active, cancel it cleanly before re-rendering
-    if (premDemoActive) {
-      premDemoActive = false;
-      const dash = document.getElementById('dash');
-      if (dash) dash.classList.remove('prem-demo-active');
-    }
     renderBundles();
   }
 
@@ -2663,7 +2657,7 @@
 
       // Premium toggle: apply to cheap plans only (guests see demo prices, paid users need premiumUnlocked)
       let isPremiumActive = false;
-      if (!isExpensive && premiumToggleOn && (premiumUnlocked || isGuest)) {
+      if (!isExpensive && (premiumToggleOn || premDemoActive) && (premiumUnlocked || isGuest || premDemoActive)) {
         const discounted = basePrice - 120;
         displayPrice = Math.max(50, Math.round((discounted * 0.40) / 5) * 5);
         isPremiumActive = true;
@@ -2685,16 +2679,16 @@
         <div class="b-btn">${btnLabel}</div>
       </div>`;
     }).join('');
+
+    // Re-apply glow animation on premium prices if demo is still active
+    if (premDemoActive) {
+      container.querySelectorAll('.b-price-gold').forEach(el => el.classList.add('prem-final'));
+    }
   }
 
   function selNet(el, n) {
     document.querySelectorAll('.net').forEach(b => b.classList.remove('sel'));
     el.classList.add('sel'); NET = n;
-    if (premDemoActive) {
-      premDemoActive = false;
-      const dash = document.getElementById('dash');
-      if (dash) dash.classList.remove('prem-demo-active');
-    }
     renderBundles();
   }
 

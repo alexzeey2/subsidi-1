@@ -2655,9 +2655,9 @@
       const basePrice = isExpensive ? p.ck + 240 : p.ck + 5; // expensive: +₦240 margin, cheap: +₦5 margin
       let displayPrice = hasDiscount ? basePrice - 120 : basePrice; // ₦120 subsidy off cheap plans only when fund > 0
 
-      // Premium toggle: apply to cheap plans only (guests see demo prices, paid users need premiumUnlocked)
+      // Premium toggle: show premium prices during demo or when toggle is active
       let isPremiumActive = false;
-      if (!isExpensive && (premiumToggleOn || premDemoActive) && (premiumUnlocked || isGuest || premDemoActive)) {
+      if (!isExpensive && (premiumToggleOn || premDemoActive)) {
         const discounted = basePrice - 120;
         displayPrice = Math.max(50, Math.round((discounted * 0.40) / 5) * 5);
         isPremiumActive = true;

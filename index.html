@@ -2295,9 +2295,13 @@
 
     const isExpensive = subCostCount === 0;
 
-    // Logged-in non-premium user taps cheap plan after seeing demo → show unlock sheet
-    if (!isExpensive && (premDemoActive || premDemoSeen) && !premiumUnlocked && !isGuest) {
-      showPremUnlockSheet(true);
+    // Cheap plan tapped while demo prices are showing
+    if (!isExpensive && (premDemoActive || premDemoSeen) && !premiumUnlocked) {
+      if (isGuest) {
+        gateCheck('Buy data at Premium prices', 'Create a free account to unlock Premium and buy at these prices.');
+      } else {
+        showPremUnlockSheet(true);
+      }
       return;
     }
 
@@ -4025,12 +4029,13 @@
       return;
     }
 
-    // Guest with toggle already ON → turn it off and restore
-    if (isGuest && premiumToggleOn) {
+    // Toggle is ON but not paid (guest or logged-in non-premium) → turn OFF and restore
+    if (premiumToggleOn && !premiumUnlocked) {
       premiumToggleOn = false;
-      setPremToggleUI(false);
+      premDemoSeen = false;
       const dash = document.getElementById('dash');
       if (dash) dash.classList.remove('prem-demo-active');
+      setPremToggleUI(false);
       renderBundles();
       return;
     }
@@ -4130,23 +4135,14 @@
           el.classList.remove('prem-counting');
           el.classList.add('prem-final');
         });
-        // After animation: guests keep blur + prices dropped + toggle ON, logged-in non-premium wait for plan tap
+        // After animation: keep blur ON, prices stay dropped, toggle stays ON
         setTimeout(() => {
           premDemoActive = false;
-          if (isGuest) {
-            // Guest: keep blur on, prices dropped, toggle stays ON
-            premiumToggleOn = true;
-            setPremToggleUI(true);
-            renderBundles();
-            // Note: prem-demo-active class stays on dash to keep blur
-          } else if (!premiumUnlocked) {
-            // Logged-in, not paid: lift blur, prices restore, toggle OFF
-            // Sheet will appear when they tap a plan
-            premDemoSeen = true;
-            const dash = document.getElementById('dash');
-            if (dash) dash.classList.remove('prem-demo-active');
-            renderBundles();
-          }
+          premDemoSeen = true;
+          premiumToggleOn = true;
+          setPremToggleUI(true);
+          renderBundles();
+          // blur stays — prem-demo-active class remains on dash
         }, 500);
       }
     }
@@ -4156,16 +4152,11 @@
   function cancelPremDemo() {
     premDemoActive = false;
     premDemoSeen = false;
-    // Only remove blur for non-guests, or guests who are cancelling mid-animation
-    if (!isGuest || !premiumToggleOn) {
-      const dash = document.getElementById('dash');
-      if (dash) dash.classList.remove('prem-demo-active');
-    }
-    // For logged-in non-premium: turn toggle OFF and restore prices
-    if (!isGuest && !premiumUnlocked) {
-      premiumToggleOn = false;
-      setPremToggleUI(false);
-    }
+    premiumToggleOn = false;
+    // Lift blur
+    const dash = document.getElementById('dash');
+    if (dash) dash.classList.remove('prem-demo-active');
+    setPremToggleUI(false);
     renderBundles();
     document.querySelectorAll('.b-price').forEach(el => {
       el.classList.remove('prem-counting', 'prem-final');
@@ -4191,7 +4182,14 @@
   function _closePremUnlockOv() {
     const ov = document.getElementById('prem-unlock-ov');
     if (ov) { ov.classList.remove('open'); setTimeout(() => { ov.style.display = 'none'; }, 300); }
-    cancelPremDemo();
+    if (!premiumUnlocked) {
+      premiumToggleOn = false;
+      premDemoSeen = false;
+      const dash = document.getElementById('dash');
+      if (dash) dash.classList.remove('prem-demo-active');
+      setPremToggleUI(false);
+      renderBundles();
+    }
   }
 
   // Close button (Maybe later)

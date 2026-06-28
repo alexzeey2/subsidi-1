@@ -1339,8 +1339,9 @@
     <div class="sh-bar"></div>
     <div style="text-align:center;padding:4px 20px 0;">
       <div style="font-size:22px;margin-bottom:6px;">⚡</div>
-      <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px;">Unlock Premium Toggle</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">Get the cheapest data prices in Nigeria.<br>Use once every 48 hours, forever.</div>
+      <div style="font-size:13px;font-weight:700;color:#F5A623;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;" id="prem-sheet-context-label">This is a Premium price</div>
+      <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px;">Unlock Premium</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">Get the cheapest data prices in Nigeria.<br>Active for 30 days from payment.</div>
     </div>
 
     <div style="margin:0 20px 16px;background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
@@ -1356,13 +1357,13 @@
           <span style="color:#F5A623;font-weight:800;">✓</span> One purchase every 48 hours
         </div>
         <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-          <span style="color:#F5A623;font-weight:800;">✓</span> One-time payment, no subscription
+          <span style="color:#F5A623;font-weight:800;">✓</span> Cancel anytime — no hidden fees
         </div>
       </div>
     </div>
 
-    <div class="prem-sheet-price">₦12,000</div>
-    <div class="prem-sheet-once">One-time payment</div>
+    <div class="prem-sheet-price">₦3,000</div>
+    <div class="prem-sheet-once">per month</div>
 
     <div style="margin:0 20px;">
       <button class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock()">
@@ -2290,9 +2291,15 @@
 
     const isExpensive = subCostCount === 0;
 
+    // Logged-in user taps a cheap plan when toggle is on but premium not unlocked → show unlock sheet
+    if (!isExpensive && premiumToggleOn && !premiumUnlocked && !isGuest) {
+      showPremUnlockSheet(true);
+      return;
+    }
+
     // Logged-in, non-premium user taps a cheap plan during demo → show unlock sheet
     if (!isExpensive && premDemoActive && !premiumUnlocked && !isGuest) {
-      showPremUnlockSheet();
+      showPremUnlockSheet(true);
       return;
     }
 
@@ -2667,6 +2674,7 @@
       const priceClass = isPremiumActive ? 'b-price b-price-gold' : (hasDiscount ? 'b-price b-price-gold' : 'b-price');
 
       return `<div class="${bundleClass}" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${basePrice},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">
+        ${isPremiumActive && !premiumUnlocked ? '<div style="position:absolute;top:8px;right:8px;font-size:11px;color:#F5A623;opacity:0.8;">🔒</div>' : ''}
         <div class="b-val">${p.val}</div>
         <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
         <div class="b-orig">${strikePrice ? fmt(strikePrice) : ''}</div>
@@ -4127,20 +4135,8 @@
           el.classList.remove('prem-counting');
           el.classList.add('prem-final');
         });
-        // Show sheet after brief glow moment — logged-in only
-        setTimeout(() => {
-          if (!isGuest) {
-            showPremUnlockSheet();
-          } else {
-            // Guest: lift the blur, keep prices dropped, toggle stays on
-            premDemoActive = false;
-            premiumToggleOn = true;
-            const dash = document.getElementById('dash');
-            if (dash) dash.classList.remove('prem-demo-active');
-            setPremToggleUI(true);
-            renderBundles();
-          }
-        }, 500);
+        // Prices are now glowing — wait for user to tap a plan card
+        // The sheet will appear when they tap openSheet() on a premium-priced plan
       }
     }
     requestAnimationFrame(step);
@@ -4158,7 +4154,12 @@
   }
 
   // ── PREMIUM UNLOCK SHEET ──
-  function showPremUnlockSheet() {
+  function showPremUnlockSheet(fromPlanTap) {
+    const label = document.getElementById('prem-sheet-context-label');
+    if (label) {
+      label.textContent = fromPlanTap ? 'This is a Premium price' : 'Unlock cheaper prices';
+      label.style.display = fromPlanTap ? '' : 'none';
+    }
     const ov = document.getElementById('prem-unlock-ov');
     if (ov) { ov.style.display = 'flex'; setTimeout(() => ov.classList.add('open'), 10); }
   }
@@ -4184,9 +4185,9 @@
       alert('Please create an account first to unlock Premium.');
       return;
     }
-    if (balance < 12000) {
+    if (balance < 3000) {
       _closePremUnlockOv();
-      if (confirm('You need ₦12,000 in your wallet to unlock Premium.\n\nTap OK to add money.')) {
+      if (confirm('You need ₦3,000 in your wallet to activate Premium.\n\nTap OK to add money.')) {
         document.getElementById('dep-ov').classList.add('open');
       }
       return;
@@ -4214,7 +4215,7 @@
         if (balElR) balElR.innerHTML = balHTML;
         setPremToggleUI(true);
         renderBundles();
-        alert('🎉 Premium unlocked! Your prices are now active. Enjoy cheap data!');
+        alert('🎉 Premium activated! Your prices are now live for 30 days. Enjoy cheap data!');
       } else {
         alert('Payment failed: ' + (result?.error || 'Please try again.'));
       }

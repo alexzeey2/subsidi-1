@@ -119,8 +119,11 @@
   /* ── PREMIUM DEMO BLUR ── */
   .prem-blur-target{transition:filter .4s,opacity .4s;}
   .prem-demo-active .prem-blur-target{filter:blur(4px);opacity:.25;pointer-events:none;}
-  /* Plans section: blur the header/tabs but NOT the cards themselves */
+  /* Plans section: blur the market header title but NOT the category tabs */
   .prem-demo-active .prem-market-header{filter:blur(4px);opacity:.25;pointer-events:none;}
+  /* Always keep category tabs visible and tappable during demo */
+  .prem-demo-active .cat-tabs-wrap{filter:none!important;opacity:1!important;pointer-events:auto!important;}
+  .prem-demo-active .cat-tab{filter:none!important;opacity:1!important;pointer-events:auto!important;}
   #prem-plans-spotlight{transition:filter .4s,opacity .4s;}
 
   /* ── PREMIUM PRICE ANIMATION ── */
@@ -879,11 +882,11 @@
         <span class="data-market-title">Data Market</span>
         <span class="data-market-count" id="market-count"></span>
       </div>
-      <div class="tabs" style="margin-bottom:12px;">
-        <div class="tab cat-tab on" onclick="selCategory(this,'daily')">Daily</div>
-        <div class="tab cat-tab" onclick="selCategory(this,'weekly')">Weekly</div>
-        <div class="tab cat-tab" onclick="selCategory(this,'monthly')">Monthly</div>
-      </div>
+    </div>
+    <div class="tabs" style="margin-bottom:12px;">
+      <div class="tab cat-tab on" onclick="selCategory(this,'daily')">Daily</div>
+      <div class="tab cat-tab" onclick="selCategory(this,'weekly')">Weekly</div>
+      <div class="tab cat-tab" onclick="selCategory(this,'monthly')">Monthly</div>
     </div>
     <div id="prem-plans-spotlight">
       <div class="bundles" id="bundles-all"></div>
@@ -4135,8 +4138,18 @@
           el.classList.remove('prem-counting');
           el.classList.add('prem-final');
         });
-        // Prices are now glowing — wait for user to tap a plan card
-        // The sheet will appear when they tap openSheet() on a premium-priced plan
+        // For guests: lift the blur and let them browse at premium prices freely
+        // For logged-in users: wait for them to tap a plan card (sheet appears on tap)
+        setTimeout(() => {
+          if (isGuest) {
+            premDemoActive = false;
+            premiumToggleOn = true;
+            const dash = document.getElementById('dash');
+            if (dash) dash.classList.remove('prem-demo-active');
+            setPremToggleUI(true);
+            renderBundles();
+          }
+        }, 500);
       }
     }
     requestAnimationFrame(step);

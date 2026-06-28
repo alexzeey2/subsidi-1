@@ -1464,7 +1464,7 @@
   const SUPA_URL = 'https://taesbjxhllruvmueeete.supabase.co';
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhZXNianhobGxydXZtdWVlZXRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzE4NTcsImV4cCI6MjA5MzgwNzg1N30.ygRn0k2o8WncP0YUbpUdc5Mevdz9NqckNsf-KNCR5L4';
   let userId = null;
-  let premiumUnlocked = false;   // true once user has paid ₦12,000
+  let premiumUnlocked = false;   // true once user has paid ₦3,000/month
   let premiumToggleOn = false;   // current toggle state (on/off)
   let premiumLastUsed = 0;       // timestamp of last premium purchase
   let premDemoActive = false;    // is the demo blur/animation running
@@ -4075,6 +4075,7 @@
   // ── DEMO ANIMATION ──
   function runPremDemo() {
     premDemoActive = true;
+    setPremToggleUI(true);
     const dash = document.getElementById('dash');
     if (dash) dash.classList.add('prem-demo-active');
 

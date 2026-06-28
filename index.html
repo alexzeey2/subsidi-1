@@ -105,6 +105,32 @@
   .refresh-btn{height:36px;padding:0 14px;background:var(--dark-4);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:6px;cursor:pointer;transition:all .15s;color:rgba(255,255,255,0.5);font-size:11px;font-weight:600;letter-spacing:.3px}
   .refresh-btn:active{background:var(--dark-5);transform:scale(.96)}
   .refresh-btn.spinning svg{animation:spin .6s linear infinite}
+
+  /* ── PREMIUM TOGGLE ── */
+  .prem-toggle-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+  .prem-toggle-label{font-size:11px;font-weight:700;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;transition:color .2s;}
+  .prem-toggle-label.active{color:#F5A623;}
+  .prem-toggle-track{width:44px;height:24px;border-radius:12px;background:var(--dark-4);border:1px solid var(--border);position:relative;transition:background .25s,border-color .25s;flex-shrink:0;animation:premPulse 2.5s ease-in-out infinite;}
+  .prem-toggle-track.on{background:linear-gradient(90deg,#b87010,#F5A623);border-color:#F5A623;animation:none;}
+  .prem-toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 4px rgba(0,0,0,.3);}
+  .prem-toggle-track.on .prem-toggle-thumb{transform:translateX(20px);}
+  @keyframes premPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,166,35,0);border-color:var(--border);}50%{box-shadow:0 0 0 4px rgba(245,166,35,.25);border-color:#F5A623;}}
+
+  /* ── PREMIUM DEMO BLUR ── */
+  .prem-blur-target{transition:filter .4s,opacity .4s;}
+  .prem-demo-active .prem-blur-target{filter:blur(4px);opacity:.25;pointer-events:none;}
+  /* Plans section: blur the header/tabs but NOT the cards themselves */
+  .prem-demo-active .prem-market-header{filter:blur(4px);opacity:.25;pointer-events:none;}
+  #prem-plans-spotlight{transition:filter .4s,opacity .4s;}
+
+  /* ── PREMIUM PRICE ANIMATION ── */
+  .b-price.prem-counting{color:#F5A623!important;}
+  @keyframes premGlow{0%,100%{text-shadow:0 0 8px rgba(245,166,35,.4)}50%{text-shadow:0 0 20px rgba(245,166,35,.9)}}
+  .b-price.prem-final{animation:premGlow 1.2s ease-in-out infinite;color:#F5A623!important;}
+
+  /* ── PREMIUM UNLOCK SHEET ── */
+  .prem-sheet-price{font-size:36px;font-weight:900;color:#F5A623;text-align:center;margin:8px 0 4px;}
+  .prem-sheet-once{font-size:12px;color:var(--w40);text-align:center;margin-bottom:20px;letter-spacing:.3px;text-transform:uppercase;}
   @keyframes spin{to{transform:rotate(360deg)}}
 
   .bal-lbl{font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--w40);margin-bottom:8px;font-weight:500}
@@ -760,16 +786,17 @@
     <div class="topbar">
       <div class="brand">subsidi<span class="bpip"></span></div>
       <div class="topbar-icons">
-        
-        <div class="refresh-btn" id="refresh-btn" onclick="refreshDash()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          Refresh
+        <div class="prem-toggle-wrap" id="prem-toggle-wrap" onclick="onPremToggleClick()">
+          <span class="prem-toggle-label" id="prem-toggle-label">Premium</span>
+          <div class="prem-toggle-track" id="prem-toggle-track">
+            <div class="prem-toggle-thumb"></div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Wallet card (static frame; only the balance number swipes) -->
-    <div class="wallet-card-frame">
+    <div class="wallet-card-frame prem-blur-target">
       <div class="bal-lbl" id="wallet-label">Wallet Balance</div>
 
       <!-- Swipeable balance strip -->
@@ -778,19 +805,19 @@
 
           <!-- Balance 0: Main Wallet -->
           <div data-card="0" style="min-width:100%;flex-shrink:0;box-sizing:border-box;">
-            <div class="bal-amt" id="bal-display"><span class="bal-cur">₦</span>100<span class="bal-dec">.00</span></div>
+            <div class="bal-amt" id="bal-display"><span class="bal-cur">₦</span>0<span class="bal-dec">.00</span></div>
           </div>
 
-          <!-- Balance 1: Safe Wallet -->
+          <!-- Balance 1: Reward Pool -->
           <div data-card="1" style="min-width:100%;flex-shrink:0;box-sizing:border-box;">
             <div class="bal-amt" style="background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
-              <span class="bal-cur" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">₦</span>79,200<span class="bal-dec" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">.00</span>
+              <span class="bal-cur" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">₦</span><span id="rp-daily-display">100</span><span class="bal-dec" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">/day</span>
             </div>
           </div>
 
           <!-- Balance 0 (repeat): lets the loop keep sliding left from Safe back to Main -->
           <div data-card="0-repeat" style="min-width:100%;flex-shrink:0;box-sizing:border-box;">
-            <div class="bal-amt" id="bal-display-repeat"><span class="bal-cur">₦</span>100<span class="bal-dec">.00</span></div>
+            <div class="bal-amt" id="bal-display-repeat"><span class="bal-cur">₦</span>0<span class="bal-dec">.00</span></div>
           </div>
 
         </div>
@@ -812,10 +839,10 @@
         </div>
       </div>
 
-      <!-- Actions for Safe Wallet -->
+      <!-- Actions for Reward Pool -->
       <div class="wallet-card-actions" id="actions-card-1" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0 4px;opacity:0;pointer-events:none;transition:opacity .25s ease;">
-        <div class="act-rect" onclick="if(gateCheck('Safe Wallet','Create a free account to collect rewards to your card.'))return;showCollectOv()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
-          <span>🔒 Collect</span>
+        <div class="act-rect" onclick="openRewardPool()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
+          <span>Collect</span>
         </div>
       </div>
 
@@ -827,8 +854,8 @@
 
 
   <!-- Subsidy Tank Bar -->
-  <div id="subsidy-bar-wrap" style="display:none;margin:24px 16px 8px;">
-    <div id="subsidy-bar-label" style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;color:#F5A623;">⚡ Buy more Golden Plans!</div>
+  <div id="subsidy-bar-wrap" class="prem-blur-target" style="display:none;margin:24px 16px 8px;">
+    <div id="subsidy-bar-label" style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;color:#F5A623;">Buy Golden Plans to Refill Discounts!</div>
     <div id="subsidy-bar-track" style="position:relative;height:10px;background:#1a1a1a;border-radius:99px;overflow:visible;border:1px solid #F5A623;">
       <div id="subsidy-bar-fill" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#b87010,#F5A623);transition:width .4s ease;width:0%;"></div>
       <div id="subsidy-bar-circle" style="position:absolute;left:100%;top:50%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#b87010,#F5A623);border:2px solid #F5A623;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#000;box-shadow:0 0 8px #F5A623;"></div>
@@ -836,7 +863,7 @@
     <div id="subsidy-bar-sub" style="font-size:10px;color:#aaa;margin-top:5px;text-align:right;"></div>
   </div>
 
-  <div class="sec">
+  <div class="sec prem-blur-target">
     <div class="sec-title">Network</div>
     <div class="net-grid">
       <div class="net sel" onclick="selNet(this,'MTN')"><div class="net-logo mtn">MTN</div><div class="net-n">MTN</div></div>
@@ -847,16 +874,20 @@
   </div>
 
   <div class="sec">
-    <div class="data-market-hdr">
-      <span class="data-market-title">Data Market</span>
-      <span class="data-market-count" id="market-count"></span>
+    <div class="prem-market-header">
+      <div class="data-market-hdr">
+        <span class="data-market-title">Data Market</span>
+        <span class="data-market-count" id="market-count"></span>
+      </div>
+      <div class="tabs" style="margin-bottom:12px;">
+        <div class="tab cat-tab on" onclick="selCategory(this,'daily')">Daily</div>
+        <div class="tab cat-tab" onclick="selCategory(this,'weekly')">Weekly</div>
+        <div class="tab cat-tab" onclick="selCategory(this,'monthly')">Monthly</div>
+      </div>
     </div>
-    <div class="tabs" style="margin-bottom:12px;">
-      <div class="tab cat-tab on" onclick="selCategory(this,'daily')">Daily</div>
-      <div class="tab cat-tab" onclick="selCategory(this,'weekly')">Weekly</div>
-      <div class="tab cat-tab" onclick="selCategory(this,'monthly')">Monthly</div>
+    <div id="prem-plans-spotlight">
+      <div class="bundles" id="bundles-all"></div>
     </div>
-    <div class="bundles" id="bundles-all"></div>
   </div>
 
 
@@ -1101,84 +1132,52 @@
 </div>
 
 <!-- ── COLLECT: REFERRAL GATE SHEET ── -->
-<div class="refer-ov" id="collect-gate-ov">
-  <div class="refer-sheet">
+<!-- ── REWARD POOL SHEET ── -->
+<div class="refer-ov" id="reward-pool-ov">
+  <div class="refer-sheet" style="max-height:88vh;overflow-y:auto;">
     <div class="sh-bar"></div>
-    <div style="text-align:center;margin-bottom:20px;">
-      <div style="width:56px;height:56px;border-radius:50%;background:rgba(245,166,35,.12);border:1.5px solid rgba(245,166,35,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-        </svg>
-      </div>
-      <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;color:#F5A623;margin-bottom:6px;">Refer 2 friends to unlock</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;">When your friends sign up and deposit ₦1,000,<br>you unlock the Safe Wallet collect feature.</div>
+
+    <!-- Header -->
+    <div style="text-align:center;padding:0 20px 16px;">
+      <div style="font-size:22px;margin-bottom:6px;">⚡</div>
+      <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:4px;">Reward Pool</div>
+      <div id="rp-pool-status" style="font-size:12px;color:var(--w40);line-height:1.6;">Collect daily rewards by buying data every week</div>
     </div>
 
-    <!-- Referral progress -->
-    <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:16px 20px;margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-size:13px;color:var(--w40);">Referrals</span>
-        <span id="collect-gate-count" style="font-size:13px;font-weight:700;color:#F5A623;">0 / 2</span>
-      </div>
-      <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">
-        <div id="collect-gate-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#b87010,#F5A623);border-radius:3px;transition:width .4s ease;"></div>
-      </div>
+    <!-- Pool active/inactive banner -->
+    <div id="rp-pool-banner" style="margin:0 20px 16px;padding:10px 16px;border-radius:12px;text-align:center;font-size:12px;font-weight:700;display:none;"></div>
+
+    <!-- Info strip -->
+    <div style="margin:0 20px 20px;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:12px 16px;font-size:12px;color:var(--w40);line-height:1.8;">
+      • Make <strong style="color:#fff;">3 purchases per week</strong> to unlock the next tier<br>
+      • Tap your unlocked tier → scan your card → money hits your wallet<br>
+      • Pool is shared — when it's dry, cards are inactive<br>
+      • Your purchases this week: <strong id="rp-weekly-count" style="color:#F5A623;">0</strong>
     </div>
 
-    <!-- Referral link box -->
-    <div class="refer-link-box" onclick="copyCollectReferLink()" style="cursor:pointer;margin-bottom:16px;">
-      <span class="refer-link-text" id="collect-gate-link">subsidi.app/ref/—</span>
-      <span class="refer-link-copy" id="collect-gate-copy-btn">Copy</span>
+    <!-- Tier cards grid -->
+    <div style="margin:0 20px 20px;">
+      <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">Your Tiers</div>
+      <div id="rp-tiers-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
     </div>
 
-    <div style="font-size:12px;color:var(--w40);text-align:center;margin-bottom:20px;line-height:1.6;">
-      Share your link. When they sign up and deposit ₦1,000,<br>your referral is counted automatically.
-    </div>
-
-    <button class="refer-close" onclick="closeCollectGateOv()">Close</button>
+    <button class="refer-close" onclick="closeRewardPool()">Close</button>
   </div>
 </div>
 
-<!-- ── COLLECT: ELIGIBLE SHEET ── -->
-<div class="refer-ov" id="collect-eligible-ov">
+<!-- ── REWARD POOL: SCANNER SHEET ── -->
+<div class="refer-ov" id="rp-scanner-ov">
   <div class="refer-sheet">
     <div class="sh-bar"></div>
 
-    <div id="collect-eligible-view">
-      <div style="text-align:center;margin-bottom:24px;">
-        <div style="font-family:'Georgia',serif;font-size:13px;font-style:italic;color:var(--w40);margin-bottom:6px;">Available to collect</div>
-        <div style="font-size:56px;font-weight:800;letter-spacing:-2px;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">₦600</div>
-        <div id="collect-pool-status" style="font-size:12px;color:var(--w40);margin-top:6px;">Checking pool...</div>
-        <div id="collect-cooldown-msg" style="display:none;font-size:12px;color:rgba(245,166,35,0.7);margin-top:6px;"></div>
-      </div>
-
-      <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:14px 18px;margin-bottom:20px;font-size:12px;color:var(--w40);line-height:1.7;">
-        • First come, first served — pool is shared<br>
-        • Once collected, wait 7 days to collect again<br>
-        • Credited instantly to your main wallet
-      </div>
-
-      <button id="collect-claim-btn" class="reg-btn" onclick="openCollectScanner()" style="width:100%;background:linear-gradient(135deg,#b87010,#F5A623);color:#000;font-weight:700;">Collect ₦600</button>
-      <button class="refer-close" onclick="closeCollectEligibleOv()" style="margin-top:10px;">Close</button>
-    </div>
-
-  </div>
-</div>
-
-<!-- ── COLLECT: SCANNER SHEET ── -->
-<div class="refer-ov" id="collect-scanner-ov">
-  <div class="refer-sheet">
-    <div class="sh-bar"></div>
-
-    <div id="collect-scan-view">
+    <div id="rp-scan-view">
       <div style="text-align:center;margin-bottom:16px;">
         <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:#F5A623;margin-bottom:4px;">Scan your card</div>
-        <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold your Subsidi card up to the camera to claim</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold your Subsidi card up to the camera to collect <span id="rp-scan-amount" style="color:#F5A623;font-weight:700;"></span></div>
       </div>
 
       <div style="position:relative;width:100%;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
-        <video id="collect-video" style="width:100%;display:block;border-radius:20px;" autoplay playsinline muted></video>
+        <video id="rp-video" style="width:100%;display:block;border-radius:20px;" autoplay playsinline muted></video>
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
           <div style="width:160px;height:160px;position:relative;">
             <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-top:3px solid #F5A623;border-left:3px solid #F5A623;border-radius:4px 0 0 0;"></div>
@@ -1190,37 +1189,36 @@
       </div>
 
       <div style="display:flex;justify-content:center;margin-bottom:14px;">
-        <button id="collect-torch-btn" onclick="toggleCollectTorch()" style="display:flex;align-items:center;gap:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:12px;padding:10px 20px;color:var(--w70);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;">
-          <svg id="collect-torch-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6l-2 4h10l-2-4V2"/><line x1="12" y1="12" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
-          <span id="collect-torch-label">Flash Off</span>
+        <button id="rp-torch-btn" onclick="toggleRpTorch()" style="display:flex;align-items:center;gap:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:12px;padding:10px 20px;color:var(--w70);font-size:12px;font-weight:600;cursor:pointer;">
+          <svg id="rp-torch-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6l-2 4h10l-2-4V2"/><line x1="12" y1="12" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+          <span id="rp-torch-label">Flash Off</span>
         </button>
       </div>
-      <div id="collect-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:8px;">Starting camera...</div>
+      <div id="rp-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:8px;">Starting camera...</div>
       <div style="text-align:center;">
-        <button class="reg-back" onclick="closeCollectScannerOv()" style="display:inline-flex;">Cancel</button>
+        <button class="reg-back" onclick="closeRpScanner()" style="display:inline-flex;">Cancel</button>
       </div>
     </div>
 
-    <!-- Success view after claim -->
-    <div id="collect-success-view" style="display:none;text-align:center;">
+    <!-- Success -->
+    <div id="rp-success-view" style="display:none;text-align:center;">
       <div style="width:64px;height:64px;border-radius:50%;background:rgba(245,166,35,.12);border:1.5px solid rgba(245,166,35,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
         <span style="font-size:28px;">✅</span>
       </div>
-      <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;color:#F5A623;margin-bottom:6px;">₦600 Collected!</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">Added to your wallet balance.<br>Come back in 7 days to collect again.</div>
-      <button class="reg-btn" onclick="closeAllCollectOvs()" style="width:100%;background:linear-gradient(135deg,#b87010,#F5A623);color:#000;font-weight:700;">Done</button>
+      <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;color:#F5A623;margin-bottom:6px;" id="rp-success-amount">₦100 Collected!</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">Added to your wallet balance.</div>
+      <button class="reg-btn" onclick="closeRpAll()" style="width:100%;background:linear-gradient(135deg,#b87010,#F5A623);color:#000;font-weight:700;">Done</button>
     </div>
 
-    <!-- Error view -->
-    <div id="collect-error-view" style="display:none;text-align:center;">
+    <!-- Error -->
+    <div id="rp-error-view" style="display:none;text-align:center;">
       <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,80,80,.08);border:1.5px solid rgba(255,80,80,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
         <span style="font-size:28px;">⚠️</span>
       </div>
-      <div id="collect-error-msg" style="font-size:14px;color:#ff6b6b;margin-bottom:20px;line-height:1.6;"></div>
-      <button class="reg-btn" onclick="retryCollectScan()" style="width:100%;margin-bottom:10px;">Try Again</button>
-      <button class="refer-close" onclick="closeAllCollectOvs()">Close</button>
+      <div id="rp-error-msg" style="font-size:14px;color:#ff6b6b;margin-bottom:20px;line-height:1.6;"></div>
+      <button class="reg-btn" onclick="retryRpScan()" style="width:100%;margin-bottom:10px;">Try Again</button>
+      <button class="refer-close" onclick="closeRpAll()">Close</button>
     </div>
-
   </div>
 </div>
 
@@ -1335,6 +1333,46 @@
   </div>
 </div>
 
+<!-- ── PREMIUM UNLOCK SHEET ── -->
+<div class="overlay" id="prem-unlock-ov" onclick="closePremUnlockOv(event)" style="display:none;align-items:flex-end;">
+  <div class="sheet" style="padding-bottom:32px;" onclick="event.stopPropagation()">
+    <div class="sh-bar"></div>
+    <div style="text-align:center;padding:4px 20px 0;">
+      <div style="font-size:22px;margin-bottom:6px;">⚡</div>
+      <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px;">Unlock Premium Toggle</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">Get the cheapest data prices in Nigeria.<br>Use once every 48 hours, forever.</div>
+    </div>
+
+    <div style="margin:0 20px 16px;background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
+      <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+          <span style="color:#F5A623;font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+          <span style="color:#F5A623;font-weight:800;">✓</span> Works even when your subsidy fund is empty
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+          <span style="color:#F5A623;font-weight:800;">✓</span> One purchase every 48 hours
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+          <span style="color:#F5A623;font-weight:800;">✓</span> One-time payment, no subscription
+        </div>
+      </div>
+    </div>
+
+    <div class="prem-sheet-price">₦12,000</div>
+    <div class="prem-sheet-once">One-time payment</div>
+
+    <div style="margin:0 20px;">
+      <button class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock()">
+        Unlock Premium
+      </button>
+      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--w40);cursor:pointer;" onclick="closePremUnlockOv()">Maybe later</div>
+    </div>
+  </div>
+</div>
+
 <!-- ── HISTORY OVERLAY ── -->
 <div class="hist-ov" id="hist-ov">
   <div class="hist-header">
@@ -1422,6 +1460,10 @@
   const SUPA_URL = 'https://taesbjxhllruvmueeete.supabase.co';
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhZXNianhobGxydXZtdWVlZXRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzE4NTcsImV4cCI6MjA5MzgwNzg1N30.ygRn0k2o8WncP0YUbpUdc5Mevdz9NqckNsf-KNCR5L4';
   let userId = null;
+  let premiumUnlocked = false;   // true once user has paid ₦12,000
+  let premiumToggleOn = false;   // current toggle state (on/off)
+  let premiumLastUsed = 0;       // timestamp of last premium purchase
+  let premDemoActive = false;    // is the demo blur/animation running
 
   async function callEdge(fnName, body) {
     const res = await fetch(SUPA_URL + '/functions/v1/' + fnName, {
@@ -1433,7 +1475,7 @@
   }
 
   let NET = 'MTN', cur = {};
-  let balance = 100;
+  let balance = 0;
   let registeredCard = null;
   let cardSecret = null;
   let userPin = null;
@@ -1917,7 +1959,7 @@
         // Card exists — go to login
         userId = data.userId;
         username = data.username;
-        balance = 100;
+        balance = 0;
         document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
         goLoginStep();
       } else {
@@ -2193,7 +2235,7 @@
       // Store userId and username from Supabase
       userId = data.userId;
       username = data.username;
-      balance = 100;
+      balance = 0;
       document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
       localStorage.removeItem('subsidi_pending_ref');
 
@@ -2245,14 +2287,22 @@
   // ── Buy: open buy sheet directly ──
   function openSheet(size, val, price, orig, planId, planNetwork, subCostCount) {
     if (gateCheck('Buy data at subsidy prices', 'Create a free account to purchase ' + size + ' for ₦' + price + ' — cheaper than anywhere else.')) return;
+
     const isExpensive = subCostCount === 0;
+
+    // Logged-in, non-premium user taps a cheap plan during demo → show unlock sheet
+    if (!isExpensive && premDemoActive && !premiumUnlocked && !isGuest) {
+      showPremUnlockSheet();
+      return;
+    }
+
     const hasDiscount = !isExpensive && subsidyFund > 0;
     cur = { size, val, price, orig, planId: planId || '', planNetwork: planNetwork || NET, hasDiscount };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
     document.getElementById('shsub').textContent = (planNetwork || NET) + ' · ' + val;
     const priceEl = document.getElementById('dprice');
     priceEl.textContent = '₦' + price.toLocaleString();
-    if (hasDiscount) {
+    if (hasDiscount || premiumToggleOn) {
       priceEl.classList.add('price-gold');
     } else {
       priceEl.classList.remove('price-gold');
@@ -2435,6 +2485,9 @@
           totalPurchases++;
           updateSubsidyUI();
 
+          // If premium toggle was on, turn it off after this purchase (48hr cooldown starts)
+          if (premiumToggleOn) turnOffPremiumAfterPurchase();
+
           // Log locally
           saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
           fetchUserData(); // background refresh after purchase
@@ -2569,6 +2622,12 @@
     document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('on'));
     el.classList.add('on');
     CATEGORY = cat;
+    // If demo blur is still active, cancel it cleanly before re-rendering
+    if (premDemoActive) {
+      premDemoActive = false;
+      const dash = document.getElementById('dash');
+      if (dash) dash.classList.remove('prem-demo-active');
+    }
     renderBundles();
   }
 
@@ -2590,13 +2649,22 @@
 
       // Pricing
       const basePrice = isExpensive ? p.ck + 240 : p.ck + 5; // expensive: +₦240 margin, cheap: +₦5 margin
-      const displayPrice = hasDiscount ? basePrice - 120 : basePrice; // ₦120 subsidy off cheap plans only when fund > 0
-      const strikePrice = hasDiscount ? basePrice : '';
+      let displayPrice = hasDiscount ? basePrice - 120 : basePrice; // ₦120 subsidy off cheap plans only when fund > 0
+
+      // Premium toggle: apply to cheap plans only (guests see demo prices, paid users need premiumUnlocked)
+      let isPremiumActive = false;
+      if (!isExpensive && premiumToggleOn && (premiumUnlocked || isGuest)) {
+        const discounted = basePrice - 120;
+        displayPrice = Math.max(50, Math.round((discounted * 0.40) / 5) * 5);
+        isPremiumActive = true;
+      }
+
+      const strikePrice = (hasDiscount || isPremiumActive) ? basePrice : '';
 
       // Card styling
       const bundleClass = isExpensive ? (isLow ? 'bundle bundle-golden-red' : 'bundle bundle-golden') : 'bundle';
-      const btnLabel = isExpensive ? 'Golden Plan' : 'Best Price';
-      const priceClass = hasDiscount ? 'b-price b-price-gold' : 'b-price';
+      const btnLabel = isExpensive ? 'Golden Plan' : (isPremiumActive ? '⚡ Premium' : 'Best Price');
+      const priceClass = isPremiumActive ? 'b-price b-price-gold' : (hasDiscount ? 'b-price b-price-gold' : 'b-price');
 
       return `<div class="${bundleClass}" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${basePrice},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">
         <div class="b-val">${p.val}</div>
@@ -2611,6 +2679,11 @@
   function selNet(el, n) {
     document.querySelectorAll('.net').forEach(b => b.classList.remove('sel'));
     el.classList.add('sel'); NET = n;
+    if (premDemoActive) {
+      premDemoActive = false;
+      const dash = document.getElementById('dash');
+      if (dash) dash.classList.remove('prem-demo-active');
+    }
     renderBundles();
   }
 
@@ -2739,7 +2812,7 @@
     localStorage.removeItem('subsidi_userId');
     localStorage.removeItem('subsidi_session_token');
     // Reset all state
-    userId = null; username = ''; balance = 100;
+    userId = null; username = ''; balance = 0;
     registeredCard = null; userPin = null;
     isGuest = true;
     subsidyFund = 360;
@@ -3138,148 +3211,189 @@
   }
 
   // ── COLLECT FLOW ──────────────────────────────────────────────
-  let collectStream = null;
-  let collectScanLoop = null;
-  let collectTorchOn = false;
+  // (collect vars removed — replaced by reward pool)
 
   // Entry point: decide which sheet to show
-  async function showCollectOv() {
-    if (gateCheck('Safe Wallet', 'Create a free account to collect rewards to your card.')) return;
+  // ── REWARD POOL ──────────────────────────────────────────────
 
-    // Check referral count
-    let count = 0;
-    try {
-      const data = await callEdge('get-referral-status', { userId });
-      count = data?.count ?? 0;
-    } catch (e) {
-      console.warn('get-referral-status failed:', e);
-      alert('Network error. Please check your connection and try again.');
+  const REWARD_TIERS = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+  let rpStream = null;
+  let rpScanLoop = null;
+  let rpTorchOn = false;
+  let rpCurrentTier = 0; // amount selected to collect
+  let rpWeeklyPurchases = 0;
+  let rpUnlockedTier = 0; // highest unlocked tier index (0-based)
+  let rpPoolActive = false;
+
+  async function openRewardPool() {
+    // Guests can see but not collect
+    const ov = document.getElementById('reward-pool-ov');
+    ov.classList.add('open');
+    renderRpTiers(false);
+
+    if (isGuest) {
+      document.getElementById('rp-pool-status').textContent = 'Register to start collecting from the pool';
+      document.getElementById('rp-weekly-count').textContent = '—';
+      renderRpTiers(false);
       return;
     }
 
-    if (count < 2) {
-      // Show referral gate
-      const link = 'subsidi.app/ref/' + (username || userId.slice(0, 8));
-      document.getElementById('collect-gate-link').textContent = link;
-      document.getElementById('collect-gate-count').textContent = count + ' / 2';
-      document.getElementById('collect-gate-bar').style.width = (count / 2 * 100) + '%';
-      document.getElementById('collect-gate-ov').classList.add('open');
-    } else {
-      // Show eligible sheet
-      await openCollectEligibleOv();
-    }
-  }
-
-  function closeCollectGateOv() {
-    document.getElementById('collect-gate-ov').classList.remove('open');
-  }
-
-  function copyCollectReferLink() {
-    const link = document.getElementById('collect-gate-link').textContent;
-    navigator.clipboard.writeText(link).then(() => {
-      const btn = document.getElementById('collect-gate-copy-btn');
-      btn.textContent = 'Copied!';
-      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
-    });
-  }
-
-  async function openCollectEligibleOv() {
-    const ov = document.getElementById('collect-eligible-ov');
-    const poolStatus = document.getElementById('collect-pool-status');
-    const claimBtn = document.getElementById('collect-claim-btn');
-    const cooldownMsg = document.getElementById('collect-cooldown-msg');
-
-    poolStatus.textContent = 'Checking pool...';
-    claimBtn.disabled = true;
-    cooldownMsg.style.display = 'none';
-    ov.classList.add('open');
-
+    // Fetch pool + user weekly purchase count
     try {
-      const data = await callEdge('get-collect-status', { userId });
+      const data = await callEdge('get-reward-pool-status', { userId });
+      rpPoolActive = data.pool_balance > 0;
+      rpWeeklyPurchases = data.weekly_purchases || 0;
+      // Unlocked tier = floor(weekly_purchases / 3), capped at 9 (₦1,000)
+      rpUnlockedTier = Math.min(Math.floor(rpWeeklyPurchases / 3), 9);
 
-      if (data.pool_balance <= 0) {
-        poolStatus.textContent = '⚠️ Pool is currently empty. Check back soon.';
-        claimBtn.disabled = true;
-      } else if (data.on_cooldown) {
-        const next = new Date(data.next_eligible);
-        const days = Math.ceil((next - Date.now()) / (1000 * 60 * 60 * 24));
-        poolStatus.textContent = 'Pool balance: ₦' + data.pool_balance.toLocaleString();
-        cooldownMsg.style.display = 'block';
-        cooldownMsg.textContent = 'You can collect again in ' + days + ' day' + (days !== 1 ? 's' : '') + '.';
-        claimBtn.disabled = true;
+      // Update the wallet card daily amount display
+      const dailyEl = document.getElementById('rp-daily-display');
+      if (dailyEl) dailyEl.textContent = REWARD_TIERS[rpUnlockedTier].toLocaleString();
+
+      document.getElementById('rp-weekly-count').textContent = rpWeeklyPurchases;
+
+      const banner = document.getElementById('rp-pool-banner');
+      if (rpPoolActive) {
+        banner.style.display = 'block';
+        banner.style.background = 'rgba(245,166,35,0.1)';
+        banner.style.border = '1px solid rgba(245,166,35,0.3)';
+        banner.style.color = '#F5A623';
+        banner.textContent = '⚡ Pool is active — ₦' + data.pool_balance.toLocaleString() + ' available';
+        document.getElementById('rp-pool-status').textContent = 'Collect daily rewards by buying data every week';
       } else {
-        poolStatus.textContent = 'Pool balance: ₦' + data.pool_balance.toLocaleString();
-        claimBtn.disabled = false;
+        banner.style.display = 'block';
+        banner.style.background = 'rgba(255,80,80,0.08)';
+        banner.style.border = '1px solid rgba(255,80,80,0.2)';
+        banner.style.color = '#ff6b6b';
+        banner.textContent = '⚠️ Pool is currently empty — check back soon';
+        document.getElementById('rp-pool-status').textContent = 'Pool is dry — rewards will resume when funded';
       }
+      renderRpTiers(true);
     } catch(e) {
-      poolStatus.textContent = 'Could not load pool status.';
+      document.getElementById('rp-pool-status').textContent = 'Could not load pool status. Try again.';
+      renderRpTiers(false);
     }
   }
 
-  function closeCollectEligibleOv() {
-    document.getElementById('collect-eligible-ov').classList.remove('open');
+  function renderRpTiers(loaded) {
+    const grid = document.getElementById('rp-tiers-grid');
+    if (!grid) return;
+
+    grid.innerHTML = REWARD_TIERS.map((amount, i) => {
+      const tierNum = i + 1;
+      const purchasesNeeded = tierNum * 3;
+      const isGuestView = isGuest;
+      const isUnlocked = !isGuestView && loaded && i <= rpUnlockedTier;
+      const isActive = isUnlocked && rpPoolActive;
+      const purchasesForThis = i * 3; // purchases needed to reach this tier
+
+      let cardStyle, labelHtml, clickAction;
+
+      if (isGuestView) {
+        // Guest: all cards visible but faded
+        cardStyle = 'opacity:0.45;cursor:pointer;';
+        clickAction = `onclick="gateCheck('Reward Pool','Register to unlock daily rewards from the pool.')"`;
+        labelHtml = `<div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px;">Register to unlock</div>`;
+      } else if (!loaded) {
+        cardStyle = 'opacity:0.3;';
+        clickAction = '';
+        labelHtml = `<div style="font-size:10px;color:var(--w40);margin-top:4px;">${purchasesForThis} purchases</div>`;
+      } else if (isActive) {
+        // Fully unlocked + pool active = clickable gold
+        cardStyle = 'background:linear-gradient(135deg,rgba(184,112,16,0.2),rgba(245,166,35,0.15));border-color:rgba(245,166,35,0.5);cursor:pointer;';
+        clickAction = `onclick="selectRpTier(${amount})"`;
+        labelHtml = `<div style="font-size:10px;color:#F5A623;font-weight:700;margin-top:4px;">Tap to collect</div>`;
+      } else if (isUnlocked && !rpPoolActive) {
+        // Unlocked but pool dry = faded
+        cardStyle = 'opacity:0.4;';
+        clickAction = '';
+        labelHtml = `<div style="font-size:10px;color:var(--w40);margin-top:4px;">Pool empty</div>`;
+      } else {
+        // Locked - show how many more purchases needed
+        const remaining = purchasesForThis - rpWeeklyPurchases;
+        cardStyle = 'opacity:0.35;';
+        clickAction = `onclick="alert('Buy ${remaining} more plan${remaining !== 1 ? 's' : ''} this week to unlock ₦${amount}/day')"`;
+        labelHtml = `<div style="font-size:10px;color:var(--w40);margin-top:4px;">${remaining} more purchase${remaining !== 1 ? 's' : ''}</div>`;
+      }
+
+      return `<div style="background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:14px 12px;text-align:center;transition:all .2s;${cardStyle}" ${clickAction}>
+        <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-0.5px;">₦${amount}</div>
+        <div style="font-size:11px;color:var(--w40);margin-top:2px;">per day</div>
+        ${labelHtml}
+      </div>`;
+    }).join('');
   }
 
-  function openCollectScanner() {
-    document.getElementById('collect-eligible-ov').classList.remove('open');
-    const ov = document.getElementById('collect-scanner-ov');
-    document.getElementById('collect-scan-view').style.display = 'block';
-    document.getElementById('collect-success-view').style.display = 'none';
-    document.getElementById('collect-error-view').style.display = 'none';
-    document.getElementById('collect-scan-status').textContent = 'Starting camera...';
+  function selectRpTier(amount) {
+    rpCurrentTier = amount;
+    document.getElementById('rp-scan-amount').textContent = '₦' + amount.toLocaleString();
+    document.getElementById('reward-pool-ov').classList.remove('open');
+    openRpScanner();
+  }
+
+  function closeRewardPool() {
+    document.getElementById('reward-pool-ov').classList.remove('open');
+  }
+
+  function openRpScanner() {
+    const ov = document.getElementById('rp-scanner-ov');
+    document.getElementById('rp-scan-view').style.display = 'block';
+    document.getElementById('rp-success-view').style.display = 'none';
+    document.getElementById('rp-error-view').style.display = 'none';
+    document.getElementById('rp-scan-status').textContent = 'Starting camera...';
     ov.classList.add('open');
-    startCollectScan();
+    startRpScan();
   }
 
-  function closeCollectScannerOv() {
-    stopCollectScan();
-    document.getElementById('collect-scanner-ov').classList.remove('open');
+  function closeRpScanner() {
+    stopRpScan();
+    document.getElementById('rp-scanner-ov').classList.remove('open');
+    document.getElementById('reward-pool-ov').classList.add('open');
   }
 
-  function closeAllCollectOvs() {
-    stopCollectScan();
-    ['collect-gate-ov', 'collect-eligible-ov', 'collect-scanner-ov'].forEach(id => {
-      document.getElementById(id).classList.remove('open');
-    });
+  function closeRpAll() {
+    stopRpScan();
+    document.getElementById('rp-scanner-ov').classList.remove('open');
+    document.getElementById('reward-pool-ov').classList.remove('open');
   }
 
-  async function startCollectScan() {
+  async function startRpScan() {
     try {
-      collectStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      const video = document.getElementById('collect-video');
-      video.srcObject = collectStream;
+      rpStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      const video = document.getElementById('rp-video');
+      video.srcObject = rpStream;
       video.play();
-      document.getElementById('collect-scan-status').textContent = 'Camera active — scan your card';
-      collectScanFrame();
+      document.getElementById('rp-scan-status').textContent = 'Camera active — scan your Subsidi card';
+      rpScanFrame();
     } catch(e) {
-      document.getElementById('collect-scan-status').textContent = '⚠️ Camera blocked. Allow camera access and try again.';
+      document.getElementById('rp-scan-status').textContent = '⚠️ Camera blocked. Allow camera access and try again.';
     }
   }
 
-  function stopCollectScan() {
-    clearTimeout(collectScanLoop);
-    collectScanLoop = null;
-    if (collectStream) {
-      collectStream.getTracks().forEach(t => t.stop());
-      collectStream = null;
+  function stopRpScan() {
+    clearTimeout(rpScanLoop);
+    rpScanLoop = null;
+    if (rpStream) {
+      rpStream.getTracks().forEach(t => t.stop());
+      rpStream = null;
     }
-    collectTorchOn = false;
-    const label = document.getElementById('collect-torch-label');
-    const btn = document.getElementById('collect-torch-btn');
+    rpTorchOn = false;
+    const label = document.getElementById('rp-torch-label');
+    const btn = document.getElementById('rp-torch-btn');
     if (label) label.textContent = 'Flash Off';
     if (btn) { btn.style.background = 'var(--dark-3)'; btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--w70)'; }
   }
 
-  async function toggleCollectTorch() {
-    if (!collectStream) return;
-    const track = collectStream.getVideoTracks()[0];
+  async function toggleRpTorch() {
+    if (!rpStream) return;
+    const track = rpStream.getVideoTracks()[0];
     if (!track) return;
     try {
-      collectTorchOn = !collectTorchOn;
-      await track.applyConstraints({ advanced: [{ torch: collectTorchOn }] });
-      const btn = document.getElementById('collect-torch-btn');
-      const label = document.getElementById('collect-torch-label');
-      if (collectTorchOn) {
+      rpTorchOn = !rpTorchOn;
+      await track.applyConstraints({ advanced: [{ torch: rpTorchOn }] });
+      const btn = document.getElementById('rp-torch-btn');
+      const label = document.getElementById('rp-torch-label');
+      if (rpTorchOn) {
         btn.style.background = 'rgba(245,166,35,0.2)';
         btn.style.borderColor = '#F5A623';
         btn.style.color = '#fff';
@@ -3290,13 +3404,11 @@
         btn.style.color = 'var(--w70)';
         label.textContent = 'Flash Off';
       }
-    } catch(e) {
-      console.warn('Torch not supported on this device');
-    }
+    } catch(e) { console.warn('Torch not supported'); }
   }
 
-  function collectScanFrame() {
-    const video = document.getElementById('collect-video');
+  function rpScanFrame() {
+    const video = document.getElementById('rp-video');
     if (video && video.readyState === video.HAVE_ENOUGH_DATA) {
       const canvas = document.createElement('canvas');
       canvas.width = video.videoWidth;
@@ -3307,55 +3419,60 @@
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       if (code && code.data) {
         const raw = code.data.trim();
-        const isValidCard = raw === 'SUBSIDI_ACTIVATE_CARD_V1' || raw === 'https://subsidi-1.vercel.app/' || raw.startsWith('https://subsidi-1.vercel.app');
+        const isValidCard = raw === 'SUBSIDI_ACTIVATE_CARD_V1' || raw.startsWith('https://subsidi-1.vercel.app');
         if (isValidCard) {
-          stopCollectScan();
-          submitCollectClaim(raw);
+          stopRpScan();
+          submitRpClaim(raw);
           return;
         }
       }
     }
-    collectScanLoop = setTimeout(collectScanFrame, 200);
+    rpScanLoop = setTimeout(rpScanFrame, 200);
   }
 
-  async function submitCollectClaim(cardCode) {
-    document.getElementById('collect-scan-view').style.display = 'none';
-    document.getElementById('collect-scan-status').textContent = 'Verifying...';
+  async function submitRpClaim(cardCode) {
+    document.getElementById('rp-scan-view').style.display = 'none';
 
     try {
-      const data = await callEdge('claim-reward', { user_id: userId, card_code: cardCode });
+      const data = await callEdge('claim-reward', {
+        user_id: userId,
+        card_code: cardCode,
+        amount: rpCurrentTier
+      });
 
       if (data.success) {
-        // Update main wallet balance in UI
-        balance += 600;
+        balance += rpCurrentTier;
         const whole = Math.floor(balance).toLocaleString();
         const dec = (balance % 1).toFixed(2).slice(1);
-        document.getElementById('bal-display').innerHTML =
-          '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-        // Show success
-        document.getElementById('collect-success-view').style.display = 'block';
-        document.getElementById('collect-error-view').style.display = 'none';
+        const balHTML = '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+        const balEl = document.getElementById('bal-display');
+        const balElR = document.getElementById('bal-display-repeat');
+        if (balEl) balEl.innerHTML = balHTML;
+        if (balElR) balElR.innerHTML = balHTML;
+        document.getElementById('rp-success-amount').textContent = '₦' + rpCurrentTier.toLocaleString() + ' Collected!';
+        document.getElementById('rp-success-view').style.display = 'block';
+        document.getElementById('rp-error-view').style.display = 'none';
       } else {
         const msgs = {
           'Pool empty': 'The pool is currently empty. Check back soon.',
-          'Cooldown active': 'You already collected recently. Wait 7 days.',
-          'Not enough referrals': 'You need 2 referrals to collect.',
-          'Card does not match account': 'This card doesn\'t match your account.',
+          'Not enough purchases': 'You need more purchases this week to collect this tier.',
+          'Card does not match account': "This card doesn't match your account.",
+          'Already collected today': 'You already collected today. Come back tomorrow.',
         };
-        document.getElementById('collect-error-msg').textContent = msgs[data.error] || 'Something went wrong. Please try again.';
-        document.getElementById('collect-error-view').style.display = 'block';
+        document.getElementById('rp-error-msg').textContent = msgs[data.error] || 'Something went wrong. Please try again.';
+        document.getElementById('rp-error-view').style.display = 'block';
       }
     } catch(e) {
-      document.getElementById('collect-error-msg').textContent = 'Network error. Please try again.';
-      document.getElementById('collect-error-view').style.display = 'block';
+      document.getElementById('rp-error-msg').textContent = 'Network error. Please try again.';
+      document.getElementById('rp-error-view').style.display = 'block';
     }
   }
 
-  function retryCollectScan() {
-    document.getElementById('collect-error-view').style.display = 'none';
-    document.getElementById('collect-scan-view').style.display = 'block';
-    document.getElementById('collect-scan-status').textContent = 'Starting camera...';
-    startCollectScan();
+  function retryRpScan() {
+    document.getElementById('rp-error-view').style.display = 'none';
+    document.getElementById('rp-scan-view').style.display = 'block';
+    document.getElementById('rp-scan-status').textContent = 'Starting camera...';
+    startRpScan();
   }
 
   // ── NO-CARD LOGIN ──────────────────────────────────────────────
@@ -3447,7 +3564,7 @@
         localStorage.setItem('subsidi_userId', userId);
         if (rData.sessionToken) localStorage.setItem('subsidi_session_token', rData.sessionToken);
 
-        balance = 100;
+        balance = 0;
         subsidyFund = 360;
         document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
         const whole = Math.floor(balance).toLocaleString();
@@ -3707,7 +3824,7 @@
     },
     {
       q: "How do I refer someone?",
-      a: "Share your referral link from your profile. Once 2 of your friends sign up and fund their wallet with at least ₦1,000, you unlock the Safe Wallet collect feature."
+      a: "The Reward Pool lets you collect daily rewards based on how many data purchases you make each week. Make 3 purchases in a week to unlock the next tier — from ₦100 up to ₦1,000 per day. You need your physical Subsidi card to collect. The pool is shared, so collect when it's active."
     },
     {
       q: "Why can't I log back in after logging out?",
@@ -3812,7 +3929,7 @@
         actions0.style.display = 'flex';
         actions1.style.display = 'none';
       } else {
-        labelEl.textContent = 'Buy Golden plan to Collect.';
+        labelEl.textContent = 'Reward Wallet';
         labelEl.style.color = '#F5A623';
         actions0.style.display = 'none';
         actions1.style.display = 'flex';
@@ -3880,7 +3997,237 @@
 </script>
 
 <script>
+  // ── PREMIUM TOGGLE LOGIC ──
+
+  // Load persisted premium state from localStorage
+  (function loadPremiumState() {
+    const saved = localStorage.getItem('subsidi_premium');
+    if (saved) {
+      try {
+        const s = JSON.parse(saved);
+        premiumUnlocked = !!s.unlocked;
+        premiumLastUsed = s.lastUsed || 0;
+      } catch(e) {}
+    }
+  })();
+
+  function savePremiumState() {
+    localStorage.setItem('subsidi_premium', JSON.stringify({
+      unlocked: premiumUnlocked,
+      lastUsed: premiumLastUsed
+    }));
+  }
+
+  function onPremToggleClick() {
+    // If demo blur is active, cancel it
+    if (premDemoActive) {
+      cancelPremDemo();
+      return;
+    }
+
+    // Guest with toggle already ON → turn it off
+    if (isGuest && premiumToggleOn) {
+      premiumToggleOn = false;
+      setPremToggleUI(false);
+      renderBundles();
+      return;
+    }
+
+    if (premiumUnlocked) {
+      // Check 48hr cooldown
+      const hrs48 = 48 * 60 * 60 * 1000;
+      const elapsed = Date.now() - premiumLastUsed;
+      if (premiumLastUsed > 0 && elapsed < hrs48) {
+        const hoursLeft = Math.ceil((hrs48 - elapsed) / (1000 * 60 * 60));
+        alert('Come back in ' + hoursLeft + ' hour' + (hoursLeft > 1 ? 's' : '') + ' to use your Premium toggle again.');
+        return;
+      }
+      // Activate premium prices
+      premiumToggleOn = true;
+      setPremToggleUI(true);
+      renderBundles();
+    } else {
+      // Run the demo then show unlock sheet
+      runPremDemo();
+    }
+  }
+
+  function setPremToggleUI(on) {
+    const track = document.getElementById('prem-toggle-track');
+    const label = document.getElementById('prem-toggle-label');
+    if (track) on ? track.classList.add('on') : track.classList.remove('on');
+    if (label) {
+      label.textContent = on ? 'Premium ON' : 'Premium';
+      on ? label.classList.add('active') : label.classList.remove('active');
+    }
+  }
+
+  function turnOffPremiumAfterPurchase() {
+    premiumToggleOn = false;
+    premiumLastUsed = Date.now();
+    savePremiumState();
+    setPremToggleUI(false);
+    renderBundles();
+  }
+
+  // ── DEMO ANIMATION ──
+  function runPremDemo() {
+    premDemoActive = true;
+    const dash = document.getElementById('dash');
+    if (dash) dash.classList.add('prem-demo-active');
+
+    // Scroll to plans immediately
+    const spotlight = document.getElementById('prem-plans-spotlight');
+    if (spotlight) {
+      setTimeout(() => {
+        spotlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
+    }
+
+    // Animate prices down quickly after scroll
+    setTimeout(() => animatePremPrices(), 400);
+  }
+
+  function animatePremPrices() {
+    const bundleEls = document.querySelectorAll('#bundles-all .bundle:not(.bundle-golden):not(.bundle-golden-red)');
+
+    const targets = [];
+    bundleEls.forEach((card) => {
+      const priceEl = card.querySelector('.b-price');
+      if (!priceEl) return;
+      const origText = priceEl.textContent.replace(/[₦,]/g,'').trim();
+      const origVal = parseFloat(origText);
+      if (isNaN(origVal)) return;
+      const discounted = origVal - 120;
+      const premVal = Math.max(50, Math.round((discounted * 0.40) / 5) * 5);
+      targets.push({ el: priceEl, from: origVal, to: premVal });
+    });
+
+    if (targets.length === 0) {
+      showPremUnlockSheet();
+      return;
+    }
+
+    // Fast count down — 600ms
+    const duration = 600;
+    const start = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      targets.forEach(({ el, from, to }) => {
+        const current = Math.round(from + (to - from) * ease);
+        el.textContent = '₦' + current.toLocaleString();
+        el.classList.add('prem-counting');
+      });
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        targets.forEach(({ el, to }) => {
+          el.textContent = '₦' + to.toLocaleString();
+          el.classList.remove('prem-counting');
+          el.classList.add('prem-final');
+        });
+        // Show sheet after brief glow moment — logged-in only
+        setTimeout(() => {
+          if (!isGuest) {
+            showPremUnlockSheet();
+          } else {
+            // Guest: lift the blur, keep prices dropped, toggle stays on
+            premDemoActive = false;
+            premiumToggleOn = true;
+            const dash = document.getElementById('dash');
+            if (dash) dash.classList.remove('prem-demo-active');
+            setPremToggleUI(true);
+            renderBundles();
+          }
+        }, 500);
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function cancelPremDemo() {
+    premDemoActive = false;
+    const dash = document.getElementById('dash');
+    if (dash) dash.classList.remove('prem-demo-active');
+    // Restore real prices
+    renderBundles();
+    document.querySelectorAll('.b-price').forEach(el => {
+      el.classList.remove('prem-counting', 'prem-final');
+    });
+  }
+
+  // ── PREMIUM UNLOCK SHEET ──
+  function showPremUnlockSheet() {
+    const ov = document.getElementById('prem-unlock-ov');
+    if (ov) { ov.style.display = 'flex'; setTimeout(() => ov.classList.add('open'), 10); }
+  }
+
+  function closePremUnlockOv(e) {
+    if (e && e.target !== document.getElementById('prem-unlock-ov')) return;
+    _closePremUnlockOv();
+  }
+
+  function _closePremUnlockOv() {
+    const ov = document.getElementById('prem-unlock-ov');
+    if (ov) { ov.classList.remove('open'); setTimeout(() => { ov.style.display = 'none'; }, 300); }
+    cancelPremDemo();
+  }
+
+  // Close button (Maybe later)
+  document.getElementById('prem-unlock-ov')?.querySelector('[onclick="closePremUnlockOv()"]')
+    ?.addEventListener('click', () => _closePremUnlockOv());
+
+  async function payPremiumUnlock() {
+    if (isGuest) {
+      _closePremUnlockOv();
+      alert('Please create an account first to unlock Premium.');
+      return;
+    }
+    if (balance < 12000) {
+      _closePremUnlockOv();
+      if (confirm('You need ₦12,000 in your wallet to unlock Premium.\n\nTap OK to add money.')) {
+        document.getElementById('dep-ov').classList.add('open');
+      }
+      return;
+    }
+
+    // Deduct from wallet via edge function
+    _closePremUnlockOv();
+    showSpinner('Unlocking Premium...');
+    try {
+      const result = await callEdge('premium-unlock', { userId });
+      hideSpinner();
+      if (result && result.success) {
+        premiumUnlocked = true;
+        premiumToggleOn = true;
+        premiumLastUsed = 0;
+        savePremiumState();
+        balance = result.newBalance ?? (balance - 12000);
+        // Update balance UI
+        const whole = Math.floor(balance).toLocaleString();
+        const dec = (balance % 1).toFixed(2).slice(1);
+        const balHTML = '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+        const balEl = document.getElementById('bal-display');
+        const balElR = document.getElementById('bal-display-repeat');
+        if (balEl) balEl.innerHTML = balHTML;
+        if (balElR) balElR.innerHTML = balHTML;
+        setPremToggleUI(true);
+        renderBundles();
+        alert('🎉 Premium unlocked! Your prices are now active. Enjoy cheap data!');
+      } else {
+        alert('Payment failed: ' + (result?.error || 'Please try again.'));
+      }
+    } catch(e) {
+      hideSpinner();
+      alert('Something went wrong. Please try again.');
+    }
+  }
+</script>
+
+<script>
 (function(){
+  // ── SERVICE WORKER & PWA ──
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(()=>{});
   }

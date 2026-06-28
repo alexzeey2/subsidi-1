@@ -2294,14 +2294,8 @@
 
     const isExpensive = subCostCount === 0;
 
-    // Logged-in user taps a cheap plan when toggle is on but premium not unlocked → show unlock sheet
-    if (!isExpensive && premiumToggleOn && !premiumUnlocked && !isGuest) {
-      showPremUnlockSheet(true);
-      return;
-    }
-
-    // Any user taps a cheap plan during demo → show unlock sheet
-    if (!isExpensive && premDemoActive && !premiumUnlocked) {
+    // Logged-in non-premium user taps cheap plan during demo → show unlock sheet
+    if (!isExpensive && premDemoActive && !premiumUnlocked && !isGuest) {
       showPremUnlockSheet(true);
       return;
     }
@@ -4134,13 +4128,21 @@
           el.classList.remove('prem-counting');
           el.classList.add('prem-final');
         });
-        // Clear the demo flag so tab/network switching works
-        // But keep prem-demo-active class on dash so blur stays for everyone
+        // After animation: guests keep blur + prices dropped + toggle ON, logged-in non-premium show unlock sheet
         setTimeout(() => {
           premDemoActive = false;
-          premiumToggleOn = true;
-          setPremToggleUI(true);
-          renderBundles();
+          if (isGuest) {
+            // Guest: keep blur on, prices dropped, toggle stays ON
+            premiumToggleOn = true;
+            setPremToggleUI(true);
+            renderBundles();
+            // Note: prem-demo-active class stays on dash to keep blur
+          } else if (!premiumUnlocked) {
+            // Logged-in, not paid: lift blur, show the unlock sheet, toggle stays OFF
+            const dash = document.getElementById('dash');
+            if (dash) dash.classList.remove('prem-demo-active');
+            showPremUnlockSheet();
+          }
         }, 500);
       }
     }
@@ -4149,9 +4151,16 @@
 
   function cancelPremDemo() {
     premDemoActive = false;
-    const dash = document.getElementById('dash');
-    if (dash) dash.classList.remove('prem-demo-active');
-    // Restore real prices
+    // Only remove blur for non-guests, or guests who are cancelling mid-animation
+    if (!isGuest || !premiumToggleOn) {
+      const dash = document.getElementById('dash');
+      if (dash) dash.classList.remove('prem-demo-active');
+    }
+    // For logged-in non-premium: turn toggle OFF and restore prices
+    if (!isGuest && !premiumUnlocked) {
+      premiumToggleOn = false;
+      setPremToggleUI(false);
+    }
     renderBundles();
     document.querySelectorAll('.b-price').forEach(el => {
       el.classList.remove('prem-counting', 'prem-final');

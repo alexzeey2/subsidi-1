@@ -1340,90 +1340,76 @@
 <div class="overlay" id="prem-unlock-ov" onclick="closePremUnlockOv(event)" style="display:none;align-items:flex-end;">
   <div class="sheet" style="padding-bottom:32px;" onclick="event.stopPropagation()">
     <div class="sh-bar"></div>
+
+    <!-- Header -->
     <div style="text-align:center;padding:4px 20px 0;">
       <div style="font-size:22px;margin-bottom:6px;">⚡</div>
       <div style="font-size:13px;font-weight:700;color:#F5A623;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;" id="prem-sheet-context-label">This is a Premium price</div>
       <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px;">Unlock Premium</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:6px;">Get the cheapest data prices in Nigeria.</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">Get the cheapest data prices in Nigeria.</div>
     </div>
 
-    <div id="prem-swipe-clip" style="overflow:hidden;position:relative;">
-    <div id="prem-swipe-wrap" style="overflow:visible;position:relative;touch-action:pan-y;">
-      <div id="prem-swipe-inner" style="display:flex;gap:14px;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;padding-left:24px;">
+    <!-- Plan selector buttons -->
+    <div style="display:flex;gap:10px;padding:0 20px;margin-bottom:20px;">
 
-        <!-- Plan 0: Monthly -->
-        <div class="prem-plan-card" style="flex-shrink:0;box-sizing:border-box;padding:0 2px;">
-          <div style="margin:0 18px 14px;background:var(--dark-3);border:1px solid rgba(108,43,217,.4);border-radius:16px;padding:16px 20px;">
+      <!-- Monthly button -->
+      <div id="prem-btn-monthly" onclick="selectPremPlan('monthly')" style="flex:1;border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:var(--p-subtle);border:1.5px solid var(--p);">
+        <div style="font-size:22px;font-weight:900;color:var(--p-light);">₦3,000</div>
+        <div style="font-size:10px;font-weight:600;color:var(--w40);letter-spacing:.8px;text-transform:uppercase;margin-top:3px;">per month</div>
+      </div>
+
+      <!-- Yearly button -->
+      <div id="prem-btn-yearly" onclick="selectPremPlan('yearly')" style="flex:1;border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;">
+        <div style="font-size:22px;font-weight:900;color:var(--w40);">₦15,000</div>
+        <div style="font-size:10px;font-weight:600;color:var(--w40);letter-spacing:.8px;text-transform:uppercase;margin-top:3px;">per year</div>
+      </div>
+
+    </div>
+
+    <!-- Benefits box: clipping container -->
+    <div style="overflow:hidden;position:relative;padding:0 20px;margin-bottom:20px;">
+      <div id="prem-benefits-inner" style="display:flex;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
+
+        <!-- Monthly benefits -->
+        <div style="flex-shrink:0;width:100%;box-sizing:border-box;">
+          <div style="background:var(--dark-3);border:1px solid rgba(108,43,217,.4);border-radius:16px;padding:16px 20px;">
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:var(--p-light);font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:var(--p-light);font-weight:800;">✓</span> Works even when your subsidy fund is empty
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:var(--p-light);font-weight:800;">✓</span> One purchase every 15 hours
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:var(--p-light);font-weight:800;">✓</span> Cancel anytime — no hidden fees
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);">
-                <span style="color:var(--w40);font-weight:800;">✕</span> No physical card included
-              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Works even when your subsidy fund is empty</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> One purchase every 15 hours</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Cancel anytime — no hidden fees</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);"><span style="color:var(--w40);font-weight:800;">✕</span> No physical card included</div>
             </div>
-          </div>
-          <div class="prem-sheet-price" style="color:var(--p-light);">₦3,000</div>
-          <div class="prem-sheet-once">per month</div>
-          <div style="margin:0 18px;">
-            <button class="reg-btn" style="background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));color:#fff;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('monthly')">
-              Unlock Premium
-            </button>
           </div>
         </div>
 
-        <!-- Plan 1: Yearly -->
-        <div class="prem-plan-card" style="flex-shrink:0;box-sizing:border-box;padding:0 2px;">
-          <div style="margin:0 18px 14px;background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
+        <!-- Yearly benefits -->
+        <div style="flex-shrink:0;width:100%;box-sizing:border-box;">
+          <div style="background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:#F5A623;font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:#F5A623;font-weight:800;">✓</span> Works even when your subsidy fund is empty
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:#F5A623;font-weight:800;">✓</span> One purchase every 2 hours
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:#F5A623;font-weight:800;">✓</span> Cancel anytime — no hidden fees
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:#F5A623;font-weight:800;">✓</span> Free physical Subsidi card included
-              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Works even when your subsidy fund is empty</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> One purchase every 2 hours</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Cancel anytime — no hidden fees</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Free physical Subsidi card included</div>
             </div>
-          </div>
-          <div class="prem-sheet-price">₦15,000</div>
-          <div class="prem-sheet-once">per year</div>
-          <div style="margin:0 18px;">
-            <button class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('yearly')">
-              Unlock Premium
-            </button>
           </div>
         </div>
 
       </div>
     </div>
-    </div>
 
-    <div style="display:flex;justify-content:center;gap:6px;margin:14px 0 4px;">
-      <div id="prem-dot-0" style="width:7px;height:7px;border-radius:50%;background:var(--p-light);transition:background .2s;"></div>
-      <div id="prem-dot-1" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .2s;"></div>
+    <!-- Unlock button -->
+    <div style="padding:0 20px;">
+      <button id="prem-unlock-btn" class="reg-btn" style="background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));color:#fff;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('monthly')">
+        Unlock Premium
+      </button>
     </div>
 
     <div style="margin:0 20px;">
-      <div style="text-align:center;margin-top:4px;font-size:12px;color:var(--w40);cursor:pointer;" onclick="closePremUnlockOv()">Maybe later</div>
+      <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--w40);cursor:pointer;" onclick="closePremUnlockOv()">Maybe later</div>
     </div>
   </div>
 </div>
@@ -4055,65 +4041,61 @@
     setButtonsVisible(0);
   })();
 
-  // Swipeable premium plan sheet: bidirectional, 2 plans (Monthly / Yearly), with symmetric peek
-  (function() {
-    const clip = document.getElementById('prem-swipe-clip');
-    const wrap = document.getElementById('prem-swipe-wrap');
-    const inner = document.getElementById('prem-swipe-inner');
-    if (!clip || !wrap || !inner) return;
+  // ── PREMIUM PLAN SELECTOR ──
+  function selectPremPlan(plan) {
+    const isYearly = plan === 'yearly';
+    const inner = document.getElementById('prem-benefits-inner');
+    const btn = document.getElementById('prem-unlock-btn');
+    const btnMonthly = document.getElementById('prem-btn-monthly');
+    const btnYearly = document.getElementById('prem-btn-yearly');
 
-    const GAP = 14;   // gap between cards (matches flex gap on inner)
-    const PEEK = 24;  // px of adjacent card visible on each side (matches inner padding-left)
-    let cardWidth = 0;
-
-    function sizeCards() {
-      // clip.clientWidth = full sheet content width (no padding on clip).
-      // Each card = clipW - 2*PEEK so there's PEEK space on both sides.
-      // inner has padding-left:PEEK so plan 0 starts PEEK px from the left,
-      // leaving PEEK px of the next card visible on the right.
-      const clipW = clip.clientWidth;
-      if (!clipW) return cardWidth;
-      const cw = clipW - (PEEK * 2);
-      Array.from(inner.children).forEach(card => {
-        card.style.width = cw + 'px';
-      });
-      cardWidth = cw;
-      return cw;
+    // Slide benefits box: yearly slides in from right, monthly from left
+    if (inner) {
+      inner.style.transform = isYearly ? 'translateX(-100%)' : 'translateX(0)';
     }
 
-    cardWidth = sizeCards();
-    window.addEventListener('resize', () => { cardWidth = sizeCards(); });
-
-    let startX = 0;
-
-    function goToPlan(idx) {
-      window._premPlanIdx = idx;
-      // Offset = idx * (cardWidth + GAP). The inner padding-left handles the initial PEEK offset.
-      const px = idx * (cardWidth + GAP);
-      inner.style.transform = 'translateX(-' + px + 'px)';
-      const d0 = document.getElementById('prem-dot-0');
-      const d1 = document.getElementById('prem-dot-1');
-      if (d0) d0.style.background = idx === 0 ? '#8B4FE8' : 'rgba(255,255,255,.2)';
-      if (d1) d1.style.background = idx === 1 ? '#F5A623' : 'rgba(255,255,255,.2)';
+    // Highlight selected, gray out the other
+    if (btnMonthly) {
+      if (isYearly) {
+        btnMonthly.style.background = 'var(--dark-4)';
+        btnMonthly.style.borderColor = 'var(--border)';
+        btnMonthly.style.opacity = '0.45';
+        btnMonthly.querySelector('div').style.color = 'var(--w40)';
+      } else {
+        btnMonthly.style.background = 'var(--p-subtle)';
+        btnMonthly.style.borderColor = 'var(--p)';
+        btnMonthly.style.opacity = '1';
+        btnMonthly.querySelector('div').style.color = 'var(--p-light)';
+      }
+    }
+    if (btnYearly) {
+      if (isYearly) {
+        btnYearly.style.background = 'rgba(245,166,35,0.1)';
+        btnYearly.style.borderColor = '#F5A623';
+        btnYearly.style.opacity = '1';
+        btnYearly.querySelector('div').style.color = '#F5A623';
+      } else {
+        btnYearly.style.background = 'var(--dark-4)';
+        btnYearly.style.borderColor = 'var(--border)';
+        btnYearly.style.opacity = '0.45';
+        btnYearly.querySelector('div').style.color = 'var(--w40)';
+      }
     }
 
-    wrap.addEventListener('touchstart', function(e) {
-      startX = e.touches[0].clientX;
-    }, { passive: true });
+    // Update unlock button style and action
+    if (btn) {
+      btn.style.background = isYearly
+        ? 'linear-gradient(90deg,#b87010,#F5A623)'
+        : 'linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light))';
+      btn.style.color = isYearly ? '#000' : '#fff';
+      btn.setAttribute('onclick', "payPremiumUnlock('" + plan + "')");
+    }
+  }
 
-    wrap.addEventListener('touchend', function(e) {
-      const diff = startX - e.changedTouches[0].clientX;
-      const idx = window._premPlanIdx || 0;
-      if (diff > 40 && idx === 0) goToPlan(1);       // swipe left → yearly plan
-      else if (diff < -40 && idx === 1) goToPlan(0); // swipe right → monthly plan
-    }, { passive: true });
-
-    // Reset to plan 0 each time the sheet is opened fresh
-    window._resetPremSwipe = function() {
-      cardWidth = sizeCards();
-      goToPlan(0);
-    };
-  })();
+  // Reset sheet to monthly on open
+  window._resetPremSwipe = function() {
+    selectPremPlan('monthly');
+  };
 </script>
 
 <script>

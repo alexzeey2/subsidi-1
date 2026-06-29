@@ -1344,35 +1344,84 @@
       <div style="font-size:22px;margin-bottom:6px;">⚡</div>
       <div style="font-size:13px;font-weight:700;color:#F5A623;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;" id="prem-sheet-context-label">This is a Premium price</div>
       <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px;">Unlock Premium</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">Get the cheapest data prices in Nigeria.<br>Active for 30 days from payment.</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:6px;">Get the cheapest data prices in Nigeria.</div>
     </div>
 
-    <div style="margin:0 20px 16px;background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
-      <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-          <span style="color:#F5A623;font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans
+    <div id="prem-swipe-wrap" style="overflow:hidden;position:relative;touch-action:pan-y;">
+      <div id="prem-swipe-inner" style="display:flex;width:200%;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
+
+        <!-- Plan 0: Monthly -->
+        <div style="width:50%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
+          <div style="margin:0 18px 14px;background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
+            <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+                <span style="color:#F5A623;font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+                <span style="color:#F5A623;font-weight:800;">✓</span> Works even when your subsidy fund is empty
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+                <span style="color:#F5A623;font-weight:800;">✓</span> One purchase every 15 hours
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+                <span style="color:#F5A623;font-weight:800;">✓</span> Cancel anytime — no hidden fees
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);">
+                <span style="color:var(--w40);font-weight:800;">✕</span> No physical card included
+              </div>
+            </div>
+          </div>
+          <div class="prem-sheet-price">₦3,000</div>
+          <div class="prem-sheet-once">per month</div>
+          <div style="margin:0 20px;">
+            <button class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('monthly')">
+              Unlock Premium
+            </button>
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-          <span style="color:#F5A623;font-weight:800;">✓</span> Works even when your subsidy fund is empty
+
+        <!-- Plan 1: Yearly -->
+        <div style="width:50%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
+          <div style="margin:0 18px 14px;background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
+            <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+                <span style="color:#F5A623;font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+                <span style="color:#F5A623;font-weight:800;">✓</span> Works even when your subsidy fund is empty
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+                <span style="color:#F5A623;font-weight:800;">✓</span> One purchase every 2 hours
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+                <span style="color:#F5A623;font-weight:800;">✓</span> Cancel anytime — no hidden fees
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
+                <span style="color:#F5A623;font-weight:800;">✓</span> Free physical Subsidi card included
+              </div>
+            </div>
+          </div>
+          <div class="prem-sheet-price">₦15,000</div>
+          <div class="prem-sheet-once">per year</div>
+          <div style="margin:0 20px;">
+            <button class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('yearly')">
+              Unlock Premium
+            </button>
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-          <span style="color:#F5A623;font-weight:800;">✓</span> One purchase every 48 hours
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-          <span style="color:#F5A623;font-weight:800;">✓</span> Cancel anytime — no hidden fees
-        </div>
+
       </div>
     </div>
 
-    <div class="prem-sheet-price">₦3,000</div>
-    <div class="prem-sheet-once">per month</div>
+    <div style="display:flex;justify-content:center;gap:6px;margin:14px 0 4px;">
+      <div id="prem-dot-0" style="width:7px;height:7px;border-radius:50%;background:#F5A623;transition:background .2s;"></div>
+      <div id="prem-dot-1" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .2s;"></div>
+    </div>
 
     <div style="margin:0 20px;">
-      <button class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock()">
-        Unlock Premium
-      </button>
-      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--w40);cursor:pointer;" onclick="closePremUnlockOv()">Maybe later</div>
+      <div style="text-align:center;margin-top:4px;font-size:12px;color:var(--w40);cursor:pointer;" onclick="closePremUnlockOv()">Maybe later</div>
     </div>
   </div>
 </div>
@@ -1464,9 +1513,14 @@
   const SUPA_URL = 'https://taesbjxhllruvmueeete.supabase.co';
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhZXNianhobGxydXZtdWVlZXRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzE4NTcsImV4cCI6MjA5MzgwNzg1N30.ygRn0k2o8WncP0YUbpUdc5Mevdz9NqckNsf-KNCR5L4';
   let userId = null;
-  let premiumUnlocked = false;   // true once user has paid ₦3,000/month
+  let premiumUnlocked = false;   // true once user has paid for a premium plan
   let premiumToggleOn = false;   // current toggle state (on/off)
   let premiumLastUsed = 0;       // timestamp of last premium purchase
+  let premiumPlan = 'monthly';   // which plan is active: 'monthly' (₦3,000) or 'yearly' (₦15,000)
+  const PREMIUM_PLANS = {
+    monthly: { price: 3000, label: 'per month', cooldownHrs: 15, hasCard: false },
+    yearly:  { price: 15000, label: 'per year', cooldownHrs: 2, hasCard: true }
+  };
   let premDemoActive = false;    // is the demo blur/animation running
   let premDemoSeen = false;      // demo has been shown to logged-in non-premium user
 
@@ -3998,6 +4052,38 @@
     applySettledUI(0);
     setButtonsVisible(0);
   })();
+
+  // Swipeable premium plan sheet: bidirectional, 2 plans (Monthly / Yearly)
+  (function() {
+    const wrap = document.getElementById('prem-swipe-wrap');
+    const inner = document.getElementById('prem-swipe-inner');
+    if (!wrap || !inner) return;
+
+    let startX = 0;
+
+    function goToPlan(idx) {
+      window._premPlanIdx = idx;
+      inner.style.transform = 'translateX(-' + (idx * 50) + '%)';
+      const d0 = document.getElementById('prem-dot-0');
+      const d1 = document.getElementById('prem-dot-1');
+      if (d0) d0.style.background = idx === 0 ? '#F5A623' : 'rgba(255,255,255,.2)';
+      if (d1) d1.style.background = idx === 1 ? '#F5A623' : 'rgba(255,255,255,.2)';
+    }
+
+    wrap.addEventListener('touchstart', function(e) {
+      startX = e.touches[0].clientX;
+    }, { passive: true });
+
+    wrap.addEventListener('touchend', function(e) {
+      const diff = startX - e.changedTouches[0].clientX;
+      const idx = window._premPlanIdx || 0;
+      if (diff > 40 && idx === 0) goToPlan(1);       // swipe left → next plan
+      else if (diff < -40 && idx === 1) goToPlan(0); // swipe right → previous plan
+    }, { passive: true });
+
+    // Reset to plan 0 each time the sheet is opened fresh
+    window._resetPremSwipe = function() { goToPlan(0); };
+  })();
 </script>
 
 <script>
@@ -4011,6 +4097,7 @@
         const s = JSON.parse(saved);
         premiumUnlocked = !!s.unlocked;
         premiumLastUsed = s.lastUsed || 0;
+        premiumPlan = s.plan || 'monthly';
       } catch(e) {}
     }
   })();
@@ -4018,7 +4105,8 @@
   function savePremiumState() {
     localStorage.setItem('subsidi_premium', JSON.stringify({
       unlocked: premiumUnlocked,
-      lastUsed: premiumLastUsed
+      lastUsed: premiumLastUsed,
+      plan: premiumPlan
     }));
   }
 
@@ -4041,11 +4129,12 @@
     }
 
     if (premiumUnlocked) {
-      // Check 48hr cooldown
-      const hrs48 = 48 * 60 * 60 * 1000;
+      // Check plan-specific cooldown (15hrs monthly / 2hrs yearly)
+      const cooldownHrs = (PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.monthly).cooldownHrs;
+      const cooldownMs = cooldownHrs * 60 * 60 * 1000;
       const elapsed = Date.now() - premiumLastUsed;
-      if (premiumLastUsed > 0 && elapsed < hrs48) {
-        const hoursLeft = Math.ceil((hrs48 - elapsed) / (1000 * 60 * 60));
+      if (premiumLastUsed > 0 && elapsed < cooldownMs) {
+        const hoursLeft = Math.ceil((cooldownMs - elapsed) / (1000 * 60 * 60));
         alert('Come back in ' + hoursLeft + ' hour' + (hoursLeft > 1 ? 's' : '') + ' to use your Premium toggle again.');
         return;
       }
@@ -4170,6 +4259,7 @@
       label.textContent = fromPlanTap ? 'This is a Premium price' : 'Unlock cheaper prices';
       label.style.display = fromPlanTap ? '' : 'none';
     }
+    if (window._resetPremSwipe) window._resetPremSwipe();
     const ov = document.getElementById('prem-unlock-ov');
     if (ov) { ov.style.display = 'flex'; setTimeout(() => ov.classList.add('open'), 10); }
   }
@@ -4196,15 +4286,19 @@
   document.getElementById('prem-unlock-ov')?.querySelector('[onclick="closePremUnlockOv()"]')
     ?.addEventListener('click', () => _closePremUnlockOv());
 
-  async function payPremiumUnlock() {
+  async function payPremiumUnlock(plan) {
+    plan = plan || 'monthly';
+    const planInfo = PREMIUM_PLANS[plan] || PREMIUM_PLANS.monthly;
+    const price = planInfo.price;
+
     if (isGuest) {
       _closePremUnlockOv();
-      showGate('Create an account to unlock Premium', 'Register for free, then activate Premium for ₦3,000/month.');
+      showGate('Create an account to unlock Premium', 'Register for free, then activate Premium.');
       return;
     }
-    if (balance < 3000) {
+    if (balance < price) {
       _closePremUnlockOv();
-      if (confirm('You need ₦3,000 in your wallet to activate Premium.\n\nTap OK to add money.')) {
+      if (confirm('You need ₦' + price.toLocaleString() + ' in your wallet to activate Premium.\n\nTap OK to add money.')) {
         document.getElementById('dep-ov').classList.add('open');
       }
       return;
@@ -4214,14 +4308,15 @@
     _closePremUnlockOv();
     showSpinner('Unlocking Premium...');
     try {
-      const result = await callEdge('premium-unlock', { userId });
+      const result = await callEdge('premium-unlock', { userId, plan, amount: price });
       hideSpinner();
       if (result && result.success) {
         premiumUnlocked = true;
         premiumToggleOn = true;
         premiumLastUsed = 0;
+        premiumPlan = plan;
         savePremiumState();
-        balance = result.newBalance ?? (balance - 3000);
+        balance = result.newBalance ?? (balance - price);
         // Update balance UI
         const whole = Math.floor(balance).toLocaleString();
         const dec = (balance % 1).toFixed(2).slice(1);
@@ -4232,7 +4327,11 @@
         if (balElR) balElR.innerHTML = balHTML;
         setPremToggleUI(true);
         renderBundles();
-        alert('🎉 Premium activated! Your prices are now live for 30 days. Enjoy cheap data!');
+        if (planInfo.hasCard) {
+          alert('🎉 Premium activated! Your yearly plan is live and your physical Subsidi card will be issued. Enjoy cheap data!');
+        } else {
+          alert('🎉 Premium activated! Your prices are now live. Enjoy cheap data!');
+        }
       } else {
         alert('Payment failed: ' + (result?.error || 'Please try again.'));
       }
@@ -4242,6 +4341,7 @@
     }
   }
 </script>
+
 
 <script>
 (function(){

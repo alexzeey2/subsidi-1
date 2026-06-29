@@ -1626,6 +1626,15 @@
           document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
         }
         if (data.cardCode) registeredCard = data.cardCode;
+
+        // Load premium state from DB — never from localStorage
+        if (typeof data.isPremium !== 'undefined') {
+          premiumUnlocked = !!data.isPremium;
+          premiumPlan = data.premiumPlan || 'monthly';
+          premiumLastUsed = data.premiumLastUsed ? new Date(data.premiumLastUsed).getTime() : 0;
+          setPremToggleUI(premiumUnlocked && premiumToggleOn);
+        }
+
         renderBundles();
       }
     } catch(e) {
@@ -1811,6 +1820,37 @@
       } catch(e) {
         hideSpinner();
         console.error('Deposit verify error:', e);
+      }
+    }
+
+    // Check if returning from a premium Paystack redirect
+    const pendingPremium = localStorage.getItem('pendingPremium');
+    if (paystackRef && pendingPremium) {
+      try {
+        const { ref, userId: premUserId, plan } = JSON.parse(pendingPremium);
+        if (paystackRef === ref) {
+          localStorage.removeItem('pendingPremium');
+          showSpinner('Activating Premium...');
+          const result = await callEdge('premium-verify', {
+            reference: paystackRef,
+            userId: premUserId,
+            plan
+          });
+          hideSpinner();
+          if (result && result.success) {
+            await fetchUserData(); // loads isPremium, premiumPlan, premiumLastUsed from DB
+            const hasCard = plan === 'yearly';
+            alert(hasCard
+              ? 'Premium activated! Your yearly plan is live and your physical Subsidi card will be issued.'
+              : 'Premium activated! Your prices are now live. Enjoy cheap data!');
+          } else {
+            alert('Payment verification failed. Contact support with ref: ' + paystackRef);
+          }
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      } catch(e) {
+        hideSpinner();
+        console.error('Premium verify error:', e);
       }
     }
 
@@ -4102,25 +4142,7 @@
   // ── PREMIUM TOGGLE LOGIC ──
 
   // Load persisted premium state from localStorage
-  (function loadPremiumState() {
-    const saved = localStorage.getItem('subsidi_premium');
-    if (saved) {
-      try {
-        const s = JSON.parse(saved);
-        premiumUnlocked = !!s.unlocked;
-        premiumLastUsed = s.lastUsed || 0;
-        premiumPlan = s.plan || 'monthly';
-      } catch(e) {}
-    }
-  })();
-
-  function savePremiumState() {
-    localStorage.setItem('subsidi_premium', JSON.stringify({
-      unlocked: premiumUnlocked,
-      lastUsed: premiumLastUsed,
-      plan: premiumPlan
-    }));
-  }
+  // Premium state is loaded from the database via fetchUserData — not localStorage
 
   function onPremToggleClick() {
     // If demo blur is active, cancel it
@@ -4172,8 +4194,7 @@
 
   function turnOffPremiumAfterPurchase() {
     premiumToggleOn = false;
-    premiumLastUsed = Date.now();
-    savePremiumState();
+    premiumLastUsed = Date.now(); // will be updated from DB on next fetchUserData
     setPremToggleUI(false);
     renderBundles();
   }
@@ -4312,47 +4333,35 @@
       showGate('Create an account to unlock Premium', 'Register for free, then activate Premium.');
       return;
     }
-    if (balance < price) {
-      _closePremUnlockOv();
-      if (confirm('You need ₦' + price.toLocaleString() + ' in your wallet to activate Premium.\n\nTap OK to add money.')) {
-        document.getElementById('dep-ov').classList.add('open');
-      }
-      return;
-    }
 
-    // Deduct from wallet via edge function
+    const email = (username || userId) + '@subsidi.app';
+    const ref = 'subsidi-prem-' + userId + '-' + Date.now();
+
+    // Save pending premium payment to localStorage so we can verify after redirect
+    localStorage.setItem('pendingPremium', JSON.stringify({ ref, userId, plan }));
+
     _closePremUnlockOv();
-    showSpinner('Unlocking Premium...');
+    showSpinner('Starting payment...');
+
     try {
-      const result = await callEdge('premium-unlock', { userId, plan, amount: price });
+      const initResult = await callEdge('premium-init', {
+        userId,
+        plan,
+        email,
+        ref,
+        callbackUrl: window.location.href
+      });
       hideSpinner();
-      if (result && result.success) {
-        premiumUnlocked = true;
-        premiumToggleOn = true;
-        premiumLastUsed = 0;
-        premiumPlan = plan;
-        savePremiumState();
-        balance = result.newBalance ?? (balance - price);
-        // Update balance UI
-        const whole = Math.floor(balance).toLocaleString();
-        const dec = (balance % 1).toFixed(2).slice(1);
-        const balHTML = '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-        const balEl = document.getElementById('bal-display');
-        const balElR = document.getElementById('bal-display-repeat');
-        if (balEl) balEl.innerHTML = balHTML;
-        if (balElR) balElR.innerHTML = balHTML;
-        setPremToggleUI(true);
-        renderBundles();
-        if (planInfo.hasCard) {
-          alert('🎉 Premium activated! Your yearly plan is live and your physical Subsidi card will be issued. Enjoy cheap data!');
-        } else {
-          alert('🎉 Premium activated! Your prices are now live. Enjoy cheap data!');
-        }
+
+      if (initResult && initResult.authorization_url) {
+        window.location.href = initResult.authorization_url;
       } else {
-        alert('Payment failed: ' + (result?.error || 'Please try again.'));
+        localStorage.removeItem('pendingPremium');
+        alert('Could not start payment: ' + (initResult?.error || 'Please try again.'));
       }
     } catch(e) {
       hideSpinner();
+      localStorage.removeItem('pendingPremium');
       alert('Something went wrong. Please try again.');
     }
   }

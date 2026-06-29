@@ -1347,11 +1347,11 @@
       <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:6px;">Get the cheapest data prices in Nigeria.</div>
     </div>
 
-    <div id="prem-swipe-wrap" style="overflow:hidden;position:relative;touch-action:pan-y;padding:0 9%;">
-      <div id="prem-swipe-inner" style="display:flex;gap:10px;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
+    <div id="prem-swipe-wrap" style="overflow:hidden;position:relative;touch-action:pan-y;padding:0 22px;">
+      <div id="prem-swipe-inner" style="display:flex;gap:14px;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
 
         <!-- Plan 0: Monthly -->
-        <div style="width:82%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
+        <div class="prem-plan-card" style="flex-shrink:0;box-sizing:border-box;padding:0 2px;">
           <div style="margin:0 18px 14px;background:var(--dark-3);border:1px solid rgba(108,43,217,.4);border-radius:16px;padding:16px 20px;">
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
@@ -1382,7 +1382,7 @@
         </div>
 
         <!-- Plan 1: Yearly -->
-        <div style="width:82%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
+        <div class="prem-plan-card" style="flex-shrink:0;box-sizing:border-box;padding:0 2px;">
           <div style="margin:0 18px 14px;background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
@@ -4053,24 +4053,34 @@
     setButtonsVisible(0);
   })();
 
-  // Swipeable premium plan sheet: bidirectional, 2 plans (Monthly / Yearly), with a peek of the next card
+  // Swipeable premium plan sheet: bidirectional, 2 plans (Monthly / Yearly), with a slim peek of the next card
   (function() {
     const wrap = document.getElementById('prem-swipe-wrap');
     const inner = document.getElementById('prem-swipe-inner');
     if (!wrap || !inner) return;
 
-    let startX = 0;
+    const GAP = 14; // matches the gap set on inner
 
-    function cardOffsetPx() {
-      // Distance to slide = width of first card + gap, measured in actual pixels
-      const firstCard = inner.children[0];
-      const gap = 10; // matches the gap set in inner's style
-      return firstCard ? (firstCard.getBoundingClientRect().width + gap) : 0;
+    function sizeCards() {
+      // Each card should exactly fill the wrap's visible window (wrap's content box,
+      // i.e. its width minus its own left/right padding). This keeps both cards at
+      // full, normal size, with only the wrap's own padding revealing a slim peek
+      // of the neighboring card on either side.
+      const cardWidth = wrap.clientWidth; // clientWidth already excludes padding
+      Array.from(inner.children).forEach(card => {
+        card.style.width = cardWidth + 'px';
+      });
+      return cardWidth;
     }
+
+    let cardWidth = sizeCards();
+    window.addEventListener('resize', () => { cardWidth = sizeCards(); });
+
+    let startX = 0;
 
     function goToPlan(idx) {
       window._premPlanIdx = idx;
-      const px = idx === 0 ? 0 : cardOffsetPx();
+      const px = idx === 0 ? 0 : (cardWidth + GAP);
       inner.style.transform = 'translateX(-' + px + 'px)';
       const d0 = document.getElementById('prem-dot-0');
       const d1 = document.getElementById('prem-dot-1');
@@ -4089,8 +4099,12 @@
       else if (diff < -40 && idx === 1) goToPlan(0); // swipe right → previous plan
     }, { passive: true });
 
-    // Reset to plan 0 each time the sheet is opened fresh
-    window._resetPremSwipe = function() { goToPlan(0); };
+    // Reset to plan 0 each time the sheet is opened fresh (also re-measures in case
+    // the sheet was opened for the first time after layout settled)
+    window._resetPremSwipe = function() {
+      cardWidth = sizeCards();
+      goToPlan(0);
+    };
   })();
 </script>
 

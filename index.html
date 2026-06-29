@@ -1347,42 +1347,42 @@
       <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:6px;">Get the cheapest data prices in Nigeria.</div>
     </div>
 
-    <div id="prem-swipe-wrap" style="overflow:hidden;position:relative;touch-action:pan-y;padding-right:14%;">
+    <div id="prem-swipe-wrap" style="overflow:hidden;position:relative;touch-action:pan-y;padding:0 9%;">
       <div id="prem-swipe-inner" style="display:flex;gap:10px;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
 
         <!-- Plan 0: Monthly -->
-        <div style="width:86%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
-          <div style="margin:0 18px 14px;background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
+        <div style="width:82%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
+          <div style="margin:0 18px 14px;background:var(--dark-3);border:1px solid rgba(108,43,217,.4);border-radius:16px;padding:16px 20px;">
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:#F5A623;font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans
+                <span style="color:var(--p-light);font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans
               </div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:#F5A623;font-weight:800;">✓</span> Works even when your subsidy fund is empty
+                <span style="color:var(--p-light);font-weight:800;">✓</span> Works even when your subsidy fund is empty
               </div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:#F5A623;font-weight:800;">✓</span> One purchase every 15 hours
+                <span style="color:var(--p-light);font-weight:800;">✓</span> One purchase every 15 hours
               </div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);">
-                <span style="color:#F5A623;font-weight:800;">✓</span> Cancel anytime — no hidden fees
+                <span style="color:var(--p-light);font-weight:800;">✓</span> Cancel anytime — no hidden fees
               </div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);">
                 <span style="color:var(--w40);font-weight:800;">✕</span> No physical card included
               </div>
             </div>
           </div>
-          <div class="prem-sheet-price">₦3,000</div>
+          <div class="prem-sheet-price" style="color:var(--p-light);">₦3,000</div>
           <div class="prem-sheet-once">per month</div>
           <div style="margin:0 18px;">
-            <button class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('monthly')">
+            <button class="reg-btn" style="background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));color:#fff;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('monthly')">
               Unlock Premium
             </button>
           </div>
         </div>
 
         <!-- Plan 1: Yearly -->
-        <div style="width:86%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
+        <div style="width:82%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
           <div style="margin:0 18px 14px;background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
@@ -1416,7 +1416,7 @@
     </div>
 
     <div style="display:flex;justify-content:center;gap:6px;margin:14px 0 4px;">
-      <div id="prem-dot-0" style="width:7px;height:7px;border-radius:50%;background:#F5A623;transition:background .2s;"></div>
+      <div id="prem-dot-0" style="width:7px;height:7px;border-radius:50%;background:var(--p-light);transition:background .2s;"></div>
       <div id="prem-dot-1" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);transition:background .2s;"></div>
     </div>
 
@@ -4074,7 +4074,7 @@
       inner.style.transform = 'translateX(-' + px + 'px)';
       const d0 = document.getElementById('prem-dot-0');
       const d1 = document.getElementById('prem-dot-1');
-      if (d0) d0.style.background = idx === 0 ? '#F5A623' : 'rgba(255,255,255,.2)';
+      if (d0) d0.style.background = idx === 0 ? '#8B4FE8' : 'rgba(255,255,255,.2)';
       if (d1) d1.style.background = idx === 1 ? '#F5A623' : 'rgba(255,255,255,.2)';
     }
 

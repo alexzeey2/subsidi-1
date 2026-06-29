@@ -1347,9 +1347,9 @@
       <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:6px;">Get the cheapest data prices in Nigeria.</div>
     </div>
 
-    <div style="overflow:hidden;position:relative;padding:0 28px;" id="prem-swipe-clip">
+    <div id="prem-swipe-clip" style="overflow:hidden;position:relative;">
     <div id="prem-swipe-wrap" style="overflow:visible;position:relative;touch-action:pan-y;">
-      <div id="prem-swipe-inner" style="display:flex;gap:14px;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
+      <div id="prem-swipe-inner" style="display:flex;gap:14px;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;padding-left:24px;">
 
         <!-- Plan 0: Monthly -->
         <div class="prem-plan-card" style="flex-shrink:0;box-sizing:border-box;padding:0 2px;">
@@ -4055,24 +4055,25 @@
     setButtonsVisible(0);
   })();
 
-  // Swipeable premium plan sheet: bidirectional, 2 plans (Monthly / Yearly), with peek of adjacent card
+  // Swipeable premium plan sheet: bidirectional, 2 plans (Monthly / Yearly), with symmetric peek
   (function() {
     const clip = document.getElementById('prem-swipe-clip');
     const wrap = document.getElementById('prem-swipe-wrap');
     const inner = document.getElementById('prem-swipe-inner');
     if (!clip || !wrap || !inner) return;
 
-    const GAP = 14; // matches the gap set on inner
-    const PEEK = 28; // how much of the adjacent card shows (matches clip padding)
+    const GAP = 14;   // gap between cards (matches flex gap on inner)
+    const PEEK = 24;  // px of adjacent card visible on each side (matches inner padding-left)
     let cardWidth = 0;
 
     function sizeCards() {
-      // Card width = clip's content width (already accounts for clip's padding)
-      // minus one PEEK on the far side so the neighbor card peeks in
-      const clipW = clip.clientWidth; // clientWidth excludes padding
+      // clip.clientWidth = full sheet content width (no padding on clip).
+      // Each card = clipW - 2*PEEK so there's PEEK space on both sides.
+      // inner has padding-left:PEEK so plan 0 starts PEEK px from the left,
+      // leaving PEEK px of the next card visible on the right.
+      const clipW = clip.clientWidth;
       if (!clipW) return cardWidth;
-      // cardWidth = visible window - PEEK (so neighbor shows on the opposite side)
-      const cw = clipW - PEEK;
+      const cw = clipW - (PEEK * 2);
       Array.from(inner.children).forEach(card => {
         card.style.width = cw + 'px';
       });
@@ -4087,7 +4088,8 @@
 
     function goToPlan(idx) {
       window._premPlanIdx = idx;
-      const px = idx === 0 ? 0 : (cardWidth + GAP);
+      // Offset = idx * (cardWidth + GAP). The inner padding-left handles the initial PEEK offset.
+      const px = idx * (cardWidth + GAP);
       inner.style.transform = 'translateX(-' + px + 'px)';
       const d0 = document.getElementById('prem-dot-0');
       const d1 = document.getElementById('prem-dot-1');

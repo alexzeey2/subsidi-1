@@ -1347,11 +1347,11 @@
       <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:6px;">Get the cheapest data prices in Nigeria.</div>
     </div>
 
-    <div id="prem-swipe-wrap" style="overflow:hidden;position:relative;touch-action:pan-y;">
-      <div id="prem-swipe-inner" style="display:flex;width:200%;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
+    <div id="prem-swipe-wrap" style="overflow:hidden;position:relative;touch-action:pan-y;padding-right:14%;">
+      <div id="prem-swipe-inner" style="display:flex;gap:10px;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
 
         <!-- Plan 0: Monthly -->
-        <div style="width:50%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
+        <div style="width:86%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
           <div style="margin:0 18px 14px;background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
@@ -1374,7 +1374,7 @@
           </div>
           <div class="prem-sheet-price">₦3,000</div>
           <div class="prem-sheet-once">per month</div>
-          <div style="margin:0 20px;">
+          <div style="margin:0 18px;">
             <button class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('monthly')">
               Unlock Premium
             </button>
@@ -1382,7 +1382,7 @@
         </div>
 
         <!-- Plan 1: Yearly -->
-        <div style="width:50%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
+        <div style="width:86%;flex-shrink:0;box-sizing:border-box;padding:0 2px;">
           <div style="margin:0 18px 14px;background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
@@ -1405,7 +1405,7 @@
           </div>
           <div class="prem-sheet-price">₦15,000</div>
           <div class="prem-sheet-once">per year</div>
-          <div style="margin:0 20px;">
+          <div style="margin:0 18px;">
             <button class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('yearly')">
               Unlock Premium
             </button>
@@ -4053,7 +4053,7 @@
     setButtonsVisible(0);
   })();
 
-  // Swipeable premium plan sheet: bidirectional, 2 plans (Monthly / Yearly)
+  // Swipeable premium plan sheet: bidirectional, 2 plans (Monthly / Yearly), with a peek of the next card
   (function() {
     const wrap = document.getElementById('prem-swipe-wrap');
     const inner = document.getElementById('prem-swipe-inner');
@@ -4061,9 +4061,17 @@
 
     let startX = 0;
 
+    function cardOffsetPx() {
+      // Distance to slide = width of first card + gap, measured in actual pixels
+      const firstCard = inner.children[0];
+      const gap = 10; // matches the gap set in inner's style
+      return firstCard ? (firstCard.getBoundingClientRect().width + gap) : 0;
+    }
+
     function goToPlan(idx) {
       window._premPlanIdx = idx;
-      inner.style.transform = 'translateX(-' + (idx * 50) + '%)';
+      const px = idx === 0 ? 0 : cardOffsetPx();
+      inner.style.transform = 'translateX(-' + px + 'px)';
       const d0 = document.getElementById('prem-dot-0');
       const d1 = document.getElementById('prem-dot-1');
       if (d0) d0.style.background = idx === 0 ? '#F5A623' : 'rgba(255,255,255,.2)';

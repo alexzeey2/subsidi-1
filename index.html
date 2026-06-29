@@ -1509,6 +1509,7 @@
     monthly: { price: 3000, label: 'per month', cooldownHrs: 15, hasCard: false },
     yearly:  { price: 15000, label: 'per year', cooldownHrs: 2, hasCard: true }
   };
+  let poolBalance = 0;           // reward pool balance — loaded from DB
   let premDemoActive = false;    // is the demo blur/animation running
   let premDemoSeen = false;      // demo has been shown to logged-in non-premium user
 
@@ -1633,6 +1634,10 @@
           premiumPlan = data.premiumPlan || 'monthly';
           premiumLastUsed = data.premiumLastUsed ? new Date(data.premiumLastUsed).getTime() : 0;
           setPremToggleUI(premiumUnlocked && premiumToggleOn);
+          schedulePremiumAutoOn();
+        }
+        if (typeof data.poolBalance !== 'undefined') {
+          poolBalance = data.poolBalance ?? 0;
         }
 
         renderBundles();
@@ -4163,16 +4168,20 @@
     }
 
     if (premiumUnlocked) {
-      // Check plan-specific cooldown (15hrs monthly / 2hrs yearly)
+      // Check cooldown first
       const cooldownHrs = (PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.monthly).cooldownHrs;
       const cooldownMs = cooldownHrs * 60 * 60 * 1000;
       const elapsed = Date.now() - premiumLastUsed;
       if (premiumLastUsed > 0 && elapsed < cooldownMs) {
-        const hoursLeft = Math.ceil((cooldownMs - elapsed) / (1000 * 60 * 60));
-        alert('Come back in ' + hoursLeft + ' hour' + (hoursLeft > 1 ? 's' : '') + ' to use your Premium toggle again.');
+        showPremCooldownPopup(cooldownMs - elapsed);
         return;
       }
-      // Activate premium prices
+      // Check pool
+      if (poolBalance <= 0) {
+        showPremPoolEmptyPopup();
+        return;
+      }
+      // All good — activate premium prices
       premiumToggleOn = true;
       setPremToggleUI(true);
       renderBundles();
@@ -4180,6 +4189,74 @@
       // Run the demo then show unlock sheet
       runPremDemo();
     }
+  }
+
+  function showPremPoolEmptyPopup() {
+    showPremStatusPopup(
+      '⚠️ Not Available',
+      'Not available at the moment, try again later.'
+    );
+  }
+
+  function showPremCooldownPopup(msLeft) {
+    const popId = 'prem-cooldown-pop';
+    // Remove any existing
+    const existing = document.getElementById(popId);
+    if (existing) existing.remove();
+
+    const pop = document.createElement('div');
+    pop.id = popId;
+    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;padding:24px;';
+    pop.innerHTML = `
+      <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;">
+        <div style="font-size:32px;margin-bottom:12px;">⏳</div>
+        <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:8px;">Cooldown Active</div>
+        <div style="font-size:13px;color:var(--w40);margin-bottom:20px;line-height:1.6;">Your next premium purchase is available in</div>
+        <div id="prem-countdown" style="font-size:36px;font-weight:900;color:#F5A623;letter-spacing:2px;font-variant-numeric:tabular-nums;margin-bottom:24px;">--:--:--</div>
+        <button onclick="document.getElementById('${popId}').remove();clearInterval(window._premCdTimer);" style="width:100%;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">Got it</button>
+      </div>`;
+    document.body.appendChild(pop);
+
+    // Live countdown
+    function tick() {
+      const el = document.getElementById('prem-countdown');
+      if (!el) { clearInterval(window._premCdTimer); return; }
+      const remaining = (premiumLastUsed + ((PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.monthly).cooldownHrs * 3600000)) - Date.now();
+      if (remaining <= 0) {
+        el.textContent = '00:00:00';
+        clearInterval(window._premCdTimer);
+        return;
+      }
+      const h = Math.floor(remaining / 3600000);
+      const m = Math.floor((remaining % 3600000) / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      el.textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    }
+    clearInterval(window._premCdTimer);
+    tick();
+    window._premCdTimer = setInterval(tick, 1000);
+
+    // Tap outside to close
+    pop.addEventListener('click', (e) => {
+      if (e.target === pop) { pop.remove(); clearInterval(window._premCdTimer); }
+    });
+  }
+
+  function showPremStatusPopup(title, message) {
+    const popId = 'prem-status-pop';
+    const existing = document.getElementById(popId);
+    if (existing) existing.remove();
+    const pop = document.createElement('div');
+    pop.id = popId;
+    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;padding:24px;';
+    pop.innerHTML = `
+      <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;">
+        <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:10px;">${title}</div>
+        <div style="font-size:13px;color:var(--w40);margin-bottom:24px;line-height:1.6;">${message}</div>
+        <button onclick="document.getElementById('${popId}').remove();" style="width:100%;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">OK</button>
+      </div>`;
+    document.body.appendChild(pop);
+    pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
   }
 
   function setPremToggleUI(on) {
@@ -4197,6 +4274,26 @@
     premiumLastUsed = Date.now(); // will be updated from DB on next fetchUserData
     setPremToggleUI(false);
     renderBundles();
+    schedulePremiumAutoOn();
+  }
+
+  function schedulePremiumAutoOn() {
+    // Clear any existing auto-on timer
+    if (window._premAutoOnTimer) clearTimeout(window._premAutoOnTimer);
+    if (!premiumUnlocked || !premiumLastUsed) return;
+
+    const cooldownMs = (PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.monthly).cooldownHrs * 3600000;
+    const msLeft = (premiumLastUsed + cooldownMs) - Date.now();
+    if (msLeft <= 0) return; // already expired
+
+    window._premAutoOnTimer = setTimeout(() => {
+      // Only auto-turn-on if pool is active and user is still premium
+      if (premiumUnlocked && poolBalance > 0) {
+        premiumToggleOn = true;
+        setPremToggleUI(true);
+        renderBundles();
+      }
+    }, msLeft);
   }
 
   // ── DEMO ANIMATION ──

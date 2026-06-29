@@ -1347,7 +1347,8 @@
       <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:6px;">Get the cheapest data prices in Nigeria.</div>
     </div>
 
-    <div id="prem-swipe-wrap" style="overflow:hidden;position:relative;touch-action:pan-y;padding:0 22px;">
+    <div style="overflow:hidden;position:relative;padding:0 28px;" id="prem-swipe-clip">
+    <div id="prem-swipe-wrap" style="overflow:visible;position:relative;touch-action:pan-y;">
       <div id="prem-swipe-inner" style="display:flex;gap:14px;transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
 
         <!-- Plan 0: Monthly -->
@@ -1413,6 +1414,7 @@
         </div>
 
       </div>
+    </div>
     </div>
 
     <div style="display:flex;justify-content:center;gap:6px;margin:14px 0 4px;">
@@ -4053,26 +4055,29 @@
     setButtonsVisible(0);
   })();
 
-  // Swipeable premium plan sheet: bidirectional, 2 plans (Monthly / Yearly), with a slim peek of the next card
+  // Swipeable premium plan sheet: bidirectional, 2 plans (Monthly / Yearly), with peek of adjacent card
   (function() {
+    const clip = document.getElementById('prem-swipe-clip');
     const wrap = document.getElementById('prem-swipe-wrap');
     const inner = document.getElementById('prem-swipe-inner');
-    if (!wrap || !inner) return;
+    if (!clip || !wrap || !inner) return;
 
     const GAP = 14; // matches the gap set on inner
+    const PEEK = 28; // how much of the adjacent card shows (matches clip padding)
     let cardWidth = 0;
 
     function sizeCards() {
-      // Each card should exactly fill the wrap's visible window (wrap's content box,
-      // i.e. its width minus its own left/right padding). This keeps both cards at
-      // full, normal size, with only the wrap's own padding revealing a slim peek
-      // of the neighboring card on either side.
-      const measured = wrap.clientWidth; // clientWidth already excludes padding
-      if (!measured) return cardWidth; // wrap is hidden/unlaid-out — keep last known good width
+      // Card width = clip's content width (already accounts for clip's padding)
+      // minus one PEEK on the far side so the neighbor card peeks in
+      const clipW = clip.clientWidth; // clientWidth excludes padding
+      if (!clipW) return cardWidth;
+      // cardWidth = visible window - PEEK (so neighbor shows on the opposite side)
+      const cw = clipW - PEEK;
       Array.from(inner.children).forEach(card => {
-        card.style.width = measured + 'px';
+        card.style.width = cw + 'px';
       });
-      return measured;
+      cardWidth = cw;
+      return cw;
     }
 
     cardWidth = sizeCards();
@@ -4097,12 +4102,11 @@
     wrap.addEventListener('touchend', function(e) {
       const diff = startX - e.changedTouches[0].clientX;
       const idx = window._premPlanIdx || 0;
-      if (diff > 40 && idx === 0) goToPlan(1);       // swipe left → next plan
-      else if (diff < -40 && idx === 1) goToPlan(0); // swipe right → previous plan
+      if (diff > 40 && idx === 0) goToPlan(1);       // swipe left → yearly plan
+      else if (diff < -40 && idx === 1) goToPlan(0); // swipe right → monthly plan
     }, { passive: true });
 
-    // Reset to plan 0 each time the sheet is opened fresh (also re-measures in case
-    // the sheet was opened for the first time after layout settled)
+    // Reset to plan 0 each time the sheet is opened fresh
     window._resetPremSwipe = function() {
       cardWidth = sizeCards();
       goToPlan(0);

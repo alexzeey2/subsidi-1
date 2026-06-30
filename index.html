@@ -1759,6 +1759,27 @@
           document.getElementById('bal-display').innerHTML =
             '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
           updateSubsidyUI();
+
+          // Load premium state from DB — never from localStorage
+          if (typeof data.isPremium !== 'undefined') {
+            premiumUnlocked = !!data.isPremium;
+            premiumPlan = data.premiumPlan || 'monthly';
+            premiumLastUsed = data.premiumLastUsed ? new Date(data.premiumLastUsed).getTime() : 0;
+            if (premiumUnlocked) {
+              const cooldownMs = (PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.monthly).cooldownHrs * 3600000;
+              const inCooldown = premiumLastUsed > 0 && (Date.now() - premiumLastUsed) < cooldownMs;
+              const poolOk = (data.poolBalance ?? 0) > 0;
+              premiumToggleOn = !inCooldown && poolOk;
+            } else {
+              premiumToggleOn = false;
+            }
+            setPremToggleUI(premiumToggleOn);
+            schedulePremiumAutoOn();
+          }
+          if (typeof data.poolBalance !== 'undefined') {
+            poolBalance = data.poolBalance ?? 0;
+          }
+
           checkWaJoined();
           show('dash');
           renderBundles();

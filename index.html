@@ -1844,6 +1844,9 @@
           hideSpinner();
           if (result && result.success) {
             await fetchUserData(); // loads isPremium, premiumPlan, premiumLastUsed from DB
+            premiumToggleOn = true;
+            setPremToggleUI(true);
+            renderBundles();
             const hasCard = plan === 'yearly';
             alert(hasCard
               ? 'Premium activated! Your yearly plan is live and your physical Subsidi card will be issued.'

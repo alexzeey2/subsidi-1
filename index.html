@@ -4185,6 +4185,7 @@
   // Premium state is loaded from the database via fetchUserData — not localStorage
 
   function onPremToggleClick() {
+    alert('CLICK DEBUG premiumUnlocked=' + premiumUnlocked + ' premiumToggleOn=' + premiumToggleOn + ' premDemoActive=' + premDemoActive + ' poolBalance=' + poolBalance + ' premiumLastUsed=' + premiumLastUsed);
     // If demo blur is active, cancel it
     if (premDemoActive) {
       cancelPremDemo();

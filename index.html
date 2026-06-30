@@ -1610,14 +1610,6 @@
     try {
       showSpinner('Refreshing...');
       const data = await callEdge('get-user', { userId });
-      window._lastGetUserDebug = JSON.stringify(data);
-      setTimeout(() => {
-        document.title = 'PU=' + premiumUnlocked + ' PT=' + premiumToggleOn + ' PB=' + poolBalance;
-        const dbg = document.createElement('div');
-        dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;background:red;color:#fff;font-size:11px;z-index:99999;padding:6px;word-break:break-all;';
-        dbg.textContent = 'T+3s premiumUnlocked=' + premiumUnlocked + ' premiumToggleOn=' + premiumToggleOn + ' poolBalance=' + poolBalance + ' premiumLastUsed=' + premiumLastUsed + ' | raw=' + window._lastGetUserDebug;
-        document.body.appendChild(dbg);
-      }, 3000);
       if (data && !data.error) {
         // Always update balance first — independent of other fields
         balance = data.balance ?? balance;
@@ -1632,7 +1624,7 @@
         updateSubsidyUI();
         if (data.username) {
           username = data.username;
-          document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+          (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
         }
         if (data.cardCode) registeredCard = data.cardCode;
 
@@ -1761,7 +1753,7 @@
           balance = data.balance ?? 0;
           subsidyFund = data.subsidyFund ?? 0;
           isGuest = false;
-          document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+          (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
           const dec = (balance % 1).toFixed(2).slice(1);
           document.getElementById('bal-display').innerHTML =
@@ -2094,12 +2086,12 @@
         userId = data.userId;
         username = data.username;
         balance = 0;
-        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
         goLoginStep();
       } else {
         // New card — go to PIN creation
         username = generateUsername(cardCode);
-        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
         goRegStep3();
       }
     } catch (e) {
@@ -2115,7 +2107,7 @@
       if (data && data.exists) {
         userId = data.userId;
         username = data.username;
-        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
         goLoginStep();
       } else {
         // 10-digit code not found — reject, cannot register with it
@@ -2174,7 +2166,7 @@
       cardSecret = typeof extractSecret === 'function' ? extractSecret(raw_code) : raw_code;
       statusEl.textContent = '✓ Card claimed! Set your PIN.';
       username = generateUsername(raw_code);
-      document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+      (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
       goRegStep3();
     } catch(e) {
       statusEl.textContent = '⚠️ Connection error. Try again.';
@@ -2370,7 +2362,7 @@
       userId = data.userId;
       username = data.username;
       balance = 0;
-      document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+      (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
       localStorage.removeItem('subsidi_pending_ref');
 
       // Link the claimed card code to this userId in Supabase
@@ -2504,7 +2496,7 @@
             balance = userData.balance ?? 100;
             subsidyFund = userData.subsidyFund ?? 0;
             username = userData.username || username;
-            document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+            (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();
             const dec = (balance % 1).toFixed(2).slice(1);
             document.getElementById('bal-display').innerHTML =
@@ -3699,7 +3691,7 @@
 
         balance = 0;
         subsidyFund = 360;
-        document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+        (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
         const whole = Math.floor(balance).toLocaleString();
         const dec = (balance % 1).toFixed(2).slice(1);
         document.getElementById('bal-display').innerHTML =
@@ -3749,7 +3741,7 @@
             balance = userData.balance ?? 100;
             subsidyFund = userData.subsidyFund ?? 0;
             username = userData.username || username;
-            document.getElementById('ref-link').textContent = 'subsidi.app/ref/' + username;
+            (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
             const whole = Math.floor(balance).toLocaleString();
             const dec = (balance % 1).toFixed(2).slice(1);
             document.getElementById('bal-display').innerHTML =

@@ -1633,7 +1633,17 @@
           premiumUnlocked = !!data.isPremium;
           premiumPlan = data.premiumPlan || 'monthly';
           premiumLastUsed = data.premiumLastUsed ? new Date(data.premiumLastUsed).getTime() : 0;
-          setPremToggleUI(premiumUnlocked && premiumToggleOn);
+
+          if (premiumUnlocked) {
+            // Determine if still in cooldown
+            const cooldownMs = (PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.monthly).cooldownHrs * 3600000;
+            const inCooldown = premiumLastUsed > 0 && (Date.now() - premiumLastUsed) < cooldownMs;
+            const poolOk = (data.poolBalance ?? 0) > 0;
+            premiumToggleOn = !inCooldown && poolOk;
+          } else {
+            premiumToggleOn = false;
+          }
+          setPremToggleUI(premiumToggleOn);
           schedulePremiumAutoOn();
         }
         if (typeof data.poolBalance !== 'undefined') {

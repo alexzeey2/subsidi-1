@@ -1354,13 +1354,13 @@
 
       <!-- Monthly button -->
       <div id="prem-btn-monthly" onclick="selectPremPlan('monthly')" style="flex:1;border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:var(--p-subtle);border:1.5px solid var(--p);">
-        <div style="font-size:22px;font-weight:900;color:var(--p-light);">₦3,000</div>
-        <div style="font-size:10px;font-weight:600;color:var(--w40);letter-spacing:.8px;text-transform:uppercase;margin-top:3px;">per month</div>
+        <div style="font-size:22px;font-weight:900;color:var(--p-light);">₦8,000</div>
+        <div style="font-size:10px;font-weight:600;color:var(--w40);letter-spacing:.8px;text-transform:uppercase;margin-top:3px;">per year</div>
       </div>
 
       <!-- Yearly button -->
       <div id="prem-btn-yearly" onclick="selectPremPlan('yearly')" style="flex:1;border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;">
-        <div style="font-size:22px;font-weight:900;color:var(--w40);">₦15,000</div>
+        <div style="font-size:22px;font-weight:900;color:var(--w40);">₦20,000</div>
         <div style="font-size:10px;font-weight:600;color:var(--w40);letter-spacing:.8px;text-transform:uppercase;margin-top:3px;">per year</div>
       </div>
 
@@ -1377,7 +1377,7 @@
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Works even when your subsidy fund is empty</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> One purchase every 15 hours</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> One purchase every 72 hours</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Cancel anytime — no hidden fees</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);"><span style="color:var(--w40);font-weight:800;">✕</span> No physical card included</div>
             </div>
@@ -1391,7 +1391,7 @@
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Extra 60% off already-discounted cheap plans</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Works even when your subsidy fund is empty</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> One purchase every 2 hours</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> One purchase every 24 hours</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Cancel anytime — no hidden fees</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Free physical Subsidi card included</div>
             </div>
@@ -1506,8 +1506,8 @@
   let premiumLastUsed = 0;       // timestamp of last premium purchase
   let premiumPlan = 'monthly';   // which plan is active: 'monthly' (₦3,000) or 'yearly' (₦15,000)
   const PREMIUM_PLANS = {
-    monthly: { price: 3000, label: 'per month', cooldownHrs: 15, hasCard: false },
-    yearly:  { price: 15000, label: 'per year', cooldownHrs: 2, hasCard: true }
+    monthly: { price: 8000, label: 'per year', cooldownHrs: 72, hasCard: false },
+    yearly:  { price: 20000, label: 'per year', cooldownHrs: 24, hasCard: true }
   };
   let poolBalance = 0;           // reward pool balance — loaded from DB
   let premDemoActive = false;    // is the demo blur/animation running
@@ -2774,29 +2774,35 @@
 
       // Pricing
       const basePrice = isExpensive ? p.ck + 240 : p.ck + 5; // expensive: +₦240 margin, cheap: +₦5 margin
-      let displayPrice = hasDiscount ? basePrice - 120 : basePrice; // ₦120 subsidy off cheap plans only when fund > 0
+      let displayPrice = hasDiscount ? basePrice - 120 : basePrice; // ₦120 subsidy off cheap plans only
 
-      // Premium toggle: show premium prices during demo or when toggle is active
+      // Premium toggle logic
       let isPremiumActive = false;
-      if (!isExpensive && (premiumToggleOn || premDemoActive)) {
-        const discounted = basePrice - 120;
-        displayPrice = Math.max(50, Math.round((discounted * 0.40) / 5) * 5);
+      let displayPriceFinal = displayPrice;
+      if (premiumToggleOn || premDemoActive) {
         isPremiumActive = true;
+        if (!isExpensive) {
+          // Cheap plans: 60% off the already-subsidised price
+          const subsidised = basePrice - 120;
+          displayPriceFinal = Math.max(50, Math.round((subsidised * 0.40) / 5) * 5);
+        } else {
+          // Golden plans: 60% off base price (first discount)
+          displayPriceFinal = Math.max(50, Math.round((basePrice * 0.40) / 5) * 5);
+        }
       }
-
       const strikePrice = (hasDiscount || isPremiumActive) ? basePrice : '';
 
       // Card styling
       const bundleClass = isExpensive ? (isLow ? 'bundle bundle-golden-red' : 'bundle bundle-golden') : 'bundle';
-      const btnLabel = isExpensive ? 'Golden Plan' : (isPremiumActive ? '⚡ Premium' : 'Best Price');
+      const btnLabel = isExpensive ? (isPremiumActive ? '⚡ Premium' : 'Golden Plan') : (isPremiumActive ? '⚡ Premium' : 'Best Price');
       const priceClass = isPremiumActive ? 'b-price b-price-gold' : (hasDiscount ? 'b-price b-price-gold' : 'b-price');
 
-      return `<div class="${bundleClass}" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPrice},${basePrice},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">
+      return `<div class="${bundleClass}" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPriceFinal},${basePrice},'${p.planId}','${NET}',${isExpensive ? 0 : 1})">
         ${isPremiumActive && !premiumUnlocked ? '<div style="position:absolute;top:8px;right:8px;font-size:11px;color:#F5A623;opacity:0.8;">🔒</div>' : ''}
         <div class="b-val">${p.val}</div>
         <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
         <div class="b-orig">${strikePrice ? fmt(strikePrice) : ''}</div>
-        <div class="${priceClass}">${fmt(displayPrice)}</div>
+        <div class="${priceClass}">${fmt(displayPriceFinal)}</div>
         <div class="b-btn">${btnLabel}</div>
       </div>`;
     }).join('');
@@ -4466,7 +4472,57 @@
       return;
     }
 
-    const email = (username || userId) + '@subsidi.app';
+    // Show terms agreement popup before payment
+    _closePremUnlockOv();
+    showPremTermsPopup(plan);
+  }
+
+  function showPremTermsPopup(plan) {
+    const popId = 'prem-terms-pop';
+    const existing = document.getElementById(popId);
+    if (existing) existing.remove();
+
+    const pop = document.createElement('div');
+    pop.id = popId;
+    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:700;display:flex;align-items:flex-end;justify-content:center;padding:0;';
+    pop.innerHTML = `
+      <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;">
+        <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+        <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:12px;">Before You Continue</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.7;margin-bottom:16px;">
+          By tapping <strong style="color:var(--w70);">I Agree</strong>, you confirm that you have read and understood how Subsidi Premium works.
+        </div>
+
+        <!-- Premium Policy expandable -->
+        <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:14px;margin-bottom:24px;overflow:hidden;">
+          <div onclick="document.getElementById('prem-policy-body').style.display = document.getElementById('prem-policy-body').style.display === 'none' ? 'block' : 'none';" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;">
+            <span style="font-size:13px;font-weight:700;color:#4A9EFF;">📄 Our Premium Policy</span>
+            <span style="font-size:11px;color:var(--w40);">Tap to read</span>
+          </div>
+          <div id="prem-policy-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);">
+            <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
+              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">60% Discount</strong> — Premium gives you 60% off all data plans, including Golden Plans. Cheap plans get an extra 60% off on top of your existing subsidy discount.</p>
+              <p style="margin:0 0 10px;">🏦 <strong style="color:var(--w70);">Reward Pool</strong> — Your premium toggle is powered by our reward pool. If the pool balance is empty, your toggle will temporarily remain off until the pool is refunded. This is not a bug — it is by design.</p>
+              <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Cooldown Period</strong> — After each data purchase using premium, your toggle turns off. The ₦8,000 plan has a 72-hour cooldown and the ₦20,000 plan has a 24-hour cooldown. Your toggle turns back on automatically when the cooldown is over.</p>
+              <p style="margin:0 0 10px;">🔁 <strong style="color:var(--w70);">Subscription</strong> — Both plans are yearly and renew every 365 days.</p>
+              <p style="margin:0;">🚫 <strong style="color:var(--w70);">No Refunds</strong> — Once premium is activated, we do not offer refunds. Please make sure you understand how the pool works before subscribing.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div style="display:flex;gap:12px;">
+          <button onclick="document.getElementById('${popId}').remove();" style="flex:1;padding:15px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w50);font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
+          <button onclick="document.getElementById('${popId}').remove();_proceedPremPayment('${plan}');" style="flex:1;padding:15px;background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));border:none;border-radius:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;">I Agree</button>
+        </div>
+      </div>`;
+    document.body.appendChild(pop);
+    pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
+  }
+
+  async function _proceedPremPayment(plan) {
+    const planInfo = PREMIUM_PLANS[plan] || PREMIUM_PLANS.monthly;
+    const price = planInfo.price;
     const ref = 'subsidi-prem-' + userId + '-' + Date.now();
 
     // Save pending premium payment to localStorage so we can verify after redirect

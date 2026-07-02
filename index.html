@@ -3417,27 +3417,9 @@
         if (vData.sessionToken) localStorage.setItem('subsidi_session_token', vData.sessionToken);
         try { await callEdge('update-last-scan', { userId }); } catch(e) { console.warn('last_scan update failed:', e); }
 
-        try {
-          showSpinner('Loading your account...');
-          const userData = await callEdge('get-user', { userId });
-          if (userData && !userData.error) {
-            balance = userData.balance ?? 100;
-            subsidyFund = userData.subsidyFund ?? 0;
-            username = userData.username || username;
-            (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
-            const whole = Math.floor(balance).toLocaleString();
-            const dec = (balance % 1).toFixed(2).slice(1);
-            document.getElementById('bal-display').innerHTML =
-              '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-          }
-        } catch(e) {
-          console.warn('post-login fetch failed:', e);
-        } finally {
-          hideSpinner();
-        }
         show('dash');
-        updateSubsidyUI();
-        renderBundles();
+        await fetchUserData();
+        window.scrollTo(0, 0);
       } else {
         err.textContent = 'Incorrect phone or PIN.';
         err.classList.add('show');

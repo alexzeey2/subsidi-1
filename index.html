@@ -579,12 +579,12 @@
 
     <!-- Step 0: Choose path -->
     <div class="reg-step active" id="reg-step-choice">
+      <div class="reg-back-wrap"><button class="reg-back" onclick="backToGuest()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Back</button></div>
       <div class="reg-title">Get started</div>
       <div class="reg-sub">Do you have an existing Subsidi account?</div>
       <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px;">
-        <button class="reg-btn" onclick="chooseNewAccount()">New Account</button>
-        <button class="reg-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);" onclick="chooseMyAccount()">My Account</button>
-        <button class="reg-btn" style="background:transparent;border:none;color:var(--p-light);font-size:13px;margin-top:4px;" onclick="chooseNoCard()">I don't have a card</button>
+        <button class="reg-btn" onclick="chooseNewAccount()">Create Account</button>
+        <button class="reg-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);" onclick="chooseMyAccount()">I already have an account</button>
       </div>
     </div>
 
@@ -1106,6 +1106,61 @@
 </div>
 
 <!-- ── COLLECT: REFERRAL GATE SHEET ── -->
+
+<!-- ── RAFFLE SCAN SHEET (₦50,000 card-scan promo) ── -->
+<div class="refer-ov" id="raffle-scan-ov">
+  <div class="refer-sheet">
+    <div class="sh-bar"></div>
+    <div style="display:flex;justify-content:flex-end;margin:-6px -6px 4px;">
+      <div onclick="closeRaffleScan()" style="width:32px;height:32px;border-radius:50%;background:var(--w15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--w40)">×</div>
+    </div>
+
+    <div id="raffle-scan-view">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:#F5A623;margin-bottom:4px;">Scan your card</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold your Subsidi card up to the camera to enter the ₦50,000 draw</div>
+      </div>
+
+      <div style="position:relative;width:100%;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
+        <video id="raffle-video" style="width:100%;display:block;border-radius:20px;" autoplay playsinline muted></video>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+          <div style="width:160px;height:160px;position:relative;">
+            <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-top:3px solid #F5A623;border-left:3px solid #F5A623;border-radius:4px 0 0 0;"></div>
+            <div style="position:absolute;top:0;right:0;width:32px;height:32px;border-top:3px solid #F5A623;border-right:3px solid #F5A623;border-radius:0 4px 0 0;"></div>
+            <div style="position:absolute;bottom:0;left:0;width:32px;height:32px;border-bottom:3px solid #F5A623;border-left:3px solid #F5A623;border-radius:0 0 0 4px;"></div>
+            <div style="position:absolute;bottom:0;right:0;width:32px;height:32px;border-bottom:3px solid #F5A623;border-right:3px solid #F5A623;border-radius:0 0 4px 0;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="raffle-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:14px;">Starting camera...</div>
+      <div style="text-align:center;">
+        <a href="javascript:void(0)" onclick="closeRaffleScan();navTo('ordercard')" style="font-size:12px;color:var(--p-light);">I don't have a card</a>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div id="raffle-success-view" style="display:none;text-align:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(245,166,35,.12);border:1.5px solid rgba(245,166,35,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <span style="font-size:28px;">🎉</span>
+      </div>
+      <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:#F5A623;margin-bottom:6px;">You're entered!</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">Good luck — we'll announce the winner in the app.</div>
+      <button class="reg-btn" onclick="closeRaffleScan()" style="width:100%;background:linear-gradient(135deg,#b87010,#F5A623);color:#000;font-weight:700;">Done</button>
+    </div>
+
+    <!-- Error -->
+    <div id="raffle-error-view" style="display:none;text-align:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,80,80,.08);border:1.5px solid rgba(255,80,80,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <span style="font-size:28px;">⚠️</span>
+      </div>
+      <div id="raffle-error-msg" style="font-size:14px;color:#ff6b6b;margin-bottom:20px;line-height:1.6;"></div>
+      <button class="reg-btn" onclick="retryRaffleScan()" style="width:100%;margin-bottom:10px;">Try Again</button>
+      <button class="refer-close" onclick="closeRaffleScan()">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── REWARDS SCREEN ── -->
 <div class="screen" id="ordercard" style="background:var(--dark);padding-bottom:90px;overflow-y:auto">
 
@@ -1531,6 +1586,7 @@
           poolBalance = data.poolBalance ?? 0;
         }
 
+        maybeShowRaffleNudge();
         renderBundles();
       }
     } catch(e) {
@@ -1809,17 +1865,13 @@
 
   function chooseNewAccount() {
     scanIntent = 'new';
-    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
-    document.getElementById('reg-step-2').classList.add('active');
-    startRegScan();
+    chooseNoCard();
   }
 
   function chooseMyAccount() {
     scanIntent = 'login';
     show('reg-screen');
-    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
-    document.getElementById('reg-step-2').classList.add('active');
-    startRegScan();
+    chooseNoCard();
   }
 
   async function startRegScan() {
@@ -2058,6 +2110,13 @@
     }
   }
 
+
+  function backToGuest() {
+    isGuest = true;
+    document.querySelectorAll('.reg-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('reg-step-choice').classList.add('active');
+    show('dash');
+  }
 
   function backToChoice() {
     stopStream(regStream);
@@ -4066,6 +4125,144 @@
       localStorage.removeItem('pendingPremium');
       alert('Something went wrong. Please try again.');
     }
+  }
+</script>
+
+<script>
+  // ── RAFFLE NUDGE (₦50,000 card-scan promo) ──────────────────────
+  // Re-checks on app open/refresh only (no live timers). Shown at most once
+  // per hour; backs off to once every few days after the user taps "Later".
+  const RAFFLE_RECHECK_MS = 60 * 60 * 1000;            // 1 hour
+  const RAFFLE_DISMISS_MS = 3 * 24 * 60 * 60 * 1000;   // 3 days
+
+  function maybeShowRaffleNudge() {
+    if (isGuest || registeredCard) return; // only nudge logged-in users without a linked card
+    const nextShow = parseInt(localStorage.getItem('subsidi_raffle_next_show') || '0', 10);
+    if (Date.now() < nextShow) return;
+    setTimeout(showRaffleNudge, 1500);
+  }
+
+  function showRaffleNudge() {
+    if (isGuest || registeredCard || document.getElementById('_raffle')) return;
+    localStorage.setItem('subsidi_raffle_next_show', String(Date.now() + RAFFLE_RECHECK_MS));
+
+    const d = document.createElement('div');
+    d.id = '_raffle';
+    d.style.cssText = 'position:fixed;bottom:80px;left:12px;right:12px;background:#161622;border:1px solid rgba(245,166,35,.5);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;z-index:9999;box-shadow:0 0 24px rgba(245,166,35,.2);animation:_ni .4s cubic-bezier(.22,1,.36,1)';
+    d.innerHTML = `
+      <style>@keyframes _ni{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}</style>
+      <div style="font-size:22px;">🎉</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px">Win ₦50,000</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4)">Scan your card for a chance to win</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button id="_raffle_y" style="background:linear-gradient(135deg,#b87010,#F5A623);border:none;border-radius:10px;color:#000;font-size:12px;font-weight:800;padding:9px 14px;cursor:pointer">Scan Card</button>
+        <button id="_raffle_n" style="background:transparent;border:none;color:rgba(255,255,255,.3);font-size:11px;cursor:pointer">Later</button>
+      </div>`;
+    document.body.appendChild(d);
+    document.getElementById('_raffle_y').onclick = () => { d.remove(); openRaffleScan(); };
+    document.getElementById('_raffle_n').onclick = () => {
+      localStorage.setItem('subsidi_raffle_next_show', String(Date.now() + RAFFLE_DISMISS_MS));
+      d.remove();
+    };
+  }
+
+  // ── RAFFLE SCAN SHEET ──
+  let raffleStream = null;
+  let raffleScanLoop = null;
+
+  function openRaffleScan() {
+    const ov = document.getElementById('raffle-scan-ov');
+    document.getElementById('raffle-scan-view').style.display = 'block';
+    document.getElementById('raffle-success-view').style.display = 'none';
+    document.getElementById('raffle-error-view').style.display = 'none';
+    document.getElementById('raffle-scan-status').textContent = 'Starting camera...';
+    ov.classList.add('open');
+    startRaffleScan();
+  }
+
+  function closeRaffleScan() {
+    stopRaffleScan();
+    document.getElementById('raffle-scan-ov').classList.remove('open');
+  }
+
+  async function startRaffleScan() {
+    try {
+      raffleStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      const video = document.getElementById('raffle-video');
+      video.srcObject = raffleStream;
+      video.play();
+      document.getElementById('raffle-scan-status').textContent = 'Camera active — scan your Subsidi card';
+      raffleScanFrame();
+    } catch(e) {
+      document.getElementById('raffle-scan-status').textContent = '⚠️ Camera blocked. Allow camera access and try again.';
+    }
+  }
+
+  function stopRaffleScan() {
+    clearTimeout(raffleScanLoop);
+    raffleScanLoop = null;
+    if (raffleStream) {
+      raffleStream.getTracks().forEach(t => t.stop());
+      raffleStream = null;
+    }
+  }
+
+  function raffleScanFrame() {
+    const video = document.getElementById('raffle-video');
+    if (video && video.readyState === video.HAVE_ENOUGH_DATA) {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code && code.data) {
+        const raw = code.data.trim();
+        const isValidCard = raw === 'SUBSIDI_ACTIVATE_CARD_V1' || raw.startsWith('https://subsidi-1.vercel.app');
+        if (isValidCard) {
+          stopRaffleScan();
+          submitRaffleEntry(raw);
+          return;
+        }
+      }
+    }
+    raffleScanLoop = setTimeout(raffleScanFrame, 200);
+  }
+
+  // NOTE: 'link-card-raffle' is a NEW Supabase edge function — see chat notes.
+  // It should: verify the card exists & isn't already linked to another
+  // account, link cardCode to userId, record a raffle entry, and return
+  // { success: true } or { success: false, error: 'Card not found' | 'Card already linked' }.
+  async function submitRaffleEntry(cardCode) {
+    document.getElementById('raffle-scan-view').style.display = 'none';
+    try {
+      const data = await callEdge('link-card-raffle', { userId, cardCode });
+      if (data.success) {
+        registeredCard = cardCode;
+        document.getElementById('raffle-success-view').style.display = 'block';
+        document.getElementById('raffle-error-view').style.display = 'none';
+      } else {
+        const msgs = {
+          'Card not found': "We couldn't find that card.",
+          'Card already linked': 'This card is already linked to another account.',
+        };
+        document.getElementById('raffle-error-msg').textContent = msgs[data.error] || 'Something went wrong. Please try again.';
+        document.getElementById('raffle-error-view').style.display = 'block';
+      }
+    } catch(e) {
+      document.getElementById('raffle-error-msg').textContent = 'Network error. Please try again.';
+      document.getElementById('raffle-error-view').style.display = 'block';
+    }
+  }
+
+  function retryRaffleScan() {
+    document.getElementById('raffle-error-view').style.display = 'none';
+    document.getElementById('raffle-scan-view').style.display = 'block';
+    document.getElementById('raffle-scan-status').textContent = 'Starting camera...';
+    startRaffleScan();
   }
 </script>
 

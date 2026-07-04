@@ -2401,10 +2401,11 @@
 
     const isExpensive = subCostCount === 0;
 
-    // Cheap plan tapped while a premium discount preview is active → show the real
-    // Unlock Premium sheet with actual prices. Guests never reach this — the
-    // gateCheck above already sent them to login/register first.
-    if (!isExpensive && (premDemoActive || premDemoSeen) && !premiumUnlocked) {
+    // Any plan (cheap or Golden) tapped while a premium discount preview is active
+    // but not actually paid for → show the real Unlock Premium sheet with actual
+    // prices instead of letting the previewed discount go through. Guests never
+    // reach this — the gateCheck above already sent them to login/register first.
+    if ((premDemoActive || premDemoSeen) && !premiumUnlocked) {
       showPremUnlockSheet(true);
       return;
     }
@@ -4139,6 +4140,7 @@
   async function _proceedPremPayment(plan, name, phone, location) {
     const planInfo = PREMIUM_PLANS[plan] || PREMIUM_PLANS.boss;
     const price = planInfo.price;
+    const email = (username || userId) + '@subsidi.app';
     const ref = 'subsidi-prem-' + userId + '-' + Date.now();
 
     // Save pending premium payment to localStorage so we can verify after redirect

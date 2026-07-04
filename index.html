@@ -1286,6 +1286,61 @@
   </div>
 </div>
 
+<!-- ── REFUND WALLET SHEET ── -->
+<div class="overlay" id="refund-ov" onclick="closeRefundSheet(event)" style="display:none;align-items:flex-end;">
+  <div class="sheet" style="padding-bottom:32px;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;" onclick="event.stopPropagation()">
+    <div class="sh-bar"></div>
+    <div style="text-align:center;padding:4px 20px 0;">
+      <div style="font-size:22px;margin-bottom:6px;">💰</div>
+      <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px;">Refund Request</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:20px;">This permanently disables your premium toggle.</div>
+    </div>
+
+    <div style="margin:0 20px 16px;background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:13px;color:var(--w40);">You paid</span>
+        <span id="refund-paid-amount" style="font-size:15px;font-weight:700;color:var(--w70);">₦0</span>
+      </div>
+      <div id="refund-card-fee-row" style="display:none;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:13px;color:var(--w40);">Card production fee</span>
+        <span id="refund-card-fee-amount" style="font-size:15px;font-weight:700;color:#F5A623;">− ₦0</span>
+      </div>
+      <div style="height:1px;background:var(--border);margin:10px 0;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:14px;font-weight:700;color:#fff;">You'll receive</span>
+        <span id="refund-net-amount" style="font-size:22px;font-weight:900;color:#fff;">₦0</span>
+      </div>
+    </div>
+
+    <div style="margin:0 20px 20px;font-size:12px;color:var(--w40);line-height:1.6;">
+      ⏳ Refunds are processed manually and take <strong style="color:var(--w70);">4–5 business days</strong> to arrive after you submit your bank details.
+    </div>
+
+    <div style="margin:0 20px 20px;">
+      <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:10px;padding-left:4px">Bank details</div>
+      <div style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+          <input id="refund-bank-input" type="text" placeholder="Bank name"
+            style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit">
+        </div>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+          <input id="refund-account-input" type="text" inputmode="numeric" maxlength="10" placeholder="Account number"
+            style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit"
+            oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)">
+        </div>
+      </div>
+      <div class="reg-err" id="refund-details-err" style="margin-bottom:4px"></div>
+    </div>
+
+    <div style="display:flex;gap:12px;padding:0 20px;">
+      <button onclick="closeRefundSheet()" style="flex:1;padding:15px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w50);font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
+      <button onclick="_submitRefundRequest()" style="flex:1;padding:15px;background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));border:none;border-radius:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;">Submit</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── PREMIUM DISCOUNT PICKER (preview only — no prices, no payment) ── -->
 <div class="overlay" id="prem-pick-ov" onclick="closePremDiscountPick(event)" style="display:none;align-items:flex-end;">
   <div class="sheet" style="padding-bottom:32px;" onclick="event.stopPropagation()">
@@ -1295,23 +1350,29 @@
       <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px;">Pick your discount</div>
       <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:20px;">See how much cheaper your data gets on each tier.</div>
     </div>
-    <div style="display:flex;gap:10px;padding:0 20px;">
-      <div id="pick-card-newbie" onclick="pickPremDiscount('newbie')" style="flex:1;border-radius:16px;padding:20px 6px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-3);border:1.5px solid var(--border);opacity:0.55;">
-        <div style="font-size:11px;font-weight:800;color:var(--w40);letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px;">Newbie</div>
-        <div style="font-size:24px;font-weight:900;color:#fff;">30%</div>
-        <div style="font-size:10px;font-weight:600;color:var(--w40);letter-spacing:.5px;text-transform:uppercase;margin-top:2px;">off</div>
+    <div style="display:flex;gap:6px;padding:0 16px;">
+      <div id="pick-card-free" onclick="pickPremDiscount('free')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-3);border:1.5px solid var(--border);opacity:0.55;">
+        <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px;">Free</div>
+        <div style="font-size:19px;font-weight:900;color:#fff;">20%</div>
+        <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off</div>
       </div>
-      <div id="pick-card-boss" onclick="pickPremDiscount('boss')" style="flex:1;border-radius:16px;padding:20px 6px;text-align:center;cursor:pointer;transition:all .2s;background:var(--p-subtle);border:1.5px solid var(--p);">
-        <div style="font-size:11px;font-weight:800;color:var(--p-light);letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px;">Boss</div>
-        <div style="font-size:24px;font-weight:900;color:var(--p-light);">50%</div>
-        <div style="font-size:10px;font-weight:600;color:var(--w40);letter-spacing:.5px;text-transform:uppercase;margin-top:2px;">off</div>
+      <div id="pick-card-newbie" onclick="pickPremDiscount('newbie')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-3);border:1.5px solid var(--border);opacity:0.55;">
+        <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px;">Newbie</div>
+        <div style="font-size:19px;font-weight:900;color:#fff;">25%</div>
+        <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off</div>
       </div>
-      <div id="pick-card-ceo" onclick="pickPremDiscount('ceo')" style="flex:1;border-radius:16px;padding:20px 6px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-3);border:1.5px solid var(--border);opacity:0.55;">
-        <div style="font-size:11px;font-weight:800;color:var(--w40);letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px;">CEO</div>
-        <div style="font-size:24px;font-weight:900;color:var(--w40);">60%</div>
-        <div style="font-size:10px;font-weight:600;color:var(--w40);letter-spacing:.5px;text-transform:uppercase;margin-top:2px;">off</div>
+      <div id="pick-card-boss" onclick="pickPremDiscount('boss')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--p-subtle);border:1.5px solid var(--p);">
+        <div style="font-size:9.5px;font-weight:800;color:var(--p-light);letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px;">Boss</div>
+        <div style="font-size:19px;font-weight:900;color:var(--p-light);">40%</div>
+        <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off</div>
+      </div>
+      <div id="pick-card-ceo" onclick="pickPremDiscount('ceo')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-3);border:1.5px solid var(--border);opacity:0.55;">
+        <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px;">CEO</div>
+        <div style="font-size:19px;font-weight:900;color:var(--w40);">60%</div>
+        <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off</div>
       </div>
     </div>
+    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">Free tier applies to ₦100–₦500 plans only</div>
   </div>
 </div>
 
@@ -1329,39 +1390,60 @@
     </div>
 
     <!-- Plan selector cards -->
-    <div style="display:flex;gap:8px;padding:0 20px;margin-bottom:20px;">
+    <div style="display:flex;gap:6px;padding:0 16px;margin-bottom:20px;">
+
+      <!-- Free -->
+      <div id="prem-btn-free" onclick="selectPremPlan('free')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;">
+        <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Free</div>
+        <div style="font-size:15px;font-weight:900;color:var(--w40);">₦0</div>
+        <div style="font-size:8.5px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:3px;">scan card</div>
+      </div>
 
       <!-- Newbie -->
-      <div id="prem-btn-newbie" onclick="selectPremPlan('newbie')" style="flex:1;border-radius:14px;padding:12px 6px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;">
-        <div style="font-size:10px;font-weight:800;color:var(--w40);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;">Newbie</div>
-        <div style="font-size:17px;font-weight:900;color:var(--w40);">₦3,000</div>
-        <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.6px;text-transform:uppercase;margin-top:3px;">one-time</div>
+      <div id="prem-btn-newbie" onclick="selectPremPlan('newbie')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;">
+        <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Newbie</div>
+        <div style="font-size:15px;font-weight:900;color:var(--w40);">₦3,000</div>
+        <div style="font-size:8.5px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:3px;">one-time</div>
       </div>
 
       <!-- Boss -->
-      <div id="prem-btn-boss" onclick="selectPremPlan('boss')" style="flex:1;border-radius:14px;padding:12px 6px;text-align:center;cursor:pointer;transition:all .2s;background:var(--p-subtle);border:1.5px solid var(--p);">
-        <div style="font-size:10px;font-weight:800;color:var(--p-light);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;">Boss</div>
-        <div style="font-size:17px;font-weight:900;color:var(--p-light);">₦8,000</div>
-        <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.6px;text-transform:uppercase;margin-top:3px;">refundable</div>
+      <div id="prem-btn-boss" onclick="selectPremPlan('boss')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--p-subtle);border:1.5px solid var(--p);">
+        <div style="font-size:9.5px;font-weight:800;color:var(--p-light);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Boss</div>
+        <div style="font-size:15px;font-weight:900;color:var(--p-light);">₦8,000</div>
+        <div style="font-size:8.5px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:3px;">refundable</div>
       </div>
 
       <!-- CEO -->
-      <div id="prem-btn-ceo" onclick="selectPremPlan('ceo')" style="flex:1;border-radius:14px;padding:12px 6px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;">
-        <div style="font-size:10px;font-weight:800;color:var(--w40);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;">CEO</div>
-        <div style="font-size:17px;font-weight:900;color:var(--w40);">₦20,000</div>
-        <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.6px;text-transform:uppercase;margin-top:3px;">refundable</div>
+      <div id="prem-btn-ceo" onclick="selectPremPlan('ceo')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;">
+        <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">CEO</div>
+        <div style="font-size:15px;font-weight:900;color:var(--w40);">₦20,000</div>
+        <div style="font-size:8.5px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:3px;">refundable</div>
       </div>
 
     </div>
 
     <!-- Benefits box: clipping container -->
     <div style="overflow:hidden;position:relative;padding:0 20px;margin-bottom:20px;">
-      <div id="prem-benefits-inner" style="display:flex;width:300%;transform:translateX(-33.3333%);transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
+      <div id="prem-benefits-inner" style="display:flex;width:400%;transform:translateX(-25%);transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
+
+        <!-- Free benefits -->
+        <div style="flex-shrink:0;width:25%;box-sizing:border-box;padding-right:6px;">
+          <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:16px 20px;">
+            <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:2px;">20% off</div>
+            <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">plans priced ₦100–₦500 only</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--w70);font-weight:800;">✓</span> Uses the same card you already scan to log in</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--w70);font-weight:800;">✓</span> One purchase every 7 days</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);"><span style="color:var(--w40);font-weight:800;">✕</span> Doesn't apply to plans above ₦500</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);"><span style="color:var(--w40);font-weight:800;">✕</span> Free — nothing to refund</div>
+            </div>
+          </div>
+        </div>
 
         <!-- Newbie benefits -->
-        <div style="flex-shrink:0;width:33.3333%;box-sizing:border-box;padding-right:6px;">
+        <div style="flex-shrink:0;width:25%;box-sizing:border-box;padding:0 3px;">
           <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:16px 20px;">
-            <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:2px;">30% off</div>
+            <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:2px;">25% off</div>
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">already-discounted cheap plans</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--w70);font-weight:800;">✓</span> Works even when your subsidy fund is empty</div>
@@ -1373,10 +1455,10 @@
         </div>
 
         <!-- Boss benefits -->
-        <div style="flex-shrink:0;width:33.3333%;box-sizing:border-box;padding:0 3px;">
+        <div style="flex-shrink:0;width:25%;box-sizing:border-box;padding:0 3px;">
           <div style="background:var(--dark-3);border:1px solid rgba(108,43,217,.4);border-radius:16px;padding:16px 20px;">
             <img src="https://i.postimg.cc/TPyH4bRD/1780031419244-removebg-preview.png" alt="Boss Card" style="width:100%;border-radius:12px;margin-bottom:14px;">
-            <div style="font-size:20px;font-weight:900;color:var(--p-light);margin-bottom:2px;">50% off</div>
+            <div style="font-size:20px;font-weight:900;color:var(--p-light);margin-bottom:2px;">40% off</div>
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">already-discounted cheap plans</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Works even when your subsidy fund is empty</div>
@@ -1388,7 +1470,7 @@
         </div>
 
         <!-- CEO benefits -->
-        <div style="flex-shrink:0;width:33.3333%;box-sizing:border-box;padding-left:6px;">
+        <div style="flex-shrink:0;width:25%;box-sizing:border-box;padding-left:6px;">
           <div style="background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
             <img src="https://i.postimg.cc/QMbVvFSz/1780768681291-removebg-preview.png" alt="CEO Card" style="width:100%;border-radius:12px;margin-bottom:14px;">
             <div style="font-size:20px;font-weight:900;color:#F5A623;margin-bottom:2px;">60% off</div>
@@ -1510,8 +1592,9 @@
   let premiumLastUsed = 0;       // timestamp of last premium purchase
   let premiumPlan = 'boss';   // which plan is active: 'newbie' (₦3,000), 'boss' (₦8,000), or 'ceo' (₦20,000)
   const PREMIUM_PLANS = {
-    newbie: { price: 3000,  label: 'one-time', cooldownHrs: 72, hasCard: false, discountPct: 30, refundable: false },
-    boss:  { price: 8000,  label: 'refundable', cooldownHrs: 72, hasCard: true, discountPct: 50, refundable: true },
+    free:   { price: 0,     label: 'free', cooldownHrs: 168, hasCard: false, discountPct: 20, refundable: false, priceBandMin: 100, priceBandMax: 500 },
+    newbie: { price: 3000,  label: 'one-time', cooldownHrs: 72, hasCard: false, discountPct: 25, refundable: false },
+    boss:  { price: 8000,  label: 'refundable', cooldownHrs: 72, hasCard: true, discountPct: 40, refundable: true },
     ceo:    { price: 20000, label: 'refundable', cooldownHrs: 72, hasCard: true,  discountPct: 60, refundable: true }
   };
   let poolBalance = 0;           // reward pool balance — loaded from DB
@@ -2765,18 +2848,23 @@
       let isPremiumActive = false;
       let displayPriceFinal = displayPrice;
       if (premiumToggleOn || premDemoActive) {
-        isPremiumActive = true;
         // Use the tier actually purchased once unlocked; otherwise the tier being previewed in the picker
         const activePlan = premiumUnlocked ? premiumPlan : demoSelectedPlan;
-        const discountPct = (PREMIUM_PLANS[activePlan] || PREMIUM_PLANS.boss).discountPct || 50;
-        const keepFraction = (100 - discountPct) / 100;
-        if (!isExpensive) {
-          // Cheap plans: tier discount off the already-subsidised price
-          const subsidised = basePrice - 120;
-          displayPriceFinal = Math.max(50, Math.round((subsidised * keepFraction) / 5) * 5);
-        } else {
-          // Golden plans: tier discount off base price (first discount)
-          displayPriceFinal = Math.max(50, Math.round((basePrice * keepFraction) / 5) * 5);
+        const planData = PREMIUM_PLANS[activePlan] || PREMIUM_PLANS.boss;
+        // Free tier only discounts plans priced ₦100–₦500; other tiers have no price cap
+        const inFreeBand = activePlan !== 'free' || (basePrice >= planData.priceBandMin && basePrice <= planData.priceBandMax);
+        if (inFreeBand) {
+          isPremiumActive = true;
+          const discountPct = planData.discountPct || 50;
+          const keepFraction = (100 - discountPct) / 100;
+          if (!isExpensive) {
+            // Cheap plans: tier discount off the already-subsidised price
+            const subsidised = basePrice - 120;
+            displayPriceFinal = Math.max(50, Math.round((subsidised * keepFraction) / 5) * 5);
+          } else {
+            // Golden plans: tier discount off base price (first discount)
+            displayPriceFinal = Math.max(50, Math.round((basePrice * keepFraction) / 5) * 5);
+          }
         }
       }
       const strikePrice = (hasDiscount || isPremiumActive) ? basePrice : '';
@@ -3142,6 +3230,79 @@
     const ov = document.getElementById('wa-premium-ov');
     window.open(buildWaPremiumLink(ov._waName, ov._waPhone, ov._waLocation), '_blank');
     closeWaPremiumSheet();
+  }
+
+  // ── Refund Wallet ──
+  function openRefundSheet() {
+    const planInfo = PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.boss;
+    const cardFee = planInfo.hasCard ? 4000 : 0;
+    const net = Math.max(0, planInfo.price - cardFee);
+
+    const paidEl = document.getElementById('refund-paid-amount');
+    const feeRow = document.getElementById('refund-card-fee-row');
+    const feeEl = document.getElementById('refund-card-fee-amount');
+    const netEl = document.getElementById('refund-net-amount');
+    if (paidEl) paidEl.textContent = '₦' + planInfo.price.toLocaleString();
+    if (feeRow) feeRow.style.display = cardFee > 0 ? 'flex' : 'none';
+    if (feeEl) feeEl.textContent = '− ₦' + cardFee.toLocaleString();
+    if (netEl) netEl.textContent = '₦' + net.toLocaleString();
+
+    const ov = document.getElementById('refund-ov');
+    if (ov) { ov.style.display = 'flex'; setTimeout(() => ov.classList.add('open'), 10); }
+  }
+
+  function closeRefundSheet(e) {
+    if (e && e.target !== document.getElementById('refund-ov')) return;
+    const ov = document.getElementById('refund-ov');
+    if (ov) { ov.classList.remove('open'); setTimeout(() => { ov.style.display = 'none'; }, 300); }
+  }
+
+  function buildWaRefundMessage(plan, amount, bank, account) {
+    return 'I would like to request a Subsidi Premium refund\n\nPlan: ' + PREM_PLAN_LABEL[plan] + '\nAmount to refund: ₦' + amount.toLocaleString() + '\nBank: ' + bank + '\nAccount number: ' + account + '\n\n> from Subsidi';
+  }
+
+  async function _submitRefundRequest() {
+    const bank = (document.getElementById('refund-bank-input')?.value || '').trim();
+    const account = (document.getElementById('refund-account-input')?.value || '').trim();
+    const errEl = document.getElementById('refund-details-err');
+
+    if (!bank || !account) {
+      if (errEl) errEl.textContent = 'Please fill in your bank name and account number.';
+      return;
+    }
+    if (account.length < 10) {
+      if (errEl) errEl.textContent = 'Enter a valid account number.';
+      return;
+    }
+
+    const planInfo = PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.boss;
+    const cardFee = planInfo.hasCard ? 4000 : 0;
+    const netAmount = Math.max(0, planInfo.price - cardFee);
+    const plan = premiumPlan;
+
+    closeRefundSheet();
+    showSpinner('Submitting refund request...');
+
+    try {
+      await callEdge('request-refund', { userId, plan, bank, account, amount: netAmount });
+    } catch (e) {
+      // Even if logging fails, the WhatsApp message still reaches Somto — don't block the person.
+      console.error('Failed to log refund request:', e);
+    }
+    hideSpinner();
+
+    // Toggle stops working immediately, before they even send the WhatsApp message
+    premiumUnlocked = false;
+    premiumToggleOn = false;
+    setPremToggleUI(false);
+    renderBundles();
+
+    window.open(buildWaRefundLink(plan, netAmount, bank, account), '_blank');
+  }
+
+  function buildWaRefundLink(plan, amount, bank, account) {
+    const msg = buildWaRefundMessage(plan, amount, bank, account);
+    return 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
   }
 
   // ── WhatsApp number (shared) ──
@@ -3672,13 +3833,14 @@
   function checkWaJoined() {}
 
   // ── PREMIUM PLAN SELECTOR ──
-  const PREM_PLAN_ORDER = ['newbie', 'boss', 'ceo'];
+  const PREM_PLAN_ORDER = ['free', 'newbie', 'boss', 'ceo'];
   const PREM_PLAN_STYLE = {
+    free:   { active: { bg: 'var(--dark-4)', border: 'var(--border)', text: '#fff' }, btnGradient: 'linear-gradient(90deg,var(--dark-4),var(--border))', btnText: '#fff' },
     newbie: { active: { bg: 'var(--dark-4)', border: 'var(--border)', text: '#fff' }, btnGradient: 'linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light))', btnText: '#fff' },
     boss:  { active: { bg: 'var(--p-subtle)', border: 'var(--p)', text: 'var(--p-light)' }, btnGradient: 'linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light))', btnText: '#fff' },
     ceo:    { active: { bg: 'rgba(245,166,35,0.1)', border: '#F5A623', text: '#F5A623' }, btnGradient: 'linear-gradient(90deg,#b87010,#F5A623)', btnText: '#000' }
   };
-  const PREM_PLAN_LABEL = { newbie: 'Newbie', boss: 'Boss', ceo: 'CEO' };
+  const PREM_PLAN_LABEL = { free: 'Free', newbie: 'Newbie', boss: 'Boss', ceo: 'CEO' };
 
   function selectPremPlan(plan) {
     const idx = PREM_PLAN_ORDER.indexOf(plan);
@@ -3687,7 +3849,7 @@
     const btn = document.getElementById('prem-unlock-btn');
 
     if (inner) {
-      inner.style.transform = 'translateX(-' + (idx * 33.3333) + '%)';
+      inner.style.transform = 'translateX(-' + (idx * 25) + '%)';
     }
 
     PREM_PLAN_ORDER.forEach(p => {
@@ -3710,10 +3872,27 @@
 
     if (btn) {
       const s = PREM_PLAN_STYLE[plan];
-      btn.style.background = s.btnGradient;
-      btn.style.color = s.btnText;
-      btn.textContent = 'Unlock Premium — ' + PREM_PLAN_LABEL[plan];
-      btn.setAttribute('onclick', "payPremiumUnlock('" + plan + "')");
+      const isCurrentPlan = premiumUnlocked && plan === premiumPlan;
+      if (isCurrentPlan) {
+        btn.style.background = 'var(--dark-4)';
+        btn.style.color = 'var(--w40)';
+        btn.textContent = '✓ Subscribed — ' + PREM_PLAN_LABEL[plan];
+        btn.setAttribute('onclick', '');
+        btn.style.cursor = 'default';
+      } else if (plan === 'free') {
+        // Free tier: no payment — just activates directly using the card already on file
+        btn.style.background = s.btnGradient;
+        btn.style.color = s.btnText;
+        btn.style.cursor = 'pointer';
+        btn.textContent = 'Activate Free Tier';
+        btn.setAttribute('onclick', "activateFreePremium()");
+      } else {
+        btn.style.background = s.btnGradient;
+        btn.style.color = s.btnText;
+        btn.style.cursor = 'pointer';
+        btn.textContent = 'Unlock Premium — ' + PREM_PLAN_LABEL[plan];
+        btn.setAttribute('onclick', "payPremiumUnlock('" + plan + "')");
+      }
     }
   }
 
@@ -3787,9 +3966,18 @@
         <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:8px;">Cooldown Active</div>
         <div style="font-size:13px;color:var(--w40);margin-bottom:20px;line-height:1.6;">Your next premium purchase is available in</div>
         <div id="prem-countdown" style="font-size:36px;font-weight:900;color:#F5A623;letter-spacing:2px;font-variant-numeric:tabular-nums;margin-bottom:24px;">--:--:--</div>
-        <button onclick="document.getElementById('${popId}').remove();clearInterval(window._premCdTimer);" style="width:100%;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">Got it</button>
+        <div style="display:flex;gap:10px;">
+          <button onclick="document.getElementById('${popId}').remove();clearInterval(window._premCdTimer);openPremUpgradeSheet();" style="flex:1;padding:14px;background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));border:none;border-radius:14px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;">Upgrade</button>
+          <button id="prem-cooldown-refund-btn" onclick="document.getElementById('${popId}').remove();clearInterval(window._premCdTimer);openRefundSheet();" style="flex:1;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:13px;font-weight:700;cursor:pointer;display:none;">Refund Me</button>
+        </div>
       </div>`;
     document.body.appendChild(pop);
+
+    // Only show "Refund Me" for refundable plans (Boss/CEO) — Free and Newbie have nothing to refund
+    const refundBtn = document.getElementById('prem-cooldown-refund-btn');
+    if (refundBtn && (PREMIUM_PLANS[premiumPlan] || {}).refundable) {
+      refundBtn.style.display = 'block';
+    }
 
     // Live countdown
     function tick() {
@@ -3872,13 +4060,14 @@
 
   // ── DISCOUNT PICKER (preview only) ──
   const PICK_CARD_STYLE = {
+    free:   { active: { bg: 'var(--dark-4)', border: 'var(--border)', text: '#fff' } },
     newbie: { active: { bg: 'var(--dark-4)', border: 'var(--border)', text: '#fff' } },
     boss:  { active: { bg: 'var(--p-subtle)', border: 'var(--p)', text: 'var(--p-light)' } },
     ceo:    { active: { bg: 'rgba(245,166,35,0.1)', border: '#F5A623', text: '#F5A623' } }
   };
 
   function highlightPickCard(plan) {
-    ['newbie', 'boss', 'ceo'].forEach(p => {
+    ['free', 'newbie', 'boss', 'ceo'].forEach(p => {
       const card = document.getElementById('pick-card-' + p);
       if (!card) return;
       const pctDiv = card.children[1];
@@ -4012,6 +4201,18 @@
     });
   }
 
+  // Opened from the cooldown popup's "Upgrade" button — shows the plan sheet with
+  // whichever plan the user currently has marked as Subscribed, rather than paid again.
+  function openPremUpgradeSheet() {
+    const label = document.getElementById('prem-sheet-context-label');
+    if (label) label.style.display = 'none';
+    const ov = document.getElementById('prem-unlock-ov');
+    if (ov) { ov.style.display = 'flex'; setTimeout(() => ov.classList.add('open'), 10); }
+    requestAnimationFrame(() => {
+      selectPremPlan(premiumPlan || 'boss');
+    });
+  }
+
   function closePremUnlockOv(e) {
     if (e && e.target !== document.getElementById('prem-unlock-ov')) return;
     _closePremUnlockOv();
@@ -4050,6 +4251,38 @@
     showPremTermsPopup(plan);
   }
 
+  async function activateFreePremium() {
+    if (isGuest) {
+      _closePremUnlockOv();
+      showGate('Create an account to unlock Premium', 'Register for free, then activate Premium.');
+      return;
+    }
+    if (!registeredCard) {
+      _closePremUnlockOv();
+      alert('You need a registered Subsidi card to activate the Free tier. Scan or register your card first.');
+      return;
+    }
+
+    _closePremUnlockOv();
+    showSpinner('Activating Free tier...');
+    try {
+      const result = await callEdge('activate-free-premium', { userId });
+      hideSpinner();
+      if (result && result.success) {
+        await fetchUserData();
+        premiumToggleOn = true;
+        setPremToggleUI(true);
+        renderBundles();
+        alert('Free tier activated! Enjoy 20% off data plans priced ₦100–₦500, every 7 days.');
+      } else {
+        alert('Could not activate Free tier: ' + (result?.error || 'Please try again.'));
+      }
+    } catch (e) {
+      hideSpinner();
+      alert('Something went wrong. Please try again.');
+    }
+  }
+
   function showPremTermsPopup(plan) {
     const popId = 'prem-terms-pop';
     const existing = document.getElementById(popId);
@@ -4074,15 +4307,17 @@
           </div>
           <div id="prem-policy-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
-              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Tiered Discount</strong> — Newbie gives 30% off, Boss gives 50% off, and CEO gives 60% off already-discounted cheap plans, on top of your existing subsidy discount.</p>
+              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Tiered Discount</strong> — Free gives 20% off (₦100–₦500 plans only), Newbie gives 25% off, Boss gives 40% off, and CEO gives 60% off already-discounted cheap plans, on top of your existing subsidy discount.</p>
               <p style="margin:0 0 10px;">🏦 <strong style="color:var(--w70);">How the Pool Is Funded</strong> — Your premium payment is placed in a high-yield savings vehicle. The interest it earns — not your principal — is what funds the shared discount pool for all premium members. If the pool balance is empty, toggles will temporarily remain off until the pool is topped up. This is not a bug — it is by design.</p>
-              <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Cooldown Period</strong> — After each data purchase using premium, your toggle turns off for 72 hours across all plans. Your toggle turns back on automatically when the cooldown is over, as long as the pool is funded.</p>
+              <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Cooldown Period</strong> — After each data purchase using premium, your toggle turns off for 72 hours (7 days on the Free tier). This gives every premium member a fair shot at the pool instead of a few people using it back-to-back. Your toggle turns back on automatically when the cooldown is over, as long as the pool is funded.</p>
+              <p style="margin:0 0 10px;">🆓 <strong style="color:var(--w70);">Free Tier</strong> — Activated by scanning your existing Subsidi card, at no cost. Gives 20% off data plans priced between ₦100 and ₦500 only, once every 7 days. Not refundable since nothing was paid.</p>
               <p style="margin:0 0 10px;">💳 <strong style="color:var(--w70);">Newbie Plan (₦3,000)</strong> — One-time payment, not refundable.</p>
-              <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Boss &amp; CEO Refund Wallet</strong> — You can request a refund of your premium payment at any time from your Refund Wallet. Refund requests are manually processed within 3 days. Requesting a refund permanently disables your premium toggle — you'll stop benefiting from the pool, and we stop paying your discounts. For the Boss and CEO plans, a ₦4,000 card production fee is deducted from your refund since you keep your physical Subsidi card. You do not earn interest on your premium payment — the interest is what funds the pool while your money is with us.</p>
+              <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Boss &amp; CEO Refund Wallet</strong> — You can request a refund of your premium payment at any time from your Refund Wallet. Refund requests are manually processed within 4–5 days. Requesting a refund permanently disables your premium toggle — you'll stop benefiting from the pool, and we stop paying your discounts. For the Boss and CEO plans, a ₦4,000 card production fee is deducted from your refund since you keep your physical Subsidi card. You do not earn interest on your premium payment — the interest is what funds the pool while your money is with us.</p>
             </div>
           </div>
         </div>
 
+        ${plan !== 'newbie' ? `
         <!-- Delivery / contact details -->
         <div style="margin-bottom:20px">
           <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:10px;padding-left:4px">Your details</div>
@@ -4107,11 +4342,12 @@
           </div>
           <div class="reg-err" id="prem-details-err" style="margin-bottom:4px"></div>
         </div>
+        ` : ''}
 
         <!-- Buttons -->
         <div style="display:flex;gap:12px;">
           <button onclick="document.getElementById('${popId}').remove();" style="flex:1;padding:15px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w50);font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
-          <button onclick="_submitPremTerms('${plan}','${popId}')" style="flex:1;padding:15px;background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));border:none;border-radius:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;">I Agree</button>
+          <button onclick="${plan === 'newbie' ? `document.getElementById('${popId}').remove();_proceedPremPayment('${plan}','','','')` : `_submitPremTerms('${plan}','${popId}')`}" style="flex:1;padding:15px;background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));border:none;border-radius:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;">I Agree</button>
         </div>
       </div>`;
     document.body.appendChild(pop);

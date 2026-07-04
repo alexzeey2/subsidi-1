@@ -1215,6 +1215,57 @@
   </div>
 </div>
 
+<!-- ── FREE TIER SCAN SHEET ── -->
+<div class="refer-ov" id="free-scan-ov">
+  <div class="refer-sheet">
+    <div class="sh-bar"></div>
+    <div style="display:flex;justify-content:flex-end;margin:-6px -6px 4px;">
+      <div onclick="closeFreeScan()" style="width:32px;height:32px;border-radius:50%;background:var(--w15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--w40)">×</div>
+    </div>
+
+    <div id="free-scan-view">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:#fff;margin-bottom:4px;">Scan a card</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold any Subsidi card up to the camera to activate the Free tier</div>
+      </div>
+
+      <div style="position:relative;width:100%;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
+        <video id="free-scan-video" style="width:100%;display:block;border-radius:20px;" autoplay playsinline muted></video>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+          <div style="width:160px;height:160px;position:relative;">
+            <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-top:3px solid #fff;border-left:3px solid #fff;border-radius:4px 0 0 0;"></div>
+            <div style="position:absolute;top:0;right:0;width:32px;height:32px;border-top:3px solid #fff;border-right:3px solid #fff;border-radius:0 4px 0 0;"></div>
+            <div style="position:absolute;bottom:0;left:0;width:32px;height:32px;border-bottom:3px solid #fff;border-left:3px solid #fff;border-radius:0 0 0 4px;"></div>
+            <div style="position:absolute;bottom:0;right:0;width:32px;height:32px;border-bottom:3px solid #fff;border-right:3px solid #fff;border-radius:0 0 4px 0;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="free-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:14px;">Starting camera...</div>
+    </div>
+
+    <!-- Success -->
+    <div id="free-success-view" style="display:none;text-align:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(0,200,150,.1);border:1.5px solid rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <span style="font-size:28px;">✓</span>
+      </div>
+      <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:var(--green);margin-bottom:6px;">Free tier activated!</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">20% off data plans priced ₦100–₦500+, every 7 days.</div>
+      <button class="reg-btn" onclick="closeFreeScan()" style="width:100%;">Done</button>
+    </div>
+
+    <!-- Error -->
+    <div id="free-error-view" style="display:none;text-align:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,80,80,.08);border:1.5px solid rgba(255,80,80,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <span style="font-size:28px;">⚠️</span>
+      </div>
+      <div id="free-error-msg" style="font-size:14px;color:#ff6b6b;margin-bottom:20px;line-height:1.6;"></div>
+      <button class="reg-btn" onclick="retryFreeScan()" style="width:100%;margin-bottom:10px;">Try Again</button>
+      <button class="refer-close" onclick="closeFreeScan()">Close</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ── LEADERBOARD SCREEN ── -->
 <div class="screen" id="leaderboard" style="background:var(--dark);padding-bottom:90px;overflow-y:auto">
@@ -1372,7 +1423,7 @@
         <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off</div>
       </div>
     </div>
-    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">Free tier applies to ₦100–₦500 plans only</div>
+    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">Free tier applies to ₦100–₦500+ plans only</div>
   </div>
 </div>
 
@@ -1430,9 +1481,9 @@
         <div style="flex-shrink:0;width:25%;box-sizing:border-box;padding-right:6px;">
           <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:16px 20px;">
             <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:2px;">20% off</div>
-            <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">plans priced ₦100–₦500 only</div>
+            <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">plans priced ₦100–₦500+ only</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--w70);font-weight:800;">✓</span> Uses the same card you already scan to log in</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--w70);font-weight:800;">✓</span> Activate by scanning any Subsidi card — no purchase needed</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--w70);font-weight:800;">✓</span> One purchase every 7 days</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);"><span style="color:var(--w40);font-weight:800;">✕</span> Doesn't apply to plans above ₦500</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);"><span style="color:var(--w40);font-weight:800;">✕</span> Free — nothing to refund</div>
@@ -2851,7 +2902,7 @@
         // Use the tier actually purchased once unlocked; otherwise the tier being previewed in the picker
         const activePlan = premiumUnlocked ? premiumPlan : demoSelectedPlan;
         const planData = PREMIUM_PLANS[activePlan] || PREMIUM_PLANS.boss;
-        // Free tier only discounts plans priced ₦100–₦500; other tiers have no price cap
+        // Free tier only discounts plans priced ₦100–₦500+; other tiers have no price cap
         const inFreeBand = activePlan !== 'free' || (basePrice >= planData.priceBandMin && basePrice <= planData.priceBandMax);
         if (inFreeBand) {
           isPremiumActive = true;
@@ -3880,12 +3931,12 @@
         btn.setAttribute('onclick', '');
         btn.style.cursor = 'default';
       } else if (plan === 'free') {
-        // Free tier: no payment — just activates directly using the card already on file
+        // Free tier: activated by scanning any Subsidi card — no payment, no stored eligibility check
         btn.style.background = s.btnGradient;
         btn.style.color = s.btnText;
         btn.style.cursor = 'pointer';
-        btn.textContent = 'Activate Free Tier';
-        btn.setAttribute('onclick', "activateFreePremium()");
+        btn.textContent = 'Scan Card to Activate';
+        btn.setAttribute('onclick', "openFreeScan()");
       } else {
         btn.style.background = s.btnGradient;
         btn.style.color = s.btnText;
@@ -4251,38 +4302,6 @@
     showPremTermsPopup(plan);
   }
 
-  async function activateFreePremium() {
-    if (isGuest) {
-      _closePremUnlockOv();
-      showGate('Create an account to unlock Premium', 'Register for free, then activate Premium.');
-      return;
-    }
-    if (!registeredCard) {
-      _closePremUnlockOv();
-      alert('You need a registered Subsidi card to activate the Free tier. Scan or register your card first.');
-      return;
-    }
-
-    _closePremUnlockOv();
-    showSpinner('Activating Free tier...');
-    try {
-      const result = await callEdge('activate-free-premium', { userId });
-      hideSpinner();
-      if (result && result.success) {
-        await fetchUserData();
-        premiumToggleOn = true;
-        setPremToggleUI(true);
-        renderBundles();
-        alert('Free tier activated! Enjoy 20% off data plans priced ₦100–₦500, every 7 days.');
-      } else {
-        alert('Could not activate Free tier: ' + (result?.error || 'Please try again.'));
-      }
-    } catch (e) {
-      hideSpinner();
-      alert('Something went wrong. Please try again.');
-    }
-  }
-
   function showPremTermsPopup(plan) {
     const popId = 'prem-terms-pop';
     const existing = document.getElementById(popId);
@@ -4307,10 +4326,10 @@
           </div>
           <div id="prem-policy-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
-              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Tiered Discount</strong> — Free gives 20% off (₦100–₦500 plans only), Newbie gives 25% off, Boss gives 40% off, and CEO gives 60% off already-discounted cheap plans, on top of your existing subsidy discount.</p>
+              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Tiered Discount</strong> — Free gives 20% off (₦100–₦500+ plans only), Newbie gives 25% off, Boss gives 40% off, and CEO gives 60% off already-discounted cheap plans, on top of your existing subsidy discount.</p>
               <p style="margin:0 0 10px;">🏦 <strong style="color:var(--w70);">How the Pool Is Funded</strong> — Your premium payment is placed in a high-yield savings vehicle. The interest it earns — not your principal — is what funds the shared discount pool for all premium members. If the pool balance is empty, toggles will temporarily remain off until the pool is topped up. This is not a bug — it is by design.</p>
               <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Cooldown Period</strong> — After each data purchase using premium, your toggle turns off for 72 hours (7 days on the Free tier). This gives every premium member a fair shot at the pool instead of a few people using it back-to-back. Your toggle turns back on automatically when the cooldown is over, as long as the pool is funded.</p>
-              <p style="margin:0 0 10px;">🆓 <strong style="color:var(--w70);">Free Tier</strong> — Activated by scanning your existing Subsidi card, at no cost. Gives 20% off data plans priced between ₦100 and ₦500 only, once every 7 days. Not refundable since nothing was paid.</p>
+              <p style="margin:0 0 10px;">🆓 <strong style="color:var(--w70);">Free Tier</strong> — Activated by scanning any Subsidi card, at no cost. Gives 20% off data plans priced between ₦100 and ₦500 only, once every 7 days. Not refundable since nothing was paid.</p>
               <p style="margin:0 0 10px;">💳 <strong style="color:var(--w70);">Newbie Plan (₦3,000)</strong> — One-time payment, not refundable.</p>
               <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Boss &amp; CEO Refund Wallet</strong> — You can request a refund of your premium payment at any time from your Refund Wallet. Refund requests are manually processed within 4–5 days. Requesting a refund permanently disables your premium toggle — you'll stop benefiting from the pool, and we stop paying your discounts. For the Boss and CEO plans, a ₦4,000 card production fee is deducted from your refund since you keep your physical Subsidi card. You do not earn interest on your premium payment — the interest is what funds the pool while your money is with us.</p>
             </div>
@@ -4544,6 +4563,105 @@
     document.getElementById('raffle-scan-view').style.display = 'block';
     document.getElementById('raffle-scan-status').textContent = 'Starting camera...';
     startRaffleScan();
+  }
+
+  // ── FREE TIER SCAN SHEET ──
+  // Any valid Subsidi card works here — it's not tied to a specific account,
+  // the scan itself is what activates the Free tier for whoever is logged in.
+  let freeStream = null;
+  let freeScanLoop = null;
+
+  function openFreeScan() {
+    if (isGuest) {
+      showGate('Create an account to unlock Premium', 'Register for free, then activate Premium.');
+      return;
+    }
+    _closePremUnlockOv();
+    const ov = document.getElementById('free-scan-ov');
+    document.getElementById('free-scan-view').style.display = 'block';
+    document.getElementById('free-success-view').style.display = 'none';
+    document.getElementById('free-error-view').style.display = 'none';
+    document.getElementById('free-scan-status').textContent = 'Starting camera...';
+    ov.classList.add('open');
+    startFreeScan();
+  }
+
+  function closeFreeScan() {
+    stopFreeScan();
+    document.getElementById('free-scan-ov').classList.remove('open');
+  }
+
+  async function startFreeScan() {
+    try {
+      freeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      const video = document.getElementById('free-scan-video');
+      video.srcObject = freeStream;
+      video.play();
+      document.getElementById('free-scan-status').textContent = 'Camera active — scan any Subsidi card';
+      freeScanFrame();
+    } catch(e) {
+      document.getElementById('free-scan-status').textContent = '⚠️ Camera blocked. Allow camera access and try again.';
+    }
+  }
+
+  function stopFreeScan() {
+    clearTimeout(freeScanLoop);
+    freeScanLoop = null;
+    if (freeStream) {
+      freeStream.getTracks().forEach(t => t.stop());
+      freeStream = null;
+    }
+  }
+
+  function freeScanFrame() {
+    const video = document.getElementById('free-scan-video');
+    if (video && video.readyState === video.HAVE_ENOUGH_DATA) {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code && code.data) {
+        const raw = code.data.trim();
+        const isValidCard = raw === 'SUBSIDI_ACTIVATE_CARD_V1' || raw.startsWith('https://subsidi-1.vercel.app');
+        if (isValidCard) {
+          stopFreeScan();
+          submitFreeScan();
+          return;
+        }
+      }
+    }
+    freeScanLoop = setTimeout(freeScanFrame, 200);
+  }
+
+  async function submitFreeScan() {
+    document.getElementById('free-scan-view').style.display = 'none';
+    try {
+      const data = await callEdge('activate-free-premium', { userId });
+      if (data && data.success) {
+        await fetchUserData();
+        premiumToggleOn = true;
+        setPremToggleUI(true);
+        renderBundles();
+        document.getElementById('free-success-view').style.display = 'block';
+        document.getElementById('free-error-view').style.display = 'none';
+      } else {
+        document.getElementById('free-error-msg').textContent = data?.error || 'Something went wrong. Please try again.';
+        document.getElementById('free-error-view').style.display = 'block';
+      }
+    } catch(e) {
+      document.getElementById('free-error-msg').textContent = 'Network error. Please try again.';
+      document.getElementById('free-error-view').style.display = 'block';
+    }
+  }
+
+  function retryFreeScan() {
+    document.getElementById('free-error-view').style.display = 'none';
+    document.getElementById('free-scan-view').style.display = 'block';
+    document.getElementById('free-scan-status').textContent = 'Starting camera...';
+    startFreeScan();
   }
 </script>
 

@@ -1250,7 +1250,7 @@
         <span style="font-size:28px;">✓</span>
       </div>
       <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:var(--green);margin-bottom:6px;">Free tier activated!</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">20% off data plans priced ₦100–₦500+, every 7 days.</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">20% off data plans priced ₦100–₦1,100, every 7 days.</div>
       <button class="reg-btn" onclick="closeFreeScan()" style="width:100%;">Done</button>
     </div>
 
@@ -1426,7 +1426,7 @@
         <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off</div>
       </div>
     </div>
-    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">Free tier applies to ₦100–₦500+ plans only</div>
+    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">Free tier applies to ₦100–₦1,100 plans only</div>
   </div>
 </div>
 
@@ -1484,11 +1484,11 @@
         <div style="flex-shrink:0;width:25%;box-sizing:border-box;padding-right:6px;">
           <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:16px 20px;">
             <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:2px;">20% off</div>
-            <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">plans priced ₦100–₦500+ only</div>
+            <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">plans priced ₦100–₦1,100 only</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--w70);font-weight:800;">✓</span> Activate by scanning any Subsidi card — no purchase needed</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--w70);font-weight:800;">✓</span> One purchase every 7 days</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);"><span style="color:var(--w40);font-weight:800;">✕</span> Doesn't apply to plans above ₦500</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);"><span style="color:var(--w40);font-weight:800;">✕</span> Doesn't apply to plans above ₦1,100</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);"><span style="color:var(--w40);font-weight:800;">✕</span> Free — nothing to refund</div>
             </div>
           </div>
@@ -1646,7 +1646,7 @@
   let premiumLastUsed = 0;       // timestamp of last premium purchase
   let premiumPlan = 'boss';   // which plan is active: 'newbie' (₦3,000), 'boss' (₦8,000), or 'ceo' (₦20,000)
   const PREMIUM_PLANS = {
-    free:   { price: 0,     label: 'free', cooldownHrs: 168, hasCard: false, discountPct: 20, refundable: false, priceBandMin: 100, priceBandMax: 500 },
+    free:   { price: 0,     label: 'free', cooldownHrs: 168, hasCard: false, discountPct: 20, refundable: false, priceBandMin: 100, priceBandMax: 1100 },
     newbie: { price: 3000,  label: 'one-time', cooldownHrs: 72, hasCard: false, discountPct: 25, refundable: false },
     boss:  { price: 8000,  label: 'refundable', cooldownHrs: 72, hasCard: true, discountPct: 40, refundable: true },
     ceo:    { price: 20000, label: 'refundable', cooldownHrs: 72, hasCard: true,  discountPct: 60, refundable: true }
@@ -2921,7 +2921,7 @@
           activePlan = demoSelectedPlan;
         }
         const planData = PREMIUM_PLANS[activePlan] || PREMIUM_PLANS.boss;
-        // Free tier only discounts plans priced ₦100–₦500+; other tiers have no price cap
+        // Free tier only discounts plans priced ₦100–₦1,100; other tiers have no price cap
         const inFreeBand = activePlan !== 'free' || (basePrice >= planData.priceBandMin && basePrice <= planData.priceBandMax);
         if (inFreeBand) {
           isPremiumActive = true;
@@ -4351,10 +4351,10 @@
           </div>
           <div id="prem-policy-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
-              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Tiered Discount</strong> — Free gives 20% off (₦100–₦500+ plans only), Newbie gives 25% off, Boss gives 40% off, and CEO gives 60% off already-discounted cheap plans, on top of your existing subsidy discount.</p>
+              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Tiered Discount</strong> — Free gives 20% off (₦100–₦1,100 plans only), Newbie gives 25% off, Boss gives 40% off, and CEO gives 60% off already-discounted cheap plans, on top of your existing subsidy discount.</p>
               <p style="margin:0 0 10px;">🏦 <strong style="color:var(--w70);">How the Pool Is Funded</strong> — Your premium payment is placed in a high-yield savings vehicle. The interest it earns — not your principal — is what funds the shared discount pool for all premium members. If the pool balance is empty, toggles will temporarily remain off until the pool is topped up. This is not a bug — it is by design.</p>
               <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Cooldown Period</strong> — After each data purchase using premium, your toggle turns off for 72 hours (7 days on the Free tier). This gives every premium member a fair shot at the pool instead of a few people using it back-to-back. Your toggle turns back on automatically when the cooldown is over, as long as the pool is funded.</p>
-              <p style="margin:0 0 10px;">🆓 <strong style="color:var(--w70);">Free Tier</strong> — Activated by scanning any Subsidi card, at no cost. Gives 20% off data plans priced between ₦100 and ₦500 only, once every 7 days. Not refundable since nothing was paid.</p>
+              <p style="margin:0 0 10px;">🆓 <strong style="color:var(--w70);">Free Tier</strong> — Activated by scanning any Subsidi card, at no cost. Gives 20% off data plans priced between ₦100 and ₦1,100 only, once every 7 days. Not refundable since nothing was paid.</p>
               <p style="margin:0 0 10px;">💳 <strong style="color:var(--w70);">Newbie Plan (₦3,000)</strong> — One-time payment, not refundable.</p>
               <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Boss &amp; CEO Refund Wallet</strong> — You can request a refund of your premium payment at any time from your Refund Wallet. Refund requests are manually processed within 4–5 days. Requesting a refund permanently disables your premium toggle — you'll stop benefiting from the pool, and we stop paying your discounts. For the Boss and CEO plans, a ₦4,000 card production fee is deducted from your refund since you keep your physical Subsidi card. You do not earn interest on your premium payment — the interest is what funds the pool while your money is with us.</p>
             </div>

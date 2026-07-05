@@ -3454,7 +3454,7 @@
     // Your position — pinned in its own section above the top 20, so the list
     // never pushes it down. Only shown when your real rank is outside the rows below.
     if (youEl) {
-      if (you && you.rank && you.rank > (rows ? rows.length : 0)) {
+      if (you && you.rank) {
         const amount = '₦' + Math.floor(you.total_spent || 0).toLocaleString();
         youEl.innerHTML = '<div style="display:flex;align-items:center;gap:14px;background:var(--dark-3);border:1.5px solid var(--p-light);border-radius:16px;padding:14px 16px">'
           + '<div style="font-size:15px;font-weight:800;color:var(--p-light);min-width:30px;text-align:center">(' + you.rank + ')</div>'

@@ -1300,13 +1300,14 @@
   <!-- Header -->
   <div style="padding:28px 24px 20px;position:relative;overflow:hidden">
     <div style="position:absolute;top:-80px;right:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(108,43,217,.12) 0%,transparent 65%);pointer-events:none"></div>
-    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:6px">Top Spenders</div>
-    <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px">Leaderboard</div>
-    <div style="font-size:13px;color:var(--w40);line-height:1.5">The top 20 biggest spenders this month. Resets on the 1st.</div>
+    <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;">Leaderboard</div>
   </div>
 
   <!-- Your position -->
   <div style="margin:0 20px 16px" id="leaderboard-you"></div>
+
+  <!-- List subtitle -->
+  <div style="margin:0 20px 12px;font-size:13px;color:var(--w40);line-height:1.5">The top 20 biggest spenders this month. Resets on the 1st.</div>
 
   <!-- List -->
   <div style="margin:0 20px 16px" id="leaderboard-list">
@@ -3452,16 +3453,16 @@
     if (!listEl) return;
 
     // Your position — pinned in its own section above the top 20, so the list
-    // never pushes it down. Only shown when your real rank is outside the rows below.
+    // never pushes it down. Always shown whenever you have a rank this month.
     if (youEl) {
       if (you && you.rank) {
         const amount = '₦' + Math.floor(you.total_spent || 0).toLocaleString();
-        youEl.innerHTML = '<div style="display:flex;align-items:center;gap:14px;background:var(--dark-3);border:1.5px solid var(--p-light);border-radius:16px;padding:14px 16px">'
-          + '<div style="font-size:15px;font-weight:800;color:var(--p-light);min-width:30px;text-align:center">(' + you.rank + ')</div>'
-          + '<div style="flex:1;min-width:0">'
-          + '<div style="font-size:14px;font-weight:700;color:#fff">You<span style="color:var(--w40);font-weight:600"> — ' + amount + ' spent</span></div>'
-          + '<div style="font-size:12px;color:var(--p-light);margin-top:2px">Your position</div>'
+        youEl.innerHTML = '<div style="background:var(--dark-3);border:1.5px solid var(--p-light);border-radius:16px;padding:14px 16px">'
+          + '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">'
+          + '<div style="font-size:14px;font-weight:700;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">You <span style="color:var(--p-light);font-weight:800">(' + you.rank + ')</span></div>'
+          + '<div style="font-size:14px;color:var(--w40);font-weight:600;white-space:nowrap">' + amount + ' spent</div>'
           + '</div>'
+          + '<div style="font-size:12px;color:var(--p-light);margin-top:2px">Your position</div>'
           + '</div>';
       } else {
         youEl.innerHTML = '';
@@ -3474,16 +3475,15 @@
     }
     listEl.innerHTML = rows.map((row, i) => {
       const rank = i + 1;
-      const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : ('(' + rank + ')');
       const amount = '₦' + Math.floor(row.total_spent || 0).toLocaleString();
       const phone = maskPhone(row.phone || '');
       const uname = row.username ? ('@' + row.username) : '—';
-      return '<div style="display:flex;align-items:center;gap:14px;background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px">'
-        + '<div style="font-size:15px;font-weight:800;color:var(--w40);min-width:30px;text-align:center">' + medal + '</div>'
-        + '<div style="flex:1;min-width:0">'
-        + '<div style="font-size:14px;font-weight:700;color:#fff">' + phone + '<span style="color:var(--w40);font-weight:600"> — ' + amount + ' spent</span></div>'
-        + '<div style="font-size:12px;color:var(--w40);margin-top:2px">' + uname + '</div>'
+      return '<div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px">'
+        + '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">'
+        + '<div style="font-size:14px;font-weight:700;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + phone + ' <span style="color:var(--p-light);font-weight:800">(' + rank + ')</span></div>'
+        + '<div style="font-size:14px;color:var(--w40);font-weight:600;white-space:nowrap">' + amount + ' spent</div>'
         + '</div>'
+        + '<div style="font-size:12px;color:var(--w40);margin-top:2px">' + uname + '</div>'
         + '</div>';
     }).join('');
   }

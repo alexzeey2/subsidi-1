@@ -114,6 +114,11 @@
   .prem-toggle-track.on{background:linear-gradient(90deg,#b87010,#F5A623);border-color:#F5A623;animation:none;}
   .prem-toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 4px rgba(0,0,0,.3);}
   .prem-toggle-track.on .prem-toggle-thumb{transform:translateX(20px);}
+  .bal-blurred{filter:blur(9px);-webkit-filter:blur(9px);user-select:none;transition:filter .25s;}
+  .set-toggle-track{width:44px;height:24px;border-radius:12px;background:var(--dark-4);border:1px solid var(--border);position:relative;transition:background .25s,border-color .25s;flex-shrink:0;}
+  .set-toggle-track.on{background:#fff;border-color:#fff;}
+  .set-toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.4,0,.2,1),background .25s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+  .set-toggle-track.on .set-toggle-thumb{transform:translateX(20px);background:#000;}
   @keyframes premPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,166,35,0);border-color:var(--border);}50%{box-shadow:0 0 0 4px rgba(245,166,35,.25);border-color:#F5A623;}}
 
   /* ── PREMIUM DEMO BLUR ── */
@@ -802,7 +807,12 @@
     <div class="wallet-card-frame prem-blur-target">
       <div class="bal-lbl" id="wallet-label">Wallet Balance</div>
 
-      <div class="bal-amt" id="bal-display"><span class="bal-cur">₦</span>0<span class="bal-dec">.00</span></div>
+      <div id="balance-visibility-wrap" onclick="toggleBalanceVisibility()" style="cursor:pointer;display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div class="bal-amt" id="bal-display" style="margin-bottom:0;"><span class="bal-cur">₦</span>0<span class="bal-dec">.00</span></div>
+        <svg id="bal-eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </div>
 
       <!-- Actions -->
       <div class="wallet-card-actions" id="actions-card-0" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0 4px;">
@@ -1067,6 +1077,20 @@
         </div>
         <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
+      <div class="prof-row" onclick="toggleBalanceVisibility()">
+        <div class="prof-row-ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <div class="prof-row-body">
+          <div class="prof-row-title">Hide Balance</div>
+          <div class="prof-row-sub">Blur your wallet balance</div>
+        </div>
+        <div class="set-toggle-track" id="hide-bal-toggle-track">
+          <div class="set-toggle-thumb"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1280,6 +1304,9 @@
     <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px">Leaderboard</div>
     <div style="font-size:13px;color:var(--w40);line-height:1.5">The top 20 biggest spenders this month. Resets on the 1st.</div>
   </div>
+
+  <!-- Your position -->
+  <div style="margin:0 20px 16px" id="leaderboard-you"></div>
 
   <!-- List -->
   <div style="margin:0 20px 16px" id="leaderboard-list">
@@ -1697,6 +1724,28 @@
     txns.unshift({ ...txn, created_at: new Date().toISOString() });
     // Keep last 100
     localStorage.setItem('subsidi_txns', JSON.stringify(txns.slice(0, 100)));
+  }
+
+  // ── Balance visibility (hide/blur) ──
+  let balanceHidden = localStorage.getItem('subsidi_hide_balance') === '1';
+
+  function applyBalanceVisibility() {
+    const bal = document.getElementById('bal-display');
+    const eye = document.getElementById('bal-eye-icon');
+    const track = document.getElementById('hide-bal-toggle-track');
+    if (bal) bal.classList.toggle('bal-blurred', balanceHidden);
+    if (eye) {
+      eye.innerHTML = balanceHidden
+        ? '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.6 21.6 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+        : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+    if (track) track.classList.toggle('on', balanceHidden);
+  }
+
+  function toggleBalanceVisibility() {
+    balanceHidden = !balanceHidden;
+    localStorage.setItem('subsidi_hide_balance', balanceHidden ? '1' : '0');
+    applyBalanceVisibility();
   }
 
   // ── Balance ──
@@ -3390,16 +3439,35 @@
     listEl.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--w40);font-size:13px">Loading leaderboard...</div>';
     try {
       const data = await callEdge('get-leaderboard', {});
-      renderLeaderboard((data && data.leaderboard) || []);
+      renderLeaderboard((data && data.leaderboard) || [], (data && data.you) || null);
     } catch (e) {
       console.error('Leaderboard fetch error:', e);
       listEl.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--w40);font-size:13px">Could not load leaderboard. Pull to refresh.</div>';
     }
   }
 
-  function renderLeaderboard(rows) {
+  function renderLeaderboard(rows, you) {
     const listEl = document.getElementById('leaderboard-list');
+    const youEl = document.getElementById('leaderboard-you');
     if (!listEl) return;
+
+    // Your position — pinned in its own section above the top 20, so the list
+    // never pushes it down. Only shown when your real rank is outside the rows below.
+    if (youEl) {
+      if (you && you.rank && you.rank > (rows ? rows.length : 0)) {
+        const amount = '₦' + Math.floor(you.total_spent || 0).toLocaleString();
+        youEl.innerHTML = '<div style="display:flex;align-items:center;gap:14px;background:var(--dark-3);border:1.5px solid var(--p-light);border-radius:16px;padding:14px 16px">'
+          + '<div style="font-size:15px;font-weight:800;color:var(--p-light);min-width:30px;text-align:center">(' + you.rank + ')</div>'
+          + '<div style="flex:1;min-width:0">'
+          + '<div style="font-size:14px;font-weight:700;color:#fff">You<span style="color:var(--w40);font-weight:600"> — ' + amount + ' spent</span></div>'
+          + '<div style="font-size:12px;color:var(--p-light);margin-top:2px">Your position</div>'
+          + '</div>'
+          + '</div>';
+      } else {
+        youEl.innerHTML = '';
+      }
+    }
+
     if (!rows || rows.length === 0) {
       listEl.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--w40);font-size:13px">No spending yet this month. Be the first!</div>';
       return;
@@ -3755,7 +3823,9 @@
       });
     }
     body.innerHTML = html;
-  }</script>
+  }
+
+  applyBalanceVisibility();</script>
 
 <!-- SUPPORT BUTTON -->
 <div class="wa-bell" id="wa-bell" onclick="window.open('https://wa.me/2349058150220?text=' + encodeURIComponent('I\'m having an issue on Subsidi'), '_blank')">

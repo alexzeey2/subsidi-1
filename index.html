@@ -1668,6 +1668,8 @@
   // ── Supabase config ──
   const SUPA_URL = 'https://taesbjxhllruvmueeete.supabase.co';
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhZXNianhobGxydXZtdWVlZXRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMzE4NTcsImV4cCI6MjA5MzgwNzg1N30.ygRn0k2o8WncP0YUbpUdc5Mevdz9NqckNsf-KNCR5L4';
+  // TODO: replace with your real Paystack public key (safe to expose client-side — it's not the secret key)
+  const PAYSTACK_PUBLIC_KEY = 'pk_live_REPLACE_ME';
   let userId = null;
   let premiumUnlocked = false;   // true once user has paid for a premium plan
   let premiumToggleOn = false;   // current toggle state (on/off)
@@ -3286,27 +3288,59 @@
     if (!selectedDep) return;
     const amount = selectedDep;
 
-    // Use Paystack redirect — more reliable on mobile
     const ref = 'subsidi-' + userId + '-' + Date.now();
     const email = (username || userId) + '@subsidi.app';
-    
-    // Save pending deposit to localStorage so we can verify after redirect
-    localStorage.setItem('pendingDeposit', JSON.stringify({ ref, userId, amount }));
 
-    // Ask edge function to initialize Paystack (secret key stays server-side)
-    const initResult = await callEdge('deposit-init', {
-      userId,
-      amount,
-      email,
-      ref,
-      callbackUrl: window.location.href
+    const btn = document.getElementById('dep-confirm-btn');
+    if (btn) { btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
+
+    // Paystack Inline — opens as a popup INSIDE the app, so the PWA never
+    // navigates away to an external tab. Works the same for card, bank
+    // transfer, and USSD; the user always lands back in the app when done.
+    const handler = PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: email,
+      amount: amount * 100, // Paystack expects amount in kobo
+      ref: ref,
+      currency: 'NGN',
+      metadata: { userId, purpose: 'deposit' },
+      callback: function(response) {
+        (async () => {
+          showSpinner('Verifying payment...');
+          try {
+            const result = await callEdge('deposit', {
+              reference: response.reference,
+              userId,
+              amount
+            });
+            hideSpinner();
+            if (result && result.success) {
+              saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
+              const balanceBefore = balance;
+              await fetchUserData();
+              if (balance === balanceBefore) {
+                await new Promise(r => setTimeout(r, 1500));
+                await fetchUserData();
+              }
+              closeDepOv();
+              alert('₦' + amount.toLocaleString() + ' added to your wallet!');
+            } else {
+              alert('Payment verification failed. Contact support with ref: ' + response.reference);
+            }
+          } catch (e) {
+            hideSpinner();
+            console.error('Deposit verify error:', e);
+            alert('Payment verification failed. Contact support with ref: ' + response.reference);
+          } finally {
+            if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+          }
+        })();
+      },
+      onClose: function() {
+        if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+      }
     });
-
-    if (initResult && initResult.authorization_url) {
-      window.location.href = initResult.authorization_url;
-    } else {
-      alert('Could not initialize payment: ' + (initResult?.error || 'Please try again.'));
-    }
+    handler.openIframe();
   }
 
   function closeDepOv(e) {
@@ -4471,33 +4505,58 @@
     const email = (username || userId) + '@subsidi.app';
     const ref = 'subsidi-prem-' + userId + '-' + Date.now();
 
-    // Save pending premium payment to localStorage so we can verify after redirect
-    localStorage.setItem('pendingPremium', JSON.stringify({ ref, userId, plan, name, phone, location }));
-
     _closePremUnlockOv();
-    showSpinner('Starting payment...');
 
-    try {
-      const initResult = await callEdge('premium-init', {
-        userId,
-        plan,
-        email,
-        ref,
-        callbackUrl: window.location.href
-      });
-      hideSpinner();
-
-      if (initResult && initResult.authorization_url) {
-        window.location.href = initResult.authorization_url;
-      } else {
-        localStorage.removeItem('pendingPremium');
-        alert('Could not start payment: ' + (initResult?.error || 'Please try again.'));
+    // Paystack Inline — opens as a popup INSIDE the app, so the PWA never
+    // navigates away to an external tab for card, bank transfer, or USSD.
+    const handler = PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: email,
+      amount: price * 100, // Paystack expects amount in kobo
+      ref: ref,
+      currency: 'NGN',
+      metadata: { userId, plan, purpose: 'premium' },
+      callback: function(response) {
+        (async () => {
+          showSpinner('Activating Premium...');
+          try {
+            const result = await callEdge('premium-verify', {
+              reference: response.reference,
+              userId,
+              plan,
+              name,
+              phone,
+              location
+            });
+            hideSpinner();
+            if (result && result.success) {
+              await fetchUserData(); // loads isPremium, premiumPlan, premiumLastUsed from DB
+              premiumToggleOn = true;
+              setPremToggleUI(true);
+              renderBundles();
+              const hasCard = plan === 'ceo' || plan === 'boss';
+              alert(hasCard
+                ? 'Premium activated! Your plan is live and your physical Subsidi card will be issued.'
+                : 'Premium activated! Your prices are now live. Enjoy cheap data!');
+              if (name && phone && location) {
+                setTimeout(() => openWaPremiumSheet(name, phone, location), 400);
+              }
+            } else {
+              alert('Payment verification failed. Contact support with ref: ' + response.reference);
+            }
+          } catch (e) {
+            hideSpinner();
+            console.error('Premium verify error:', e);
+            alert('Payment verification failed. Contact support with ref: ' + response.reference);
+          }
+        })();
+      },
+      onClose: function() {
+        // User closed the popup without paying — nothing to clean up since
+        // we never left the app or wrote a pending state.
       }
-    } catch(e) {
-      hideSpinner();
-      localStorage.removeItem('pendingPremium');
-      alert('Something went wrong. Please try again.');
-    }
+    });
+    handler.openIframe();
   }
 </script>
 

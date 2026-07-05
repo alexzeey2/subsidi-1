@@ -1482,21 +1482,24 @@
       </div>
 
       <!-- Newbie -->
-      <div id="prem-btn-newbie" onclick="selectPremPlan('newbie')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;">
+      <div id="prem-btn-newbie" onclick="selectPremPlan('newbie')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;position:relative;">
+        <div id="prem-current-badge-newbie" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--p);color:#fff;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
         <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Newbie</div>
         <div style="font-size:15px;font-weight:900;color:var(--w40);">₦3,000</div>
         <div style="font-size:8.5px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:3px;">one-time</div>
       </div>
 
       <!-- Boss -->
-      <div id="prem-btn-boss" onclick="selectPremPlan('boss')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--p-subtle);border:1.5px solid var(--p);">
+      <div id="prem-btn-boss" onclick="selectPremPlan('boss')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--p-subtle);border:1.5px solid var(--p);position:relative;">
+        <div id="prem-current-badge-boss" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--p);color:#fff;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
         <div style="font-size:9.5px;font-weight:800;color:var(--p-light);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Boss</div>
         <div style="font-size:15px;font-weight:900;color:var(--p-light);">₦8,000</div>
         <div style="font-size:8.5px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:3px;">refundable</div>
       </div>
 
       <!-- CEO -->
-      <div id="prem-btn-ceo" onclick="selectPremPlan('ceo')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;">
+      <div id="prem-btn-ceo" onclick="selectPremPlan('ceo')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;position:relative;">
+        <div id="prem-current-badge-ceo" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#F5A623;color:#000;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
         <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">CEO</div>
         <div style="font-size:15px;font-weight:900;color:var(--w40);">₦20,000</div>
         <div style="font-size:8.5px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:3px;">refundable</div>
@@ -4343,6 +4346,16 @@
     });
   }
 
+  // Stamps a persistent "Current" badge on the plan the user is actually
+  // subscribed to — independent of whichever plan they're previewing/tapping,
+  // so it doesn't disappear just because they tap a different plan to look at it.
+  function updateCurrentPlanBadge() {
+    ['newbie', 'boss', 'ceo'].forEach(p => {
+      const badge = document.getElementById('prem-current-badge-' + p);
+      if (badge) badge.style.display = (premiumUnlocked && premiumPlan === p) ? '' : 'none';
+    });
+  }
+
   // ── PREMIUM UNLOCK SHEET ──
   function showPremUnlockSheet(fromPlanTap) {
     const label = document.getElementById('prem-sheet-context-label');
@@ -4352,6 +4365,7 @@
     }
     const ov = document.getElementById('prem-unlock-ov');
     if (ov) { ov.style.display = 'flex'; setTimeout(() => ov.classList.add('open'), 10); }
+    updateCurrentPlanBadge();
     // Measure/reset the swipe AFTER the sheet is visible, so wrap.clientWidth is non-zero.
     // requestAnimationFrame ensures layout has actually happened post-display-change.
     requestAnimationFrame(() => {
@@ -4366,6 +4380,7 @@
     if (label) label.style.display = 'none';
     const ov = document.getElementById('prem-unlock-ov');
     if (ov) { ov.style.display = 'flex'; setTimeout(() => ov.classList.add('open'), 10); }
+    updateCurrentPlanBadge();
     requestAnimationFrame(() => {
       selectPremPlan(premiumPlan || 'boss');
     });
@@ -4534,6 +4549,7 @@
               premiumToggleOn = true;
               setPremToggleUI(true);
               renderBundles();
+              updateCurrentPlanBadge();
               const hasCard = plan === 'ceo' || plan === 'boss';
               alert(hasCard
                 ? 'Premium activated! Your plan is live and your physical Subsidi card will be issued.'

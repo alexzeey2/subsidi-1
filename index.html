@@ -4074,8 +4074,9 @@
   // not just on whichever card happens to be centered). Only non-premium users get
   // steered to Boss as the easy first-purchase default.
   window._resetPremSwipe = function() {
-    const target = premiumUnlocked ? premiumPlan : 'boss';
-    selectPremPlan(target || 'boss');
+    const isPaidSubscriber = premiumUnlocked && premiumPlan !== 'free';
+    const target = isPaidSubscriber ? premiumPlan : 'boss';
+    selectPremPlan(target);
   };
 </script>
 

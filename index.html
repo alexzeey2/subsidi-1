@@ -1830,16 +1830,14 @@
           premiumLastUsed = data.premiumLastUsed ? new Date(data.premiumLastUsed).getTime() : 0;
 
           if (premiumUnlocked) {
-            // Determine if still in cooldown
-            const cooldownMs = (PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.boss).cooldownHrs * 3600000;
-            const inCooldown = premiumLastUsed > 0 && (Date.now() - premiumLastUsed) < cooldownMs;
-            const poolOk = (data.poolBalance ?? 0) > 0;
-            premiumToggleOn = !inCooldown && poolOk;
+            // Toggle never auto-restores to on, even if cooldown has already
+            // expired — user must manually tap it back on every time (this is
+            // intentional, to keep the toggle an active engagement point).
+            premiumToggleOn = false;
           } else {
             premiumToggleOn = false;
           }
           setPremToggleUI(premiumToggleOn);
-          schedulePremiumAutoOn();
         }
         if (typeof data.poolBalance !== 'undefined') {
           poolBalance = data.poolBalance ?? 0;
@@ -1963,15 +1961,13 @@
             if (typeof renderMyCard === 'function') renderMyCard();
             premiumLastUsed = data.premiumLastUsed ? new Date(data.premiumLastUsed).getTime() : 0;
             if (premiumUnlocked) {
-              const cooldownMs = (PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.boss).cooldownHrs * 3600000;
-              const inCooldown = premiumLastUsed > 0 && (Date.now() - premiumLastUsed) < cooldownMs;
-              const poolOk = (data.poolBalance ?? 0) > 0;
-              premiumToggleOn = !inCooldown && poolOk;
+              // Toggle never auto-restores to on, even if cooldown has already
+              // expired — user must manually tap it back on every time.
+              premiumToggleOn = false;
             } else {
               premiumToggleOn = false;
             }
             setPremToggleUI(premiumToggleOn);
-            schedulePremiumAutoOn();
           }
           if (typeof data.poolBalance !== 'undefined') {
             poolBalance = data.poolBalance ?? 0;
@@ -3141,15 +3137,9 @@
     if (userId) { try { callEdge('update-last-scan', { userId, clear: true }); } catch(e) {} }
     localStorage.removeItem('subsidi_userId');
     localStorage.removeItem('subsidi_session_token');
-    // Reset all state
-    userId = null; username = ''; balance = 0;
-    registeredCard = null; userPin = null;
-    isGuest = true;
-    subsidyFund = 360;
-    show('dash');
-    updateSubsidyUI();
-    renderBundles();
-    window.scrollTo(0, 0);
+    // Full reload guarantees no stale balance, premium state, or cached UI
+    // lingers on screen — much safer than manually resetting every element.
+    window.location.reload();
   }
 
   // ── Change PIN ──
@@ -4184,23 +4174,11 @@
   }
 
   function schedulePremiumAutoOn() {
-    // Clear any existing auto-on timer
+    // Auto-reactivation removed by design: once the cooldown ends, the toggle
+    // stays off until the user manually taps it back on. This keeps the
+    // toggle an active, recurring engagement point instead of a passive one.
     if (window._premAutoOnTimer) clearTimeout(window._premAutoOnTimer);
-    if (!premiumUnlocked || !premiumLastUsed) return;
-    if (premiumPlan === 'free') return; // Free tier never auto-reactivates — always needs a fresh scan
-
-    const cooldownMs = (PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.boss).cooldownHrs * 3600000;
-    const msLeft = (premiumLastUsed + cooldownMs) - Date.now();
-    if (msLeft <= 0) return; // already expired
-
-    window._premAutoOnTimer = setTimeout(() => {
-      // Only auto-turn-on if pool is active and user is still premium
-      if (premiumUnlocked && premiumPlan !== 'free' && poolBalance > 0) {
-        premiumToggleOn = true;
-        setPremToggleUI(true);
-        renderBundles();
-      }
-    }, msLeft);
+    return;
   }
 
   // ── DISCOUNT PICKER (preview only) ──
@@ -4423,7 +4401,7 @@
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
               <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Tiered Discount</strong> — Free gives 20% off (₦100–₦1,100 plans only), Newbie gives 25% off, Boss gives 40% off, and CEO gives 60% off already-discounted cheap plans, on top of your existing subsidy discount.</p>
               <p style="margin:0 0 10px;">🏦 <strong style="color:var(--w70);">How the Pool Is Funded</strong> — Your premium payment is placed in a high-yield savings vehicle. The interest it earns — not your principal — is what funds the shared discount pool for all premium members. If the pool balance is empty, toggles will temporarily remain off until the pool is topped up. This is not a bug — it is by design.</p>
-              <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Cooldown Period</strong> — After each data purchase using premium, your toggle turns off for 72 hours (7 days on the Free tier). This gives every premium member a fair shot at the pool instead of a few people using it back-to-back. Your toggle turns back on automatically when the cooldown is over, as long as the pool is funded.</p>
+              <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Cooldown Period</strong> — After each data purchase using premium, your toggle turns off for 72 hours (7 days on the Free tier). This gives every premium member a fair shot at the pool instead of a few people using it back-to-back. Once the cooldown ends, tap the toggle again to switch it back on — it never turns back on by itself.</p>
               <p style="margin:0 0 10px;">🆓 <strong style="color:var(--w70);">Free Tier</strong> — Activated by scanning any Subsidi card, at no cost. Gives 20% off data plans priced between ₦100 and ₦1,100 only, once every 7 days. Not refundable since nothing was paid.</p>
               <p style="margin:0 0 10px;">💳 <strong style="color:var(--w70);">Newbie Plan (₦3,000)</strong> — One-time payment, not refundable.</p>
               <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Boss &amp; CEO Refund Wallet</strong> — You can request a refund of your premium payment at any time from your Refund Wallet. Refund requests are manually processed within 4–5 days. Requesting a refund permanently disables your premium toggle — you'll stop benefiting from the pool, and we stop paying your discounts. For the Boss and CEO plans, a ₦4,000 card production fee is deducted from your refund since you keep your physical Subsidi card. You do not earn interest on your premium payment — the interest is what funds the pool while your money is with us.</p>

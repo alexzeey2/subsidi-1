@@ -1501,7 +1501,7 @@
       <div id="prem-btn-ceo" onclick="selectPremPlan('ceo')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;position:relative;">
         <div id="prem-current-badge-ceo" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#F5A623;color:#000;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
         <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">CEO</div>
-        <div style="font-size:15px;font-weight:900;color:var(--w40);">₦20,000</div>
+        <div style="font-size:15px;font-weight:900;color:var(--w40);">₦14,000</div>
         <div style="font-size:8.5px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:3px;">refundable</div>
       </div>
 
@@ -1677,12 +1677,12 @@
   let premiumUnlocked = false;   // true once user has paid for a premium plan
   let premiumToggleOn = false;   // current toggle state (on/off)
   let premiumLastUsed = 0;       // timestamp of last premium purchase
-  let premiumPlan = 'boss';   // which plan is active: 'newbie' (₦3,000), 'boss' (₦8,000), or 'ceo' (₦20,000)
+  let premiumPlan = 'boss';   // which plan is active: 'newbie' (₦3,000), 'boss' (₦8,000), or 'ceo' (₦14,000)
   const PREMIUM_PLANS = {
     free:   { price: 0,     label: 'free', cooldownHrs: 168, hasCard: false, discountPct: 20, refundable: false, priceBandMin: 100, priceBandMax: 1100 },
     newbie: { price: 3000,  label: 'one-time', cooldownHrs: 72, hasCard: false, discountPct: 25, refundable: false },
     boss:  { price: 8000,  label: 'refundable', cooldownHrs: 72, hasCard: true, discountPct: 40, refundable: true },
-    ceo:    { price: 20000, label: 'refundable', cooldownHrs: 72, hasCard: true,  discountPct: 60, refundable: true }
+    ceo:    { price: 14000, label: 'refundable', cooldownHrs: 72, hasCard: true,  discountPct: 60, refundable: true }
   };
   let poolBalance = 0;           // reward pool balance — loaded from DB
   let premDemoActive = false;    // is the demo blur/animation running
@@ -4069,8 +4069,13 @@
   }
 
   // Reset sheet to whichever tier the user previewed in the discount picker
+  // Sheet defaults to whatever the user ACTUALLY has — an already-subscribed user
+  // must always land on their own plan (so "Current"/"Subscribed" shows immediately,
+  // not just on whichever card happens to be centered). Only non-premium users get
+  // steered to Boss as the easy first-purchase default.
   window._resetPremSwipe = function() {
-    selectPremPlan(demoSelectedPlan || 'boss');
+    const target = premiumUnlocked ? premiumPlan : 'boss';
+    selectPremPlan(target || 'boss');
   };
 </script>
 

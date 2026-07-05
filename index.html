@@ -4061,6 +4061,11 @@
         btn.setAttribute('onclick', "payPremiumUnlock('" + plan + "')");
       }
     }
+
+    // Always re-stamp the Current badge here too — selectPremPlan gets called
+    // from several different entry points (direct tap, sheet reset, upgrade
+    // flow), and the badge must never depend on which one fired last.
+    updateCurrentPlanBadge();
   }
 
   // Reset sheet to whichever tier the user previewed in the discount picker

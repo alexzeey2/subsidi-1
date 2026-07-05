@@ -2907,7 +2907,19 @@
       let displayPriceFinal = displayPrice;
       if (premiumToggleOn || premDemoActive) {
         // Use the tier actually purchased once unlocked; otherwise the tier being previewed in the picker
-        const activePlan = premiumUnlocked ? premiumPlan : demoSelectedPlan;
+        // Paid tiers: always their real committed plan once unlocked.
+        // Free tier: only counts as "real" for THIS cycle once a scan has been
+        // confirmed — otherwise (still just previewing in the picker) use whichever
+        // tier is actually being previewed, so tapping Newbie/Boss/CEO shows their
+        // own math instead of defaulting back to Free's.
+        let activePlan;
+        if (premiumUnlocked && premiumPlan !== 'free') {
+          activePlan = premiumPlan;
+        } else if (premiumPlan === 'free' && freeScanConfirmed) {
+          activePlan = 'free';
+        } else {
+          activePlan = demoSelectedPlan;
+        }
         const planData = PREMIUM_PLANS[activePlan] || PREMIUM_PLANS.boss;
         // Free tier only discounts plans priced ₦100–₦500+; other tiers have no price cap
         const inFreeBand = activePlan !== 'free' || (basePrice >= planData.priceBandMin && basePrice <= planData.priceBandMax);

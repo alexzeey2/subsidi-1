@@ -3438,7 +3438,7 @@
     if (!listEl) return;
     listEl.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--w40);font-size:13px">Loading leaderboard...</div>';
     try {
-      const data = await callEdge('get-leaderboard', {});
+      const data = await callEdge('get-leaderboard', { userId });
       renderLeaderboard((data && data.leaderboard) || [], (data && data.you) || null);
     } catch (e) {
       console.error('Leaderboard fetch error:', e);

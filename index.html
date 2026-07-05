@@ -4114,8 +4114,11 @@
       setPremToggleUI(true);
       renderBundles();
     } else {
-      // Not yet premium, OR Free tier starting a fresh cycle — open the discount picker
-      openPremDiscountPick();
+      // Not yet premium, OR Free tier starting a fresh cycle — skip the picker sheet
+      // entirely. Drop straight to the 60% (CEO) preview price so the toggle itself
+      // is the whole "aha" moment. The full 4-tier picker only shows up later, when
+      // they actually try to buy (handled by showPremUnlockSheet via notYetConfirmed).
+      pickPremDiscount('ceo');
     }
   }
 

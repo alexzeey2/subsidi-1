@@ -1261,7 +1261,10 @@
       </div>
       <div id="free-error-msg" style="font-size:14px;color:#ff6b6b;margin-bottom:20px;line-height:1.6;"></div>
       <button class="reg-btn" onclick="retryFreeScan()" style="width:100%;margin-bottom:10px;">Try Again</button>
-      <button class="refer-close" onclick="closeFreeScan()">Close</button>
+      <button class="refer-close" onclick="closeFreeScan()" style="margin-bottom:10px;">Close</button>
+      <div style="font-size:12px;color:var(--w40);">
+        Want cheaper data without the wait? <a href="javascript:void(0)" onclick="closeFreeScan();openPremDiscountPick();" style="color:var(--p-light);font-weight:600;">See paid plans</a>
+      </div>
     </div>
   </div>
 </div>
@@ -3972,6 +3975,13 @@
     }
 
     if (premiumUnlocked) {
+      // Free tier never auto-reactivates — every toggle-on requires a fresh scan,
+      // and whether the cooldown has passed is checked silently server-side.
+      if (premiumPlan === 'free') {
+        openFreeScan();
+        return;
+      }
+
       // Check cooldown first
       const cooldownHrs = (PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.boss).cooldownHrs;
       const cooldownMs = cooldownHrs * 60 * 60 * 1000;
@@ -4648,11 +4658,12 @@
         document.getElementById('free-success-view').style.display = 'block';
         document.getElementById('free-error-view').style.display = 'none';
       } else {
-        document.getElementById('free-error-msg').textContent = data?.error || 'Something went wrong. Please try again.';
+        // Deliberately generic — never reveal cooldown timing or pool status here.
+        document.getElementById('free-error-msg').textContent = 'Not available right now. Try again later.';
         document.getElementById('free-error-view').style.display = 'block';
       }
     } catch(e) {
-      document.getElementById('free-error-msg').textContent = 'Network error. Please try again.';
+      document.getElementById('free-error-msg').textContent = 'Not available right now. Try again later.';
       document.getElementById('free-error-view').style.display = 'block';
     }
   }

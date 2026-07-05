@@ -1655,6 +1655,7 @@
   let premDemoActive = false;    // is the demo blur/animation running
   let premDemoSeen = false;      // demo has been shown to logged-in non-premium user
   let demoSelectedPlan = 'boss'; // which tier the user previewed in the discount picker
+  let freeScanConfirmed = false; // Free tier: has THIS cycle had a real successful scan (not just preview)
 
   async function callEdge(fnName, body) {
     const res = await fetch(SUPA_URL + '/functions/v1/' + fnName, {
@@ -2539,10 +2540,13 @@
     const isExpensive = subCostCount === 0;
 
     // Any plan (cheap or Golden) tapped while a premium discount preview is active
-    // but not actually paid for → show the real Unlock Premium sheet with actual
+    // but not actually confirmed yet → show the real Unlock Premium sheet with actual
     // prices instead of letting the previewed discount go through. Guests never
     // reach this — the gateCheck above already sent them to login/register first.
-    if ((premDemoActive || premDemoSeen) && !premiumUnlocked) {
+    // Free tier is gated on freeScanConfirmed (not premiumUnlocked) since it never
+    // "locks in" — every cycle needs a fresh confirmed scan before buying.
+    const notYetConfirmed = premiumPlan === 'free' ? !freeScanConfirmed : !premiumUnlocked;
+    if ((premDemoActive || premDemoSeen) && notYetConfirmed) {
       showPremUnlockSheet(true);
       return;
     }
@@ -3926,7 +3930,7 @@
 
     if (btn) {
       const s = PREM_PLAN_STYLE[plan];
-      const isCurrentPlan = premiumUnlocked && plan === premiumPlan;
+      const isCurrentPlan = premiumUnlocked && plan === premiumPlan && plan !== 'free';
       if (isCurrentPlan) {
         btn.style.background = 'var(--dark-4)';
         btn.style.color = 'var(--w40)';
@@ -3963,10 +3967,13 @@
   // Premium state is loaded from the database via fetchUserData — not localStorage
 
   function onPremToggleClick() {
-    // Toggle is ON but not paid (guest or logged-in non-premium) → turn OFF and restore
-    if (premiumToggleOn && !premiumUnlocked) {
+    // Toggle is ON but nothing has permanently locked it in — guest/non-premium
+    // preview, OR Free tier mid-cycle (Free never "locks in", it always restarts
+    // the full process next time) → turn OFF and restore
+    if (premiumToggleOn && (!premiumUnlocked || premiumPlan === 'free')) {
       premiumToggleOn = false;
       premDemoSeen = false;
+      if (premiumPlan === 'free') freeScanConfirmed = false;
       const dash = document.getElementById('dash');
       if (dash) dash.classList.remove('prem-demo-active');
       setPremToggleUI(false);
@@ -3974,14 +3981,7 @@
       return;
     }
 
-    if (premiumUnlocked) {
-      // Free tier never auto-reactivates — every toggle-on requires a fresh scan,
-      // and whether the cooldown has passed is checked silently server-side.
-      if (premiumPlan === 'free') {
-        openFreeScan();
-        return;
-      }
-
+    if (premiumUnlocked && premiumPlan !== 'free') {
       // Check cooldown first
       const cooldownHrs = (PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.boss).cooldownHrs;
       const cooldownMs = cooldownHrs * 60 * 60 * 1000;
@@ -4000,7 +4000,7 @@
       setPremToggleUI(true);
       renderBundles();
     } else {
-      // Not yet premium — open the discount picker (name + % only, no prices)
+      // Not yet premium, OR Free tier starting a fresh cycle — open the discount picker
       openPremDiscountPick();
     }
   }
@@ -4095,6 +4095,7 @@
   function turnOffPremiumAfterPurchase() {
     premiumToggleOn = false;
     premiumLastUsed = Date.now(); // will be updated from DB on next fetchUserData
+    if (premiumPlan === 'free') freeScanConfirmed = false;
     setPremToggleUI(false);
     renderBundles();
     schedulePremiumAutoOn();
@@ -4104,6 +4105,7 @@
     // Clear any existing auto-on timer
     if (window._premAutoOnTimer) clearTimeout(window._premAutoOnTimer);
     if (!premiumUnlocked || !premiumLastUsed) return;
+    if (premiumPlan === 'free') return; // Free tier never auto-reactivates — always needs a fresh scan
 
     const cooldownMs = (PREMIUM_PLANS[premiumPlan] || PREMIUM_PLANS.boss).cooldownHrs * 3600000;
     const msLeft = (premiumLastUsed + cooldownMs) - Date.now();
@@ -4111,7 +4113,7 @@
 
     window._premAutoOnTimer = setTimeout(() => {
       // Only auto-turn-on if pool is active and user is still premium
-      if (premiumUnlocked && poolBalance > 0) {
+      if (premiumUnlocked && premiumPlan !== 'free' && poolBalance > 0) {
         premiumToggleOn = true;
         setPremToggleUI(true);
         renderBundles();
@@ -4165,6 +4167,7 @@
     demoSelectedPlan = plan;
     premiumToggleOn = true;
     premDemoSeen = true;
+    if (plan === 'free') freeScanConfirmed = false; // fresh cycle — always needs a new scan before buying
     setPremToggleUI(true);
     const dash = document.getElementById('dash');
     if (dash) dash.classList.add('prem-demo-active');
@@ -4653,6 +4656,7 @@
       if (data && data.success) {
         await fetchUserData();
         premiumToggleOn = true;
+        freeScanConfirmed = true;
         setPremToggleUI(true);
         renderBundles();
         document.getElementById('free-success-view').style.display = 'block';

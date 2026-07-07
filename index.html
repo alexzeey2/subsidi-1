@@ -210,9 +210,13 @@
 
   .bnav{position:fixed;bottom:0;left:0;right:0;background:var(--dark-2);border-top:1px solid var(--border);display:flex;padding:10px 0 22px;z-index:50}
   .ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px}
-  .ni-ico{width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+  .ni-ico{width:28px;height:28px;display:flex;align-items:center;justify-content:center;position:relative}
   .ni-lbl{font-size:9px;font-weight:700;color:var(--w40);letter-spacing:.8px;text-transform:uppercase}
   .ni.on .ni-lbl{color:var(--p-light)}
+
+  .ni-badge{position:absolute;top:-4px;right:-6px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:linear-gradient(135deg,#FFD84D,#E8A500);display:none;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#3a2600;line-height:1;box-shadow:0 0 6px 1px rgba(255,200,0,.75);animation:badgeGlow 2s ease-in-out infinite}
+  .ni-badge.show{display:flex}
+  @keyframes badgeGlow{0%,100%{box-shadow:0 0 5px 1px rgba(255,200,0,.6)}50%{box-shadow:0 0 9px 3px rgba(255,200,0,.9)}}
 
   /* SUCCESS */
   #success{align-items:center;justify-content:center;padding:48px 28px;text-align:center;background:var(--dark)}
@@ -895,6 +899,7 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
         </svg>
+        <span class="ni-badge lb-badge">0</span>
       </div>
       <span class="ni-lbl">Leaderboard</span>
     </div>
@@ -1168,6 +1173,7 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
         </svg>
+        <span class="ni-badge lb-badge">0</span>
       </div>
       <span class="ni-lbl">Leaderboard</span>
     </div>
@@ -1330,6 +1336,7 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B4FE8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
         </svg>
+        <span class="ni-badge lb-badge">0</span>
       </div>
       <span class="ni-lbl" style="color:var(--p-light)">Leaderboard</span>
     </div>
@@ -1981,6 +1988,7 @@
           checkWaJoined();
           show('dash');
           renderBundles();
+          fetchLeaderboardBadge();
         } else {
           localStorage.removeItem('subsidi_userId');
           localStorage.removeItem('subsidi_session_token');
@@ -1994,6 +2002,7 @@
         show('dash');
         updateSubsidyUI();
         renderBundles(); // restore so retry fetch works correctly
+        fetchLeaderboardBadge();
         // Retry the data fetch after a short delay — don't silently show empty dashboard
         setTimeout(async () => {
           try {
@@ -2010,6 +2019,7 @@
       show('dash');
       updateSubsidyUI();
       renderBundles();
+      fetchLeaderboardBadge();
     }
 
     // Refresh bar and balance when user comes back to the tab
@@ -3468,9 +3478,31 @@
     try {
       const data = await callEdge('get-leaderboard', { userId });
       renderLeaderboard((data && data.leaderboard) || [], (data && data.you) || null);
+      updateLeaderboardBadge(data && data.total_participants);
     } catch (e) {
       console.error('Leaderboard fetch error:', e);
       listEl.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--w40);font-size:13px">Could not load leaderboard. Pull to refresh.</div>';
+    }
+  }
+
+  // ── Gold nav badge: total number of people on this month's leaderboard ──
+  function updateLeaderboardBadge(count) {
+    const n = Number(count) || 0;
+    const badges = document.querySelectorAll('.lb-badge');
+    badges.forEach(b => {
+      b.textContent = n > 99 ? '99+' : String(n);
+      b.classList.toggle('show', n > 0);
+    });
+  }
+
+  // Lightweight fetch used just to keep the badge current (e.g. on app load),
+  // without touching the leaderboard list/screen UI.
+  async function fetchLeaderboardBadge() {
+    try {
+      const data = await callEdge('get-leaderboard', { userId });
+      updateLeaderboardBadge(data && data.total_participants);
+    } catch (e) {
+      console.error('Leaderboard badge fetch error:', e);
     }
   }
 
@@ -3595,6 +3627,7 @@
     show('dash');
     renderBundles();
     fetchUserData();
+    fetchLeaderboardBadge();
   }
 
   // ── COLLECT FLOW ──────────────────────────────────────────────

@@ -928,12 +928,6 @@
   const CARD_IMG_BOSS = 'https://i.postimg.cc/QMbVvFSz/1780768681291-removebg-preview.png';
   const CARD_IMG_CEO  = 'https://i.postimg.cc/QMbVvFSz/1780768681291-removebg-preview.png';
 
-  // "Order a New Card" screen shows the same standalone card photo used in My Card
-  (function() {
-    const el = document.getElementById('newcard-photo');
-    if (el) el.src = CARD_IMG_BOSS;
-  })();
-
   function renderMyCard() {
     const wrap = document.getElementById('mycard-content');
     if (!wrap) return;
@@ -1420,7 +1414,7 @@
       Lost, damaged, or never had one? Get the same plastic Subsidi card used to reactivate discounts — no premium plan required.
     </div>
 
-    <img id="newcard-photo" src="" alt="Subsidi Card" style="width:100%;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,0.5);margin-bottom:20px;">
+    <img id="newcard-photo" src="https://i.postimg.cc/QMbVvFSz/1780768681291-removebg-preview.png" alt="Subsidi Card" style="width:100%;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,0.5);margin-bottom:20px;">
 
     <div id="newcard-buy" style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;">
       <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Standalone Card — ₦3,000</div>

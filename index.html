@@ -1590,7 +1590,7 @@
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Discounted prices on every plan</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Scan your existing Subsidi card to reactivate after cooldown</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Earn ₦40 cashback on purchases made during cooldown</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Earn ₦40 cashback on every data purchase</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> ₦3,900/month, billed every 30 days</div>
             </div>
           </div>
@@ -2249,7 +2249,7 @@
       if (code && code.data) {
         const raw = code.data.trim();
         // Valid Subsidi card
-        if (raw === 'SUBSIDI_ACTIVATE_CARD_V1' || raw === 'https://subsidi-1.vercel.app/' || raw.startsWith('https://subsidi-1.vercel.app')) {
+        if (raw.startsWith('https://subsidi-1.vercel.app')) {
           clearTimeout(_scanBadTimer);
           hideScanBad();
           stopStream(regStream);
@@ -4771,7 +4771,7 @@
               <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Flat Discount</strong> — Boss gives ₦260 off every plan, no matter the size. CEO gives ₦260 off on plans ₦100–₦500, and ₦500 off on plans above ₦500. This is a fixed amount, not a percentage.</p>
               <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Cashback Wallet</strong> — Every purchase, premium or not, earns a small cashback added to your wallet automatically. Collect it into your main balance any time by scanning your card, once you have at least ₦150 saved up.</p>
               ${plan === 'boss' ? `
-              <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">Boss Cooldown Cashback</strong> — On top of the regular cashback, Boss subscribers earn an extra ₦40 on any purchase made while their discount is in cooldown — so you're still earning something even between discounts.</p>` : ''}
+              <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">Boss Cashback</strong> — On top of the regular cashback, Boss subscribers earn an extra ₦40 on every data purchase made while premium is active, added to your wallet.</p>` : ''}
               ${plan === 'ceo' ? `
               <p style="margin:0 0 10px;">💳 <strong style="color:var(--w70);">CEO Pricing</strong> — Your first CEO payment is ₦11,900, which includes your plastic card. Renewals after that are ₦8,900 since you keep the card.</p>
               <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">CEO Cashback</strong> — On top of the regular cashback, CEO subscribers earn an extra ₦100 on every data purchase made while premium is active, added to your wallet.</p>` : ''}
@@ -5005,7 +5005,7 @@
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       if (code && code.data) {
         const raw = code.data.trim();
-        const isValidCard = raw === 'SUBSIDI_ACTIVATE_CARD_V1' || raw.startsWith('https://subsidi-1.vercel.app');
+        const isValidCard = raw.startsWith('https://subsidi-1.vercel.app');
         if (isValidCard) {
           stopRaffleScan();
           submitRaffleEntry(raw);
@@ -5110,7 +5110,7 @@
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       if (code && code.data) {
         const raw = code.data.trim();
-        const isValidCard = raw === 'SUBSIDI_ACTIVATE_CARD_V1' || raw.startsWith('https://subsidi-1.vercel.app');
+        const isValidCard = raw.startsWith('https://subsidi-1.vercel.app');
         if (isValidCard) {
           stopFreeScan();
           submitFreeScan();
@@ -5238,7 +5238,7 @@
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       if (code && code.data) {
         const raw = code.data.trim();
-        const isValidCard = raw === 'SUBSIDI_ACTIVATE_CARD_V1' || raw.startsWith('https://subsidi-1.vercel.app');
+        const isValidCard = raw.startsWith('https://subsidi-1.vercel.app');
         if (isValidCard) {
           stopCashbackScan();
           submitCashbackScan(raw);

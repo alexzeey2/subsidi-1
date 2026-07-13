@@ -2269,9 +2269,10 @@
 
         // QR detected but not a Subsidi card — show overlay
         clearTimeout(_scanBadTimer);
-        showScanBad();
-        // Auto-hide after 1.5s in case they pull card away without another QR in view
-        _scanBadTimer = setTimeout(hideScanBad, 1500);
+        showScanBad('Card Not Recognised (debug)', 'Scanned text was:\n' + raw);
+        // Auto-hide after 8s (temporarily extended for debugging) — will hide sooner
+        // if another QR comes into view
+        _scanBadTimer = setTimeout(hideScanBad, 8000);
       } else {
         // Nothing detected — hide overlay
         clearTimeout(_scanBadTimer);

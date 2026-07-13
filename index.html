@@ -1740,11 +1740,11 @@
   let premDemoSeen = false;      // demo has been shown to logged-in non-premium user
   let demoSelectedPlan = 'free'; // which tier the user previewed in the discount picker
 
-  // Free trial: self-serve in-app, no card, no payment. Flat ₦150 off (any plan
-  // size), 2 total uses, 1hr cooldown between uses. Tab disappears once used up.
+  // Free trial: requires a card scan to activate (see openFreeScan('activate')).
+  // Flat ₦150 off (any plan size), 2 total uses. Tab disappears once used up.
   const FREE_TRIAL_DISCOUNT = 150;
   const FREE_TRIAL_COOLDOWN_HRS = 1;
-  const FREE_TRIAL_MAX_USES = 1;
+  const FREE_TRIAL_MAX_USES = 2;
   let freeTrialUsesLeft = FREE_TRIAL_MAX_USES; // loaded from DB (data.freeTrialUsesLeft)
 
   // Returns the flat naira discount for this purchase, based on the plan's price band.
@@ -2184,7 +2184,7 @@
 
   async function startRegScan() {
     try {
-      regStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      regStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 }, focusMode: 'continuous' } });
       const video = document.getElementById('reg-video');
       video.srcObject = regStream;
       video.play();
@@ -2269,10 +2269,9 @@
 
         // QR detected but not a Subsidi card — show overlay
         clearTimeout(_scanBadTimer);
-        showScanBad('Card Not Recognised (debug)', 'Scanned text was:\n' + raw);
-        // Auto-hide after 8s (temporarily extended for debugging) — will hide sooner
-        // if another QR comes into view
-        _scanBadTimer = setTimeout(hideScanBad, 8000);
+        showScanBad();
+        // Auto-hide after 1.5s in case they pull card away without another QR in view
+        _scanBadTimer = setTimeout(hideScanBad, 1500);
       } else {
         // Nothing detected — hide overlay
         clearTimeout(_scanBadTimer);
@@ -4312,7 +4311,8 @@
     updateCurrentPlanBadge();
   }
 
-  // Activates the free trial directly — no payment, no card, no scan.
+  // Free trial activation happens via openFreeScan('activate') → submitFreeScan(),
+  // which requires a card scan and calls the activate-premium-scan edge function.
   // Reuses the premiumUnlocked/premiumPlan plumbing so the existing pricing
   // and cooldown logic in renderBundles/updateSubsidyUI just works; once both
   // uses are spent, this reverts automatically (see turnOffPremiumAfterPurchase).
@@ -4976,7 +4976,7 @@
 
   async function startRaffleScan() {
     try {
-      raffleStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      raffleStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 }, focusMode: 'continuous' } });
       const video = document.getElementById('raffle-video');
       video.srcObject = raffleStream;
       video.play();
@@ -5081,7 +5081,7 @@
 
   async function startFreeScan() {
     try {
-      freeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      freeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 }, focusMode: 'continuous' } });
       const video = document.getElementById('free-scan-video');
       video.srcObject = freeStream;
       video.play();
@@ -5116,7 +5116,7 @@
         const isValidCard = raw.startsWith('https://subsidi-1.vercel.app/');
         if (isValidCard) {
           stopFreeScan();
-          submitFreeScan();
+          submitFreeScan(raw);
           return;
         }
       }
@@ -5124,19 +5124,21 @@
     freeScanLoop = setTimeout(freeScanFrame, 200);
   }
 
-  async function submitFreeScan() {
+  async function submitFreeScan(cardCode) {
     document.getElementById('free-scan-view').style.display = 'none';
     try {
-      // NOTE: backend edge function needs updating to match — for 'activate' this
-      // should just confirm a real card was scanned (no cooldown check, first-ever
-      // use). For 'reactivate' it should verify the cooldown has actually elapsed
-      // for this paid subscriber before confirming.
-      const data = await callEdge('activate-premium-scan', { userId, context: scanContext });
+      // Edge function now verifies cardCode server-side against the user's
+      // stored card_code — see activate-premium-scan/index.ts.
+      const data = await callEdge('activate-premium-scan', { userId, context: scanContext, cardCode });
       if (data && data.success) {
         if (scanContext === 'activate') {
-          // First-time Free Trial activation — no payment, just confirms the scan.
+          // First-time (or repeat) Free Trial activation — no payment, just confirms the scan.
           premiumUnlocked = true;
           premiumPlan = 'free';
+          if (typeof data.usesLeft === 'number') {
+            freeTrialUsesLeft = data.usesLeft;
+            updateFreeTrialVisibility();
+          }
         } else {
           await fetchUserData();
         }
@@ -5209,7 +5211,7 @@
 
   async function startCashbackScan() {
     try {
-      cashbackStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      cashbackStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 }, focusMode: 'continuous' } });
       const video = document.getElementById('cashback-scan-video');
       video.srcObject = cashbackStream;
       video.play();

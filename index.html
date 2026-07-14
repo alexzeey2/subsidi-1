@@ -5150,7 +5150,19 @@
 
     // Best-effort background sync — failures here are silent and don't
     // affect the scan result the user just saw.
-    callEdge('activate-premium-scan', { userId, context: scanContext, cardCode }).catch(() => {});
+    callEdge('activate-premium-scan', { userId, context: scanContext, cardCode })
+      .then((data) => {
+        // Reconcile with what the server actually saved — protects against
+        // drift if this device's local count was ever out of sync.
+        if (data && typeof data.usesLeft === 'number' && scanContext === 'activate') {
+          freeTrialUsesLeft = data.usesLeft;
+          updateFreeTrialVisibility();
+        }
+        if (!data || data.error) {
+          console.warn('activate-premium-scan did not save:', data && data.error);
+        }
+      })
+      .catch((e) => console.warn('activate-premium-scan failed:', e));
   }
 
   function retryFreeScan() {
@@ -5260,7 +5272,19 @@
 
     // Best-effort background sync — failures here are silent and don't
     // affect the scan result the user just saw.
-    callEdge('claim-cashback', { userId, cardCode, collectedAmount: collected }).catch(() => {});
+    callEdge('claim-cashback', { userId, cardCode, collectedAmount: collected })
+      .then((data) => {
+        // Reconcile with the server's confirmed numbers in case of drift.
+        if (data && typeof data.newBalance === 'number') balance = data.newBalance;
+        if (data && typeof data.newCashbackBalance === 'number') {
+          cashbackBalance = data.newCashbackBalance;
+          if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
+        }
+        if (!data || data.error) {
+          console.warn('claim-cashback did not save:', data && data.error);
+        }
+      })
+      .catch((e) => console.warn('claim-cashback failed:', e));
   }
 
   function retryCashbackScan() {

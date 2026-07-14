@@ -5260,31 +5260,30 @@
     cashbackScanLoop = setTimeout(cashbackScanFrame, 200);
   }
 
-  function submitCashbackScan(cardCode) {
-    // Card recognition is front-end only (the isValidCard check already ran
-    // before this was called) — collecting cashback never depends on a
-    // backend round trip, so it can't fail with "Card not recognized"
-    // because of a network or edge function issue.
+  async function submitCashbackScan(cardCode) {
+    // Recognizing the card is front-end only (isValidCard already ran) —
+    // but moving money into the balance is real data, so this part DOES
+    // wait for and trust the database, not the locally-cached number.
     document.getElementById('cashback-scan-view').style.display = 'none';
-    closeCashbackScan();
-    const collected = cashbackBalance;
-    collectCashbackIntoMain(collected); // animates cashbackBalance -> 0 and Main balance up, on its own
-
-    // Best-effort background sync — failures here are silent and don't
-    // affect the scan result the user just saw.
-    callEdge('claim-cashback', { userId, cardCode, collectedAmount: collected })
-      .then((data) => {
-        // Reconcile with the server's confirmed numbers in case of drift.
-        if (data && typeof data.newBalance === 'number') balance = data.newBalance;
-        if (data && typeof data.newCashbackBalance === 'number') {
-          cashbackBalance = data.newCashbackBalance;
-          if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
-        }
-        if (!data || data.error) {
-          console.warn('claim-cashback did not save:', data && data.error);
-        }
-      })
-      .catch((e) => console.warn('claim-cashback failed:', e));
+    document.getElementById('cashback-scan-status').textContent = 'Confirming...';
+    try {
+      const data = await callEdge('claim-cashback', { userId, cardCode });
+      if (!data || data.error) {
+        document.getElementById('cashback-error-msg').textContent =
+          (data && data.error) || 'Something went wrong. Please try again.';
+        document.getElementById('cashback-error-view').style.display = 'block';
+        return;
+      }
+      closeCashbackScan();
+      await collectCashbackIntoMain(data.collectedAmount); // animates using the DB-confirmed amount
+      // Snap to the DB's final numbers in case of any rounding drift.
+      balance = data.newBalance;
+      cashbackBalance = data.newCashbackBalance;
+      if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
+    } catch (e) {
+      document.getElementById('cashback-error-msg').textContent = 'Something went wrong. Please try again.';
+      document.getElementById('cashback-error-view').style.display = 'block';
+    }
   }
 
   function retryCashbackScan() {

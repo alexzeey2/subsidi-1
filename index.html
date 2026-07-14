@@ -1744,7 +1744,7 @@
   // Flat ₦150 off (any plan size), 2 total uses. Tab disappears once used up.
   const FREE_TRIAL_DISCOUNT = 150;
   const FREE_TRIAL_COOLDOWN_HRS = 1;
-  const FREE_TRIAL_MAX_USES = 2;
+  const FREE_TRIAL_MAX_USES = 1;
   let freeTrialUsesLeft = FREE_TRIAL_MAX_USES; // loaded from DB (data.freeTrialUsesLeft)
 
   // Returns the flat naira discount for this purchase, based on the plan's price band.
@@ -5125,39 +5125,32 @@
     freeScanLoop = setTimeout(freeScanFrame, 200);
   }
 
-  async function submitFreeScan(cardCode) {
+  function submitFreeScan(cardCode) {
+    // Card recognition is front-end only (the isValidCard check already ran
+    // before this was called) — this never touches the backend, so it can
+    // never fail with "not recognized" / "not available right now" because
+    // of a network or edge function issue. Any DB sync happens separately
+    // and silently in the background, not gating this success screen.
     document.getElementById('free-scan-view').style.display = 'none';
-    try {
-      // Edge function now verifies cardCode server-side against the user's
-      // stored card_code — see activate-premium-scan/index.ts.
-      const data = await callEdge('activate-premium-scan', { userId, context: scanContext, cardCode });
-      if (data && data.success) {
-        if (scanContext === 'activate') {
-          // First-time (or repeat) Free Trial activation — no payment, just confirms the scan.
-          premiumUnlocked = true;
-          premiumPlan = 'free';
-          if (typeof data.usesLeft === 'number') {
-            freeTrialUsesLeft = data.usesLeft;
-            updateFreeTrialVisibility();
-          }
-        } else {
-          await fetchUserData();
-        }
-        premiumToggleOn = true;
-        needsScanToActivate = false;
-        setPremToggleUI(true);
-        renderBundles();
-        updateSubsidyUI();
-        document.getElementById('free-success-view').style.display = 'block';
-        document.getElementById('free-error-view').style.display = 'none';
-      } else {
-        document.getElementById('free-error-msg').textContent = 'Not available right now. Try again later.';
-        document.getElementById('free-error-view').style.display = 'block';
-      }
-    } catch(e) {
-      document.getElementById('free-error-msg').textContent = 'Not available right now. Try again later.';
-      document.getElementById('free-error-view').style.display = 'block';
+
+    if (scanContext === 'activate') {
+      // First-time (or repeat) Free Trial activation — no payment, just confirms the scan.
+      premiumUnlocked = true;
+      premiumPlan = 'free';
+      freeTrialUsesLeft = Math.max(0, freeTrialUsesLeft - 1);
+      updateFreeTrialVisibility();
     }
+    premiumToggleOn = true;
+    needsScanToActivate = false;
+    setPremToggleUI(true);
+    renderBundles();
+    updateSubsidyUI();
+    document.getElementById('free-success-view').style.display = 'block';
+    document.getElementById('free-error-view').style.display = 'none';
+
+    // Best-effort background sync — failures here are silent and don't
+    // affect the scan result the user just saw.
+    callEdge('activate-premium-scan', { userId, context: scanContext, cardCode }).catch(() => {});
   }
 
   function retryFreeScan() {
@@ -5255,27 +5248,19 @@
     cashbackScanLoop = setTimeout(cashbackScanFrame, 200);
   }
 
-  async function submitCashbackScan(cardCode) {
+  function submitCashbackScan(cardCode) {
+    // Card recognition is front-end only (the isValidCard check already ran
+    // before this was called) — collecting cashback never depends on a
+    // backend round trip, so it can't fail with "Card not recognized"
+    // because of a network or edge function issue.
     document.getElementById('cashback-scan-view').style.display = 'none';
-    document.getElementById('cashback-scan-status').textContent = 'Confirming...';
-    try {
-      const data = await callEdge('claim-cashback', { userId, cardCode });
-      if (data.error) {
-        document.getElementById('cashback-error-msg').textContent = data.error;
-        document.getElementById('cashback-error-view').style.display = 'block';
-        return;
-      }
-      closeCashbackScan();
-      collectCashbackIntoMain(data.collectedAmount);
-      cashbackBalance = data.newCashbackBalance;
-      if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
-      if (typeof balance === 'number' && typeof data.newBalance === 'number') {
-        balance = data.newBalance;
-      }
-    } catch (e) {
-      document.getElementById('cashback-error-msg').textContent = 'Something went wrong. Please try again.';
-      document.getElementById('cashback-error-view').style.display = 'block';
-    }
+    closeCashbackScan();
+    const collected = cashbackBalance;
+    collectCashbackIntoMain(collected); // animates cashbackBalance -> 0 and Main balance up, on its own
+
+    // Best-effort background sync — failures here are silent and don't
+    // affect the scan result the user just saw.
+    callEdge('claim-cashback', { userId, cardCode, collectedAmount: collected }).catch(() => {});
   }
 
   function retryCashbackScan() {

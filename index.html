@@ -100,6 +100,8 @@
   .ci-icon{width:40px;height:40px;background:var(--dark-4);border:1px solid var(--p);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;box-shadow:0 0 12px var(--p-glow);animation:iconpulse 2.5s ease-in-out infinite;transition:all .15s}
   .ci-icon:active{transform:scale(.93)}
   @keyframes iconpulse{0%,100%{box-shadow:0 0 8px var(--p-glow)}50%{box-shadow:0 0 20px rgba(108,43,217,.5)}}
+  .trial-glow{animation:trialGlow 1.8s ease-in-out infinite;}
+  @keyframes trialGlow{0%,100%{box-shadow:0 0 10px 0 rgba(155,92,246,.5)}50%{box-shadow:0 0 22px 4px rgba(155,92,246,.85)}}
   .ci-badge{position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid var(--dark-2);animation:blink 2s ease-in-out infinite}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
   .refresh-btn{height:36px;padding:0 14px;background:var(--dark-4);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:6px;cursor:pointer;transition:all .15s;color:rgba(255,255,255,0.5);font-size:11px;font-weight:600;letter-spacing:.3px}
@@ -1563,7 +1565,6 @@
             <div style="font-size:20px;font-weight:900;color:var(--p-light);margin-bottom:2px;">Instantly cheaper</div>
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">on every data plan</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> First use free — scan any Subsidi card to try it</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Discounted prices on every plan</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Scan your existing Subsidi card to reactivate after cooldown</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Earn ₦40 cashback on every data purchase</div>
@@ -4243,8 +4244,9 @@
         btn.style.background = s.btnGradient;
         btn.style.color = s.btnText;
         btn.style.cursor = 'pointer';
-        btn.textContent = '📇 Try Boss Free — Scan Card';
+        btn.textContent = '📇 1 Free Trial';
         btn.setAttribute('onclick', "openFreeScan('activate')");
+        btn.classList.add('trial-glow');
       } else if (isCurrentPlan && premiumIsTrial) {
         // Mid-trial, already scanned in — just waiting for them to use it.
         btn.style.background = 'var(--dark-4)';
@@ -4252,24 +4254,28 @@
         btn.textContent = '✓ Free trial active — use it once';
         btn.setAttribute('onclick', '');
         btn.style.cursor = 'default';
+        btn.classList.remove('trial-glow');
       } else if (isCurrentPlan && needsScanToActivate) {
         btn.style.background = s.btnGradient;
         btn.style.color = s.btnText;
         btn.style.cursor = 'pointer';
         btn.textContent = '📇 Scan Card to Reactivate';
         btn.setAttribute('onclick', "openFreeScan('reactivate')");
+        btn.classList.remove('trial-glow');
       } else if (isCurrentPlan) {
         btn.style.background = 'var(--dark-4)';
         btn.style.color = 'var(--w40)';
         btn.textContent = '✓ Subscribed — ' + PREM_PLAN_LABEL[plan];
         btn.setAttribute('onclick', '');
         btn.style.cursor = 'default';
+        btn.classList.remove('trial-glow');
       } else {
         btn.style.background = s.btnGradient;
         btn.style.color = s.btnText;
         btn.style.cursor = 'pointer';
         btn.textContent = 'Unlock Premium — ' + PREM_PLAN_LABEL[plan];
         btn.setAttribute('onclick', "payPremiumUnlock('" + plan + "')");
+        btn.classList.remove('trial-glow');
       }
     }
 
@@ -5086,11 +5092,17 @@
 
   function submitFreeScan(cardCode) {
     // Card recognition is front-end only (the isValidCard check already ran
-    // before this was called) — this never touches the backend, so it can
-    // never fail with "not recognized" / "not available right now" because
-    // of a network or edge function issue. Any DB sync happens separately
-    // and silently in the background, not gating this success screen.
+    // before this was called) — so a network blip alone never shows as
+    // "not recognized." But if the backend comes back with a confirmed
+    // rejection (trial already used, no cards left, etc.), we DO revert and
+    // tell the user — we just don't reveal which of those it was.
     document.getElementById('free-scan-view').style.display = 'none';
+
+    // Snapshot so we can roll back cleanly if the backend rejects this.
+    const prevState = {
+      premiumUnlocked, premiumPlan, premiumIsTrial, bossTrialAvailable,
+      premiumToggleOn, needsScanToActivate,
+    };
 
     if (scanContext === 'activate') {
       // One-time Boss trial — no payment, just confirms the scan. Good for
@@ -5109,12 +5121,33 @@
     document.getElementById('free-success-view').style.display = 'block';
     document.getElementById('free-error-view').style.display = 'none';
 
-    // Best-effort background sync — failures here are silent and don't
-    // affect the scan result the user just saw.
     callEdge('activate-premium-scan', { userId, context: scanContext, cardCode })
       .then((data) => {
         if (!data || data.error) {
-          console.warn('activate-premium-scan did not save:', data && data.error);
+          // Confirmed rejection — roll back the optimistic activation and
+          // tell the user plainly, without exposing the real reason
+          // (empty card stock, trial already used, etc.)
+          console.warn('activate-premium-scan rejected:', data && data.error);
+          premiumUnlocked = prevState.premiumUnlocked;
+          premiumPlan = prevState.premiumPlan;
+          premiumIsTrial = prevState.premiumIsTrial;
+          bossTrialAvailable = prevState.bossTrialAvailable;
+          premiumToggleOn = prevState.premiumToggleOn;
+          needsScanToActivate = prevState.needsScanToActivate;
+          setPremToggleUI(premiumToggleOn);
+          renderBundles();
+          updateSubsidyUI();
+          document.getElementById('free-success-view').style.display = 'none';
+          document.getElementById('free-error-msg').textContent = 'Card not recognized.';
+          document.getElementById('free-error-view').style.display = 'block';
+          return;
+        }
+        // If this was this account's first-ever scan, the backend just
+        // claimed a real card for it — reflect that locally (My Card screen,
+        // the "link your card" nudge, etc.)
+        if (data.cardCode && data.cardCode !== registeredCard) {
+          registeredCard = data.cardCode;
+          if (typeof renderMyCard === 'function') renderMyCard();
         }
       })
       .catch((e) => console.warn('activate-premium-scan failed:', e));
@@ -5224,8 +5257,10 @@
     try {
       const data = await callEdge('claim-cashback', { userId, cardCode });
       if (!data || data.error) {
-        document.getElementById('cashback-error-msg').textContent =
-          (data && data.error) || 'Something went wrong. Please try again.';
+        // Same policy as the premium scan: don't reveal the real reason
+        // (empty card stock vs. genuinely bad scan) — just a generic message.
+        console.warn('claim-cashback rejected:', data && data.error);
+        document.getElementById('cashback-error-msg').textContent = 'Card not recognized.';
         document.getElementById('cashback-error-view').style.display = 'block';
         return;
       }
@@ -5235,6 +5270,12 @@
       balance = data.newBalance;
       cashbackBalance = data.newCashbackBalance;
       if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
+      // If this was this account's first-ever scan, the backend just
+      // claimed a real card for it — reflect that locally.
+      if (data.cardCode && data.cardCode !== registeredCard) {
+        registeredCard = data.cardCode;
+        if (typeof renderMyCard === 'function') renderMyCard();
+      }
     } catch (e) {
       document.getElementById('cashback-error-msg').textContent = 'Something went wrong. Please try again.';
       document.getElementById('cashback-error-view').style.display = 'block';

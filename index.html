@@ -1259,7 +1259,7 @@
     <div id="free-scan-view">
       <div style="text-align:center;margin-bottom:16px;">
         <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:#fff;margin-bottom:4px;">Scan a card</div>
-        <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold any Subsidi card up to the camera to activate the Free tier</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold your Subsidi card up to the camera to activate</div>
       </div>
 
       <div style="position:relative;width:100%;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
@@ -1504,11 +1504,6 @@
       <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:20px;">See how much cheaper your data gets on each tier.</div>
     </div>
     <div style="display:flex;gap:6px;padding:0 16px;">
-      <div id="pick-card-free" onclick="pickPremDiscount('free')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-3);border:1.5px solid var(--border);opacity:0.55;">
-        <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px;">Free Trial</div>
-        <div style="font-size:19px;font-weight:900;color:#fff;">₦150</div>
-        <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off, 1 use</div>
-      </div>
       <div id="pick-card-boss" onclick="pickPremDiscount('boss')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-3);border:1.5px solid var(--border);opacity:0.55;">
         <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px;">Boss</div>
         <div style="font-size:19px;font-weight:900;color:var(--w40);">₦260</div>
@@ -1520,7 +1515,7 @@
         <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off (by plan size)</div>
       </div>
     </div>
-    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">Free Trial: scan once to start, no payment. Boss/CEO: pay, then scan after every 72hr cooldown</div>
+    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">Boss: first use free with a card scan, then pay to keep it going. Boss/CEO after that: pay, then scan after every 72hr cooldown.</div>
   </div>
 </div>
 
@@ -1541,14 +1536,6 @@
     <!-- Plan selector cards -->
     <div style="display:flex;gap:6px;padding:0 16px;margin-bottom:20px;">
 
-      <!-- Free Trial -->
-      <div id="prem-btn-free" onclick="selectPremPlan('free')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;position:relative;">
-        <div id="prem-current-badge-free" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#fff;color:#000;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Active</div>
-        <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Free Trial</div>
-        <div style="font-size:15px;font-weight:900;color:var(--w40);">₦0</div>
-        <div style="font-size:8.5px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:3px;">1 use</div>
-      </div>
-
       <!-- Boss -->
       <div id="prem-btn-boss" onclick="selectPremPlan('boss')" style="flex:1;border-radius:14px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;position:relative;">
         <div id="prem-current-badge-boss" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--p);color:#fff;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
@@ -1568,28 +1555,15 @@
 
     <!-- Benefits box: clipping container -->
     <div id="prem-benefits-wrap" style="overflow:hidden;position:relative;padding:0 20px;margin-bottom:20px;" ontouchstart="premSwipeStart(event)" ontouchmove="premSwipeMove(event)" ontouchend="premSwipeEnd(event)">
-      <div id="prem-benefits-inner" style="display:flex;width:300%;transform:translateX(0%);transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
-
-        <!-- Free Trial benefits -->
-        <div style="flex-shrink:0;width:33.3333%;box-sizing:border-box;padding-right:6px;">
-          <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:16px 20px;">
-            <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:2px;">₦150 off</div>
-            <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">any plan, 1 use total</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#fff;font-weight:800;">✓</span> No payment — scan any Subsidi card to activate</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#fff;font-weight:800;">✓</span> One-time only — gone once used</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);"><span style="color:var(--w40);font-weight:800;">✕</span> Disappears once both uses are used</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w40);"><span style="color:var(--w40);font-weight:800;">✕</span> No physical card, nothing to refund</div>
-            </div>
-          </div>
-        </div>
+      <div id="prem-benefits-inner" style="display:flex;width:200%;transform:translateX(0%);transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
 
         <!-- Boss benefits -->
-        <div style="flex-shrink:0;width:33.3333%;box-sizing:border-box;padding:0 3px;">
+        <div style="flex-shrink:0;width:50%;box-sizing:border-box;padding-right:6px;">
           <div style="background:var(--dark-3);border:1px solid rgba(108,43,217,.4);border-radius:16px;padding:16px 20px;">
             <div style="font-size:20px;font-weight:900;color:var(--p-light);margin-bottom:2px;">Instantly cheaper</div>
             <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">on every data plan</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> First use free — scan any Subsidi card to try it</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Discounted prices on every plan</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Scan your existing Subsidi card to reactivate after cooldown</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Earn ₦40 cashback on every data purchase</div>
@@ -1599,7 +1573,7 @@
         </div>
 
         <!-- CEO benefits -->
-        <div style="flex-shrink:0;width:33.3333%;box-sizing:border-box;padding-left:6px;">
+        <div style="flex-shrink:0;width:50%;box-sizing:border-box;padding-left:6px;">
           <div style="background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
             <img src="https://i.postimg.cc/QMbVvFSz/1780768681291-removebg-preview.png" alt="CEO Card" style="width:100%;border-radius:12px;margin-bottom:14px;">
             <div style="font-size:20px;font-weight:900;color:#F5A623;margin-bottom:2px;">Cheapest prices, period</div>
@@ -1736,27 +1710,25 @@
     ceo:  { price: 11900, cooldownHrs: 72, hasCard: true,  cardType: 'plastic', cardCost: 3000, discountCheap: 260, discountExpensive: 500 }
   };
   let premDemoActive = false;    // is the demo blur/animation running
-  let scanContext = 'reactivate'; // 'reactivate' (Boss/CEO cooldown scan) or 'activate' (first-time Free Trial scan)
+  let scanContext = 'reactivate'; // 'reactivate' (Boss/CEO cooldown scan) or 'activate' (one-time Boss trial scan)
   let premDemoSeen = false;      // demo has been shown to logged-in non-premium user
-  let demoSelectedPlan = 'free'; // which tier the user previewed in the discount picker
+  let demoSelectedPlan = 'boss'; // which tier the user previewed in the discount picker
 
-  // Free trial: requires a card scan to activate (see openFreeScan('activate')).
-  // Flat ₦150 off (any plan size), 2 total uses. Tab disappears once used up.
-  const FREE_TRIAL_DISCOUNT = 150;
-  const FREE_TRIAL_COOLDOWN_HRS = 1;
-  const FREE_TRIAL_MAX_USES = 1;
-  let freeTrialUsesLeft = FREE_TRIAL_MAX_USES; // loaded from DB (data.freeTrialUsesLeft)
+  // One-time Boss trial: a brand-new user can activate Boss for free with just
+  // a card scan. It's good for exactly one purchase-use — once that use is
+  // spent, premiumUnlocked goes fully dark (no cooldown, no reactivate-by-scan)
+  // until they actually subscribe and pay. loaded from DB (data.bossTrialAvailable / data.premiumIsTrial).
+  let bossTrialAvailable = true;
+  let premiumIsTrial = false;    // true while the ACTIVE premium session is the free trial, not a paid subscription
 
   // Returns the flat naira discount for this purchase, based on the plan's price band.
   function rollDiscountAmount(planKey, isExpensive) {
-    if (planKey === 'free') return FREE_TRIAL_DISCOUNT;
     const p = PREMIUM_PLANS[planKey] || PREMIUM_PLANS.boss;
     return isExpensive ? p.discountExpensive : p.discountCheap;
   }
 
-  // Cooldown length for whichever plan is active — free trial has its own shorter window.
+  // Cooldown length for whichever plan is active.
   function getCooldownHrs(planKey) {
-    if (planKey === 'free') return FREE_TRIAL_COOLDOWN_HRS;
     return (PREMIUM_PLANS[planKey] || PREMIUM_PLANS.boss).cooldownHrs;
   }
 
@@ -1904,23 +1876,24 @@
           cashbackBalance = data.cashbackBalance;
           if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
         }
-        if (typeof data.freeTrialUsesLeft !== 'undefined') freeTrialUsesLeft = data.freeTrialUsesLeft;
-        updateFreeTrialVisibility();
+        if (typeof data.bossTrialAvailable !== 'undefined') bossTrialAvailable = !!data.bossTrialAvailable;
 
         // Load premium state from DB — never from localStorage
         if (typeof data.isPremium !== 'undefined') {
           premiumUnlocked = !!data.isPremium;
           premiumPlan = data.premiumPlan || 'boss';
+          premiumIsTrial = !!data.premiumIsTrial;
           if (typeof renderMyCard === 'function') renderMyCard();
           premiumLastUsed = data.premiumLastUsed ? new Date(data.premiumLastUsed).getTime() : 0;
 
           // Toggle never auto-restores to on — user must scan the card again every time
-          // the cooldown has elapsed (free trial: just tap again, no scan needed).
+          // the cooldown has elapsed. The one-time trial has no cooldown/reactivate
+          // cycle at all — it just goes dark once used, so it's excluded here.
           // While still inside the cooldown window, nothing is needed yet — waiting it out.
           premiumToggleOn = false;
           const cooldownMs = getCooldownHrs(premiumPlan) * 3600000;
           const cooldownElapsed = (Date.now() - premiumLastUsed) >= cooldownMs;
-          needsScanToActivate = premiumUnlocked && premiumPlan !== 'free' && cooldownElapsed;
+          needsScanToActivate = premiumUnlocked && !premiumIsTrial && cooldownElapsed;
           setPremToggleUI(premiumToggleOn);
         }
 
@@ -2033,18 +2006,18 @@
           document.getElementById('bal-display').innerHTML =
             '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
           updateSubsidyUI();
-          if (typeof data.freeTrialUsesLeft !== 'undefined') freeTrialUsesLeft = data.freeTrialUsesLeft;
-          updateFreeTrialVisibility();
+          if (typeof data.bossTrialAvailable !== 'undefined') bossTrialAvailable = !!data.bossTrialAvailable;
 
           // Load premium state from DB — never from localStorage
           if (typeof data.isPremium !== 'undefined') {
             premiumUnlocked = !!data.isPremium;
             premiumPlan = data.premiumPlan || 'boss';
+            premiumIsTrial = !!data.premiumIsTrial;
             if (typeof renderMyCard === 'function') renderMyCard();
             premiumLastUsed = data.premiumLastUsed ? new Date(data.premiumLastUsed).getTime() : 0;
             premiumToggleOn = false;
             const cooldownMs = getCooldownHrs(premiumPlan) * 3600000;
-            needsScanToActivate = premiumUnlocked && premiumPlan !== 'free' && ((Date.now() - premiumLastUsed) >= cooldownMs);
+            needsScanToActivate = premiumUnlocked && !premiumIsTrial && ((Date.now() - premiumLastUsed) >= cooldownMs);
             setPremToggleUI(premiumToggleOn);
           }
 
@@ -4139,7 +4112,7 @@
   const FAQ_ITEMS = [
     {
       q: "What is Subsidi?",
-      a: "Subsidi is a membership that gets you mobile data cheaper than market price. Free Trial gets you 2 discounted purchases with just a card scan — no payment. Boss and CEO are paid monthly plans that keep every purchase discounted."
+      a: "Subsidi is a membership that gets you mobile data cheaper than market price. Your first Boss purchase is free with just a card scan — no payment. After that, Boss and CEO are paid monthly plans that keep every purchase discounted."
     },
     {
       q: "What is a Golden Plan?",
@@ -4147,7 +4120,7 @@
     },
     {
       q: "How do I keep my discount active?",
-      a: "Boss and CEO discounts run in 72-hour windows: once you use a discount, scan your card again after the cooldown to reactivate it. Free Trial works differently — it's 1 use total, and disappears once used."
+      a: "Boss and CEO discounts run in 72-hour windows: once you use a discount, scan your card again after the cooldown to reactivate it. Your one-time free Boss trial works differently — it's good for one use only, and once you spend it you'll need to subscribe to keep the discount going."
     },
     {
       q: "Is my money safe?",
@@ -4224,13 +4197,13 @@
   function checkWaJoined() {}
 
   // ── PREMIUM PLAN SELECTOR ──
-  const PREM_PLAN_ORDER = ['free', 'boss', 'ceo'];
+  const PREM_PLAN_ORDER = ['boss', 'ceo'];
+  const PREM_PANEL_PCT = 100 / PREM_PLAN_ORDER.length; // % width per carousel panel
   const PREM_PLAN_STYLE = {
-    free:  { active: { bg: 'var(--dark-4)', border: '#fff', text: '#fff' }, btnGradient: 'linear-gradient(90deg,#555,#888)', btnText: '#fff' },
     boss:  { active: { bg: 'var(--p-subtle)', border: 'var(--p)', text: 'var(--p-light)' }, btnGradient: 'linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light))', btnText: '#fff' },
     ceo:    { active: { bg: 'rgba(245,166,35,0.1)', border: '#F5A623', text: '#F5A623' }, btnGradient: 'linear-gradient(90deg,#b87010,#F5A623)', btnText: '#000' }
   };
-  const PREM_PLAN_LABEL = { free: 'Free Trial', boss: 'Boss', ceo: 'CEO' };
+  const PREM_PLAN_LABEL = { boss: 'Boss', ceo: 'CEO' };
   let premSheetActivePlan = 'boss'; // which plan the swipe carousel is currently showing
 
   function selectPremPlan(plan) {
@@ -4241,7 +4214,7 @@
     const btn = document.getElementById('prem-unlock-btn');
 
     if (inner) {
-      inner.style.transform = 'translateX(-' + (idx * 33.3333) + '%)';
+      inner.style.transform = 'translateX(-' + (idx * PREM_PANEL_PCT) + '%)';
     }
 
     PREM_PLAN_ORDER.forEach(p => {
@@ -4265,26 +4238,20 @@
     if (btn) {
       const s = PREM_PLAN_STYLE[plan];
       const isCurrentPlan = premiumUnlocked && plan === premiumPlan;
-      if (plan === 'free') {
-        if (freeTrialUsesLeft <= 0) {
-          btn.style.background = 'var(--dark-4)';
-          btn.style.color = 'var(--w40)';
-          btn.textContent = 'Free trial used up';
-          btn.setAttribute('onclick', '');
-          btn.style.cursor = 'default';
-        } else if (isCurrentPlan) {
-          btn.style.background = 'var(--dark-4)';
-          btn.style.color = 'var(--w40)';
-          btn.textContent = '✓ Free trial active — ' + freeTrialUsesLeft + ' use' + (freeTrialUsesLeft !== 1 ? 's' : '') + ' left';
-          btn.setAttribute('onclick', '');
-          btn.style.cursor = 'default';
-        } else {
-          btn.style.background = s.btnGradient;
-          btn.style.color = s.btnText;
-          btn.style.cursor = 'pointer';
-          btn.textContent = 'Scan Card to Activate (' + freeTrialUsesLeft + ' left)';
-          btn.setAttribute('onclick', "openFreeScan('activate')");
-        }
+      if (plan === 'boss' && !premiumUnlocked && bossTrialAvailable) {
+        // Brand-new user, hasn't spent their one free Boss trial yet.
+        btn.style.background = s.btnGradient;
+        btn.style.color = s.btnText;
+        btn.style.cursor = 'pointer';
+        btn.textContent = '📇 Try Boss Free — Scan Card';
+        btn.setAttribute('onclick', "openFreeScan('activate')");
+      } else if (isCurrentPlan && premiumIsTrial) {
+        // Mid-trial, already scanned in — just waiting for them to use it.
+        btn.style.background = 'var(--dark-4)';
+        btn.style.color = 'var(--w40)';
+        btn.textContent = '✓ Free trial active — use it once';
+        btn.setAttribute('onclick', '');
+        btn.style.cursor = 'default';
       } else if (isCurrentPlan && needsScanToActivate) {
         btn.style.background = s.btnGradient;
         btn.style.color = s.btnText;
@@ -4312,11 +4279,10 @@
     updateCurrentPlanBadge();
   }
 
-  // Free trial activation happens via openFreeScan('activate') → submitFreeScan(),
-  // which requires a card scan and calls the activate-premium-scan edge function.
-  // Reuses the premiumUnlocked/premiumPlan plumbing so the existing pricing
-  // and cooldown logic in renderBundles/updateSubsidyUI just works; once both
-  // uses are spent, this reverts automatically (see turnOffPremiumAfterPurchase).
+  // One-time Boss trial activation happens via openFreeScan('activate') →
+  // submitFreeScan(), which requires a card scan. Once that single free use
+  // is spent, turnOffPremiumAfterPurchase() takes it fully dark (see below) —
+  // no cooldown, no reactivate-by-scan — until they actually subscribe and pay.
   
   // Reset sheet to whichever tier the user previewed in the discount picker
   // Sheet defaults to whatever the user ACTUALLY has — an already-subscribed user
@@ -4359,10 +4325,10 @@
     const inner = document.getElementById('prem-benefits-inner');
     if (!inner) return;
     const wrapWidth = inner.parentElement.offsetWidth || 1;
-    const dragPct = (dx / wrapWidth) * 33.3333;
-    let pct = -(idx * 33.3333) + dragPct;
+    const dragPct = (dx / wrapWidth) * PREM_PANEL_PCT;
+    let pct = -(idx * PREM_PANEL_PCT) + dragPct;
     // Clamp so you can't drag past the first or last panel
-    pct = Math.max(-66.6666, Math.min(0, pct));
+    pct = Math.max(-(PREM_PLAN_ORDER.length - 1) * PREM_PANEL_PCT, Math.min(0, pct));
     inner.style.transform = 'translateX(' + pct + '%)';
   }
 
@@ -4510,16 +4476,20 @@
   }
 
   function turnOffPremiumAfterPurchase() {
-    if (premiumPlan === 'free') {
-      // NOTE: backend edge function needs updating to persist freeTrialUsesLeft
-      // for this user — right now this is only tracked in-memory client-side.
-      freeTrialUsesLeft = Math.max(0, freeTrialUsesLeft - 1);
-      if (freeTrialUsesLeft <= 0) {
-        // Trial fully used — revert back to non-premium state and hide the tab.
-        premiumUnlocked = false;
-        premiumPlan = 'boss';
-      }
-      updateFreeTrialVisibility();
+    if (premiumIsTrial) {
+      // One-time Boss trial: this was the single free use — go fully dark,
+      // no cooldown, no scan-to-reactivate. They must actually subscribe
+      // and pay to get Boss/CEO discounts again.
+      premiumUnlocked = false;
+      premiumPlan = 'boss';
+      premiumIsTrial = false;
+      premiumToggleOn = false;
+      premiumLastUsed = 0;
+      needsScanToActivate = false;
+      setPremToggleUI(false);
+      renderBundles();
+      updateSubsidyUI();
+      return;
     }
     premiumToggleOn = false;
     premiumLastUsed = Date.now(); // cooldown starts now; will be confirmed from DB on next fetchUserData
@@ -4529,25 +4499,14 @@
     updateSubsidyUI();
   }
 
-  // Hides the Free Trial tab everywhere once both uses are spent.
-  function updateFreeTrialVisibility() {
-    const show = freeTrialUsesLeft > 0;
-    const pickCard = document.getElementById('pick-card-free');
-    const unlockCard = document.getElementById('prem-btn-free');
-    if (pickCard) pickCard.style.display = show ? '' : 'none';
-    if (unlockCard) unlockCard.style.display = show ? '' : 'none';
-  }
-
-  
   // ── DISCOUNT PICKER (preview only) ──
   const PICK_CARD_STYLE = {
-    free:  { active: { bg: 'var(--dark-4)', border: '#fff', text: '#fff' } },
     boss:  { active: { bg: 'var(--p-subtle)', border: 'var(--p)', text: 'var(--p-light)' } },
     ceo:    { active: { bg: 'rgba(245,166,35,0.1)', border: '#F5A623', text: '#F5A623' } }
   };
 
   function highlightPickCard(plan) {
-    ['free', 'boss', 'ceo'].forEach(p => {
+    ['boss', 'ceo'].forEach(p => {
       const card = document.getElementById('pick-card-' + p);
       if (!card) return;
       const pctDiv = card.children[1];
@@ -4569,7 +4528,7 @@
   function openPremDiscountPick() {
     const ov = document.getElementById('prem-pick-ov');
     if (ov) { ov.style.display = 'flex'; setTimeout(() => ov.classList.add('open'), 10); }
-    highlightPickCard(demoSelectedPlan || 'free');
+    highlightPickCard(demoSelectedPlan || 'boss');
   }
 
   function closePremDiscountPick(e) {
@@ -4669,9 +4628,9 @@
   // subscribed to — independent of whichever plan they're previewing/tapping,
   // so it doesn't disappear just because they tap a different plan to look at it.
   function updateCurrentPlanBadge() {
-    ['free', 'boss', 'ceo'].forEach(p => {
+    ['boss', 'ceo'].forEach(p => {
       const badge = document.getElementById('prem-current-badge-' + p);
-      if (badge) badge.style.display = (premiumUnlocked && premiumPlan === p && !(p === 'free' && freeTrialUsesLeft <= 0)) ? '' : 'none';
+      if (badge) badge.style.display = (premiumUnlocked && premiumPlan === p) ? '' : 'none';
     });
   }
 
@@ -5053,9 +5012,9 @@
     startRaffleScan();
   }
 
-  // ── FREE TIER SCAN SHEET ──
+  // ── CARD SCAN SHEET (Boss trial activation / Boss+CEO cooldown reactivation) ──
   // Any valid Subsidi card works here — it's not tied to a specific account,
-  // the scan itself is what activates the Free tier for whoever is logged in.
+  // the scan itself is what activates/reactivates the discount for whoever is logged in.
   let freeStream = null;
   let freeScanLoop = null;
 
@@ -5134,11 +5093,13 @@
     document.getElementById('free-scan-view').style.display = 'none';
 
     if (scanContext === 'activate') {
-      // First-time (or repeat) Free Trial activation — no payment, just confirms the scan.
+      // One-time Boss trial — no payment, just confirms the scan. Good for
+      // exactly one purchase-use; turnOffPremiumAfterPurchase() takes it
+      // fully dark once that use is spent.
       premiumUnlocked = true;
-      premiumPlan = 'free';
-      freeTrialUsesLeft = Math.max(0, freeTrialUsesLeft - 1);
-      updateFreeTrialVisibility();
+      premiumPlan = 'boss';
+      premiumIsTrial = true;
+      bossTrialAvailable = false;
     }
     premiumToggleOn = true;
     needsScanToActivate = false;
@@ -5152,12 +5113,6 @@
     // affect the scan result the user just saw.
     callEdge('activate-premium-scan', { userId, context: scanContext, cardCode })
       .then((data) => {
-        // Reconcile with what the server actually saved — protects against
-        // drift if this device's local count was ever out of sync.
-        if (data && typeof data.usesLeft === 'number' && scanContext === 'activate') {
-          freeTrialUsesLeft = data.usesLeft;
-          updateFreeTrialVisibility();
-        }
         if (!data || data.error) {
           console.warn('activate-premium-scan did not save:', data && data.error);
         }

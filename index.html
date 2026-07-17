@@ -2059,7 +2059,10 @@
 
     // Refresh bar and balance when user comes back to the tab
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && userId && !isGuest) fetchUserData();
+      if (document.visibilityState === 'visible' && userId && !isGuest) {
+        reconcilePendingDeposit();
+        fetchUserData();
+      }
     });
 
     // Check if returning from Paystack redirect
@@ -3404,6 +3407,12 @@
     const ref = 'subsidi-' + userId + '-' + Date.now();
     const email = (username || userId) + '@subsidi.app';
 
+    // Persist the pending deposit so it can be reconciled even if the
+    // Paystack callback never fires (e.g. bank transfer takes minutes and
+    // the OS suspends the app in the background while the user is away
+    // confirming in their bank app).
+    localStorage.setItem('pendingDeposit', JSON.stringify({ ref, userId, amount }));
+
     const btn = document.getElementById('dep-confirm-btn');
     if (btn) { btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
 
@@ -3428,6 +3437,7 @@
             });
             hideSpinner();
             if (result && result.success) {
+              localStorage.removeItem('pendingDeposit');
               saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
               const balanceBefore = balance;
               await fetchUserData();
@@ -3451,9 +3461,40 @@
       },
       onClose: function() {
         if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+        // Catches bank transfers that were actually confirmed on Paystack's
+        // side after the user closed/left the popup without the callback firing.
+        reconcilePendingDeposit();
       }
     });
     handler.openIframe();
+  }
+
+  // Re-checks a deposit that was started but never confirmed client-side.
+  // Safe to call repeatedly — the deposit edge function is idempotent on
+  // the reference, so this will not double-credit a wallet.
+  async function reconcilePendingDeposit() {
+    const pending = localStorage.getItem('pendingDeposit');
+    if (!pending || !userId || isGuest) return;
+    let ref, pendingUserId, amount;
+    try {
+      ({ ref, userId: pendingUserId, amount } = JSON.parse(pending));
+    } catch (e) {
+      localStorage.removeItem('pendingDeposit');
+      return;
+    }
+    try {
+      const result = await callEdge('deposit', { reference: ref, userId: pendingUserId, amount });
+      if (result && result.success) {
+        localStorage.removeItem('pendingDeposit');
+        saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
+        await fetchUserData();
+        alert('₦' + amount.toLocaleString() + ' added to your wallet!');
+      }
+      // If not successful yet, Paystack may still be processing — leave
+      // pendingDeposit in place so the next trigger (app resume) retries it.
+    } catch (e) {
+      console.warn('[deposit] reconcile failed, will retry later:', e);
+    }
   }
 
   function closeDepOv(e) {

@@ -828,8 +828,8 @@
 
       <!-- Actions for Cashback Pool -->
       <div class="wallet-card-actions" id="actions-card-1" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0 4px;opacity:0;pointer-events:none;transition:opacity .25s ease;">
-        <div class="act-rect" onclick="event.stopPropagation();if(gateCheck('Collect Cashback','Create a free account to collect your cashback.'))return;openCashbackScan()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
-          <span>Collect</span>
+        <div class="act-rect" id="cashback-collect-btn" onclick="event.stopPropagation();if(gateCheck('Collect Cashback','Create a free account to collect your cashback.'))return;handleCashbackCollectTap()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
+          <span id="cashback-collect-btn-label">Collect</span>
         </div>
       </div>
 
@@ -1908,6 +1908,7 @@
           const cooldownElapsed = (Date.now() - premiumLastUsed) >= cooldownMs;
           needsScanToActivate = premiumUnlocked && !premiumIsTrial && cooldownElapsed;
           setPremToggleUI(premiumToggleOn);
+          if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
         }
 
         maybeShowRaffleNudge();
@@ -2032,6 +2033,7 @@
             const cooldownMs = getCooldownHrs(premiumPlan) * 3600000;
             needsScanToActivate = premiumUnlocked && !premiumIsTrial && ((Date.now() - premiumLastUsed) >= cooldownMs);
             setPremToggleUI(premiumToggleOn);
+            if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
           }
 
           checkWaJoined();
@@ -5236,15 +5238,31 @@
       el.innerHTML = '<span class="bal-cur" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">₦</span>' +
         whole + '<span class="bal-dec" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">' + dec + '</span>';
     }
-    // Collect button is premium-only — grey it out otherwise.
+    // Collect button is premium-only — grey it out otherwise, and swap the
+    // label so non-premium users know what tapping it will do.
     const collectBtn = document.getElementById('actions-card-1');
+    const collectLabel = document.getElementById('cashback-collect-btn-label');
     if (collectBtn) {
       const canCollect = premiumUnlocked && poolBalance > 0;
       collectBtn.style.filter = canCollect ? 'none' : 'grayscale(1)';
       collectBtn.style.opacity = collectBtn.style.opacity; // leave swipe-controlled opacity alone
     }
+    if (collectLabel) {
+      collectLabel.textContent = premiumUnlocked ? 'Collect' : 'Unlock to Claim';
+    }
   }
   renderCashbackBalance();
+
+  // Non-premium users never see the scan/claim flow at all — tapping the
+  // button sends them straight to the unlock sheet instead of a dead-end
+  // rejection popup.
+  function handleCashbackCollectTap() {
+    if (!premiumUnlocked) {
+      showPremUnlockSheet();
+      return;
+    }
+    openCashbackScan();
+  }
 
   // ── COLLECT CASHBACK: card scan ──
   // This is the same scan mechanism used everywhere else in the app (jsQR +

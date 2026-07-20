@@ -974,6 +974,7 @@
       <div onclick="selectDep(this,5000)" class="dep-opt">₦5,000</div>
       <div onclick="selectDep(this,10000)" class="dep-opt" style="grid-column:span 2;">₦10,000</div>
     </div>
+    <div style="font-size:11px;color:var(--w40);text-align:center;margin:-10px 0 16px;">A flat ₦15 fee applies to every top-up</div>
     <button class="cbtn" id="dep-confirm-btn" onclick="confirmDep()" style="opacity:.4;pointer-events:none;">Add to Wallet</button>
   </div>
 </div>
@@ -3388,18 +3389,21 @@
     document.getElementById('dep-ov').classList.add('open');
   }
 
+  const DEPOSIT_FEE = 15;
+
   function selectDep(el, amt) {
     document.querySelectorAll('.dep-opt').forEach(o => o.classList.remove('sel'));
     el.classList.add('sel');
     selectedDep = amt;
     const btn = document.getElementById('dep-confirm-btn');
     btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
-    btn.textContent = 'Add ₦' + amt.toLocaleString() + ' to Wallet';
+    btn.textContent = 'Pay ₦' + (amt + DEPOSIT_FEE).toLocaleString() + ' — Add ₦' + amt.toLocaleString() + ' to Wallet';
   }
 
   async function confirmDep() {
     if (!selectedDep) return;
     const amount = selectedDep;
+    const chargeAmount = amount + DEPOSIT_FEE; // ₦15 fee is charged on top, not deducted from what's credited
 
     const ref = 'subsidi-' + userId + '-' + Date.now();
     const email = (username || userId) + '@subsidi.app';
@@ -3419,7 +3423,7 @@
     const handler = PaystackPop.setup({
       key: PAYSTACK_PUBLIC_KEY,
       email: email,
-      amount: amount * 100, // Paystack expects amount in kobo
+      amount: chargeAmount * 100, // Paystack expects amount in kobo — includes the ₦15 fee
       ref: ref,
       currency: 'NGN',
       metadata: { userId, purpose: 'deposit' },

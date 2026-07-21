@@ -4445,18 +4445,28 @@
       // Already premium (trial or paid) — flip freely. No cooldown gate
       // anymore: every premium purchase scans fresh at checkout regardless
       // of toggle state, so there's nothing left to reactivate here.
-      premiumToggleOn = !premiumToggleOn;
-      setPremToggleUI(premiumToggleOn);
-      renderBundles();
+      if (premiumToggleOn) {
+        premiumToggleOn = false;
+        setPremToggleUI(false);
+        renderBundles();
+        return;
+      }
+      // Turning on — play the blur + scroll + price-drop reveal.
+      pickPremDiscount(premiumPlan);
       return;
     }
 
     if (bossTrialAvailable) {
       // Never subscribed, trial still available — flip on now. The trial
       // itself only actually activates on the card scan at checkout.
-      premiumToggleOn = !premiumToggleOn;
-      setPremToggleUI(premiumToggleOn);
-      renderBundles();
+      if (premiumToggleOn) {
+        premiumToggleOn = false;
+        setPremToggleUI(false);
+        renderBundles();
+        return;
+      }
+      // Turning on — play the blur + scroll + price-drop reveal.
+      pickPremDiscount('basic');
       return;
     }
 

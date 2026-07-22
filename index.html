@@ -4506,9 +4506,9 @@
         renderBundles();
         return;
       }
-      // Turning on — paid subscribers (not the one-time trial) are gated by
-      // the cooldown that starts on their last premium purchase.
-      if (!premiumIsTrial && premiumLastUsed > 0) {
+      // Turning on — every premium purchase (trial or paid) is gated by
+      // the cooldown that starts on the last premium purchase.
+      if (premiumLastUsed > 0) {
         const msLeft = (premiumLastUsed + getCooldownHrs(premiumPlan) * 3600000) - Date.now();
         if (msLeft > 0) {
           showPremCooldownPopup(msLeft);
@@ -4666,21 +4666,11 @@
   }
 
   function turnOffPremiumAfterPurchase() {
-    if (premiumIsTrial) {
-      // One-time Boss trial: this was the single free use — go fully dark,
-      // no cooldown, no scan-to-reactivate. They must actually subscribe
-      // and pay to get Boss/CEO discounts again.
-      premiumUnlocked = false;
-      premiumPlan = 'basic';
-      premiumIsTrial = false;
-      premiumToggleOn = false;
-      premiumLastUsed = 0;
-      needsScanToActivate = false;
-      setPremToggleUI(false);
-      renderBundles();
-      updateSubsidyUI();
-      return;
-    }
+    // Every premium purchase — trial or paid — turns the toggle off and
+    // starts the cooldown. The free trial still only covers its 3-day
+    // window (enforced server-side against premium_expires_at), but within
+    // that window it now cools down like any paid plan instead of going
+    // fully dark after a single use.
     premiumToggleOn = false;
     premiumLastUsed = Date.now(); // cooldown starts now; will be confirmed from DB on next fetchUserData
     needsScanToActivate = false;  // false during the cooldown itself — nothing to scan yet, just waiting

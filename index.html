@@ -1213,6 +1213,12 @@
         </div>
       </div>
 
+      <div style="display:flex;justify-content:center;margin-bottom:14px;">
+        <button id="raffle-torch-btn" onclick="toggleRaffleTorch()" style="display:flex;align-items:center;gap:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:12px;padding:10px 20px;color:var(--w70);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6l-2 4h10l-2-4V2"/><line x1="12" y1="12" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+          <span id="raffle-torch-label">Flash Off</span>
+        </button>
+      </div>
       <div id="raffle-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:14px;">Starting camera...</div>
       <div style="text-align:center;">
         <a href="javascript:void(0)" onclick="closeRaffleScan();showPremUnlockSheet()" style="font-size:12px;color:var(--p-light);">I don't have a card</a>
@@ -1267,6 +1273,12 @@
         </div>
       </div>
 
+      <div style="display:flex;justify-content:center;margin-bottom:14px;">
+        <button id="free-torch-btn" onclick="toggleFreeTorch()" style="display:flex;align-items:center;gap:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:12px;padding:10px 20px;color:var(--w70);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6l-2 4h10l-2-4V2"/><line x1="12" y1="12" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+          <span id="free-torch-label">Flash Off</span>
+        </button>
+      </div>
       <div id="free-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:14px;">Starting camera...</div>
     </div>
 
@@ -1323,6 +1335,12 @@
         </div>
       </div>
 
+      <div style="display:flex;justify-content:center;margin-bottom:14px;">
+        <button id="cashback-torch-btn" onclick="toggleCashbackTorch()" style="display:flex;align-items:center;gap:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:12px;padding:10px 20px;color:var(--w70);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6l-2 4h10l-2-4V2"/><line x1="12" y1="12" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+          <span id="cashback-torch-label">Flash Off</span>
+        </button>
+      </div>
       <div id="cashback-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:14px;">Starting camera...</div>
     </div>
 
@@ -1716,11 +1734,11 @@
   let needsScanToActivate = false; // true once cooldown has elapsed and user must scan card again before toggle can turn on
   // Flat ₦300 naira discount on every plan, regardless of tier or plan size.
   // What differs between tiers is billing price/frequency and the daily
-  // cashback-pool claim cap. Cooldown is 10hrs across all three tiers.
+  // cashback-pool claim cap. Cooldown is 18hrs across all three tiers.
   const PREMIUM_PLANS = {
-    basic:    { price: 290,  billing: 'week',  cooldownHrs: 10, discountCheap: 300, discountExpensive: 300, claimCapPerDay: 100  },
-    standard: { price: 790,  billing: 'month', cooldownHrs: 10, discountCheap: 300, discountExpensive: 300, claimCapPerDay: 350  },
-    pro:      { price: 6000, billing: 'year',  cooldownHrs: 10, discountCheap: 300, discountExpensive: 300, claimCapPerDay: 1000 }
+    basic:    { price: 290,  billing: 'week',  cooldownHrs: 18, discountCheap: 300, discountExpensive: 300, claimCapPerDay: 100  },
+    standard: { price: 790,  billing: 'month', cooldownHrs: 18, discountCheap: 300, discountExpensive: 300, claimCapPerDay: 350  },
+    pro:      { price: 6000, billing: 'year',  cooldownHrs: 18, discountCheap: 300, discountExpensive: 300, claimCapPerDay: 1000 }
   };
   let premDemoActive = false;    // is the demo blur/animation running
   let scanContext = 'reactivate'; // 'reactivate' (Boss/CEO cooldown scan) or 'activate' (one-time Boss trial scan)
@@ -2294,6 +2312,44 @@
     if (btn) { btn.style.background = 'var(--dark-3)'; btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--w70)'; }
   }
 
+  // ── Generic torch toggle for the other scan sheets (free/cashback/raffle) ──
+  const _torchState = {};
+  async function toggleTorchFor(prefix, stream) {
+    if (!stream) return;
+    const track = stream.getVideoTracks()[0];
+    if (!track) return;
+    try {
+      _torchState[prefix] = !_torchState[prefix];
+      await track.applyConstraints({ advanced: [{ torch: _torchState[prefix] }] });
+      _applyTorchBtnUI(prefix, _torchState[prefix]);
+    } catch(e) {
+      console.warn('Torch not supported on this device');
+    }
+  }
+  function _applyTorchBtnUI(prefix, on) {
+    const btn = document.getElementById(prefix + '-torch-btn');
+    const label = document.getElementById(prefix + '-torch-label');
+    if (!btn || !label) return;
+    if (on) {
+      btn.style.background = 'rgba(108,43,217,0.2)';
+      btn.style.borderColor = 'var(--p)';
+      btn.style.color = '#fff';
+      label.textContent = 'Flash On';
+    } else {
+      btn.style.background = 'var(--dark-3)';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.color = 'var(--w70)';
+      label.textContent = 'Flash Off';
+    }
+  }
+  function _resetTorchFor(prefix) {
+    _torchState[prefix] = false;
+    _applyTorchBtnUI(prefix, false);
+  }
+  function toggleFreeTorch() { toggleTorchFor('free', freeStream); }
+  function toggleCashbackTorch() { toggleTorchFor('cashback', cashbackStream); }
+  function toggleRaffleTorch() { toggleTorchFor('raffle', raffleStream); }
+
   // ── Registration Step 3: Set PIN ──
   // Check if card already exists in Supabase
   async function checkCardExists(cardCode) {
@@ -2820,10 +2876,10 @@
       // The pool number on screen refreshes via fetchUserData or the next
       // claim-cashback call, not from this response.
 
-      // Record the timestamp locally for display purposes only — scanning
-      // happens fresh on every premium purchase now, so there's no cooldown
-      // left to enforce here.
-      if (isPremiumPurchase) premiumLastUsed = Date.now();
+      // Turn the toggle back off and start the cooldown (or, if this was
+      // the one-time trial, go fully dark) now that the purchase actually
+      // went through.
+      if (isPremiumPurchase) turnOffPremiumAfterPurchase();
 
       // Log locally
       saveLocalTxn({ type: 'data', data_plan: cur.size, network: cur.planNetwork || NET, amount: cur.price, status: 'success' });
@@ -4442,9 +4498,6 @@
 
   function onPremToggleClick() {
     if (premiumUnlocked) {
-      // Already premium (trial or paid) — flip freely. No cooldown gate
-      // anymore: every premium purchase scans fresh at checkout regardless
-      // of toggle state, so there's nothing left to reactivate here.
       if (premiumToggleOn) {
         premiumToggleOn = false;
         const dash = document.getElementById('dash');
@@ -4452,6 +4505,15 @@
         setPremToggleUI(false);
         renderBundles();
         return;
+      }
+      // Turning on — paid subscribers (not the one-time trial) are gated by
+      // the cooldown that starts on their last premium purchase.
+      if (!premiumIsTrial && premiumLastUsed > 0) {
+        const msLeft = (premiumLastUsed + getCooldownHrs(premiumPlan) * 3600000) - Date.now();
+        if (msLeft > 0) {
+          showPremCooldownPopup(msLeft);
+          return;
+        }
       }
       // Turning on — play the blur + scroll + price-drop reveal.
       pickPremDiscount(premiumPlan);
@@ -4505,6 +4567,7 @@
         <div style="font-size:13px;color:var(--w40);margin-bottom:20px;line-height:1.6;">Your next premium purchase is available in</div>
         <div id="prem-countdown" style="font-size:36px;font-weight:900;color:#F5A623;letter-spacing:2px;font-variant-numeric:tabular-nums;margin-bottom:24px;">--:--:--</div>
         <div style="display:flex;gap:10px;">
+          <button onclick="document.getElementById('${popId}').remove();clearInterval(window._premCdTimer);" style="flex:1;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:13px;font-weight:700;cursor:pointer;">Close</button>
           <button onclick="document.getElementById('${popId}').remove();clearInterval(window._premCdTimer);openPremUpgradeSheet();" style="flex:1;padding:14px;background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));border:none;border-radius:14px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;">Upgrade</button>
         </div>
       </div>`;
@@ -5025,6 +5088,7 @@
       raffleStream.getTracks().forEach(t => t.stop());
       raffleStream = null;
     }
+    _resetTorchFor('raffle');
   }
 
   function raffleScanFrame() {
@@ -5042,6 +5106,7 @@
         const isValidCard = raw.startsWith('https://subsidi-1.vercel.app/');
         if (isValidCard) {
           stopRaffleScan();
+          playSuccessSound();
           submitRaffleEntry(raw);
           return;
         }
@@ -5130,6 +5195,7 @@
       freeStream.getTracks().forEach(t => t.stop());
       freeStream = null;
     }
+    _resetTorchFor('free');
   }
 
   function freeScanFrame() {
@@ -5147,6 +5213,7 @@
         const isValidCard = raw.startsWith('https://subsidi-1.vercel.app/');
         if (isValidCard) {
           stopFreeScan();
+          playSuccessSound();
           submitFreeScan(raw);
           return;
         }
@@ -5207,15 +5274,18 @@
       renderBundles();
       updateSubsidyUI();
       document.getElementById('free-success-view').style.display = 'none';
-      document.getElementById('free-error-msg').textContent = 'Card not recognized. Please try again.';
+      document.getElementById('free-error-msg').textContent =
+        (typeof reason === 'string' && reason) ? reason : 'Not available right now, please try again later.';
       document.getElementById('free-error-view').style.display = 'block';
     }
 
     callEdge('activate-premium-scan', { userId, context: scanContext, cardCode })
       .then((data) => {
         if (!data || data.error) {
-          // Confirmed rejection — don't expose the real reason
-          // (empty card stock, trial already used, etc.)
+          // Confirmed rejection — this could be empty card stock, trial
+          // already used, or the toggle pool sitting below the ₦300 floor.
+          // The QR itself was already validated before we ever got here, so
+          // it's never actually a "card not recognized" situation.
           rollbackFreeScan(data && data.error);
           return;
         }
@@ -5245,8 +5315,17 @@
     }
 
     if (!data || data.error) {
+      // The QR was already validated as a real Subsidi card before we ever
+      // called the backend, so a rejection here is a business-logic reason
+      // (toggle pool below the ₦300 floor, trial already used, etc.) —
+      // never actually "card not recognized." Show the real reason, and
+      // don't leave the toggle looking ON when nothing actually activated.
+      premiumToggleOn = false;
+      setPremToggleUI(false);
+      renderBundles();
       document.getElementById('free-scan-view').style.display = 'none';
-      document.getElementById('free-error-msg').textContent = 'Card not recognized. Please try again.';
+      document.getElementById('free-error-msg').textContent =
+        (data && typeof data.error === 'string' && data.error) ? data.error : 'Not available right now, please try again later.';
       document.getElementById('free-error-view').style.display = 'block';
       return;
     }
@@ -5415,6 +5494,7 @@
       cashbackStream.getTracks().forEach(t => t.stop());
       cashbackStream = null;
     }
+    _resetTorchFor('cashback');
   }
 
   function cashbackScanFrame() {
@@ -5432,6 +5512,7 @@
         const isValidCard = raw.startsWith('https://subsidi-1.vercel.app/');
         if (isValidCard) {
           stopCashbackScan();
+          playSuccessSound();
           submitCashbackScan(raw);
           return;
         }

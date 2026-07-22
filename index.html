@@ -1684,8 +1684,8 @@
     <div class="chpin-step" id="chpin-s2">
       <div class="reg-pin-lbl" id="chpin-new-lbl">New PIN</div>
       <div class="reg-dots" style="margin-bottom:28px;">
-        <div class="dot" id="npd0"></div><div class="dot" id="npd1"></div>
-        <div class="dot" id="npd2"></div><div class="dot" id="npd3"></div>
+        <div class="dot" id="chnpd0"></div><div class="dot" id="chnpd1"></div>
+        <div class="dot" id="chnpd2"></div><div class="dot" id="chnpd3"></div>
       </div>
       <div class="keypad">
         <div class="key" onclick="cpKey(1,'n')">1</div><div class="key" onclick="cpKey(2,'n')">2</div><div class="key" onclick="cpKey(3,'n')">3</div>
@@ -1898,13 +1898,12 @@
           premiumIsTrial = !!data.premiumIsTrial;
           if (typeof renderMyCard === 'function') renderMyCard();
           premiumLastUsed = data.premiumLastUsed ? new Date(data.premiumLastUsed).getTime() : 0;
-
-          // Toggle never auto-restores to on — user re-toggles each session if they
-          // want premium pricing. Every premium purchase scans fresh at checkout now,
-          // so there's no cooldown/reactivate gate left to compute here.
-          premiumToggleOn = false;
           needsScanToActivate = false;
-          setPremToggleUI(premiumToggleOn);
+
+          // Toggle never auto-restores to on at true session start (handled
+          // separately, at boot) — but this function runs constantly in the
+          // background (nav to dash, tab refocus, post-purchase refresh), so
+          // it must never stomp on a toggle the user has live right now.
           if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
         }
 
@@ -3292,7 +3291,7 @@
   }
 
   function updateCpDots(set, val) {
-    const prefix = set === 'c' ? 'cpd' : 'npd';
+    const prefix = set === 'c' ? 'cpd' : 'chnpd';
     for (let i = 0; i < 4; i++) {
       const d = document.getElementById(prefix + i);
       if (d) { d.classList.toggle('on', i < val.length); d.classList.remove('err'); }
@@ -3362,7 +3361,7 @@
     if (cpNew !== cpConfirm) {
       err.textContent = 'PINs don\'t match. Try again.';
       err.classList.add('show');
-      for (let i = 0; i < 4; i++) document.getElementById('npd'+i).classList.add('err');
+      for (let i = 0; i < 4; i++) document.getElementById('chnpd'+i).classList.add('err');
       setTimeout(() => {
         err.classList.remove('show');
         cpPhase = 'new'; cpNew = ''; cpConfirm = '';
@@ -4317,14 +4316,15 @@
       const s = PREM_PLAN_STYLE[plan];
       const isCurrentPlan = premiumUnlocked && plan === premiumPlan;
       if (plan === 'basic' && !premiumUnlocked && bossTrialAvailable) {
-        // Brand-new user — no separate activation step anymore. The trial
-        // starts automatically the first time they scan at checkout.
-        btn.style.background = 'var(--dark-4)';
-        btn.style.color = 'var(--w40)';
-        btn.textContent = '📇 3-day free trial starts on your first purchase';
-        btn.setAttribute('onclick', '');
-        btn.style.cursor = 'default';
-        btn.classList.remove('trial-glow');
+        // Brand-new, trial-eligible user — activate the trial directly with
+        // one tap. No card scan here; scanning only happens later, at the
+        // point of an actual data purchase (replacing PIN entry there).
+        btn.style.background = s.btnGradient;
+        btn.style.color = s.btnText;
+        btn.style.cursor = 'pointer';
+        btn.textContent = 'Try it FREE — 3 Days';
+        btn.setAttribute('onclick', 'activateFreeTrialDirect()');
+        btn.classList.add('trial-glow');
       } else if (isCurrentPlan && premiumIsTrial) {
         btn.style.background = 'var(--dark-4)';
         btn.style.color = 'var(--w40)';
@@ -4447,6 +4447,8 @@
       // of toggle state, so there's nothing left to reactivate here.
       if (premiumToggleOn) {
         premiumToggleOn = false;
+        const dash = document.getElementById('dash');
+        if (dash) dash.classList.remove('prem-demo-active');
         setPremToggleUI(false);
         renderBundles();
         return;
@@ -4461,6 +4463,8 @@
       // itself only actually activates on the card scan at checkout.
       if (premiumToggleOn) {
         premiumToggleOn = false;
+        const dash = document.getElementById('dash');
+        if (dash) dash.classList.remove('prem-demo-active');
         setPremToggleUI(false);
         renderBundles();
         return;
@@ -4622,8 +4626,6 @@
   }
 
   function pickPremDiscount(plan) {
-    const isFirstPick = !premDemoSeen;
-
     demoSelectedPlan = plan;
     premiumToggleOn = true;
     premDemoSeen = true;
@@ -4662,10 +4664,8 @@
 
       runPriceCountAnimation(targets);
 
-      if (isFirstPick) {
-        const spotlight = document.getElementById('prem-plans-spotlight');
-        if (spotlight) spotlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      const spotlight = document.getElementById('prem-plans-spotlight');
+      if (spotlight) spotlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 320);
   }
 
@@ -5270,6 +5270,50 @@
 
     closeFreeScan();
     await completePurchase(true);
+  }
+
+  async function activateFreeTrialDirect() {
+    const btn = document.getElementById('prem-unlock-btn');
+    if (btn) {
+      btn.textContent = 'Activating...';
+      btn.style.cursor = 'default';
+      btn.setAttribute('onclick', '');
+    }
+
+    let data;
+    try {
+      data = await callEdge('activate-premium-scan', { userId, context: 'activate' });
+    } catch (e) {
+      data = null;
+    }
+
+    if (!data || data.error) {
+      alert(data && data.error ? data.error : 'Could not activate your free trial. Please try again.');
+      selectPremPlan('basic'); // restore the button to its normal tappable state
+      return;
+    }
+
+    premiumUnlocked = true;
+    premiumPlan = data.plan || 'basic';
+    premiumIsTrial = true;
+    bossTrialAvailable = false;
+    premiumToggleOn = true;
+    needsScanToActivate = false;
+    setPremToggleUI(true);
+
+    if (data.cardCode && data.cardCode !== registeredCard) {
+      registeredCard = data.cardCode;
+      if (typeof renderMyCard === 'function') renderMyCard();
+    }
+
+    // Real activation, not a preview — no blur here.
+    const dash = document.getElementById('dash');
+    if (dash) dash.classList.remove('prem-demo-active');
+
+    _closePremUnlockOv();
+    renderBundles();
+
+    alert('🎉 Congratulations!\n\nYou\'re now a Basic premium user.\n\n⚠️ Your free trial ends in 3 days — after that, you\'ll need to subscribe to keep the discount.');
   }
 
   function retryFreeScan() {

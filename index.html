@@ -4496,7 +4496,7 @@
   // Load persisted premium state from localStorage
   // Premium state is loaded from the database via fetchUserData — not localStorage
 
-  function onPremToggleClick() {
+  async function onPremToggleClick() {
     if (premiumUnlocked) {
       if (premiumToggleOn) {
         premiumToggleOn = false;
@@ -4515,6 +4515,12 @@
           return;
         }
       }
+      // Check the toggle pool BEFORE opening the camera — no point walking
+      // someone through a scan that's going to fail anyway.
+      if (!(await checkToggleAvailable())) {
+        showToggleUnavailablePopup();
+        return;
+      }
       // Turning on — play the blur + scroll + price-drop reveal.
       pickPremDiscount(premiumPlan);
       return;
@@ -4529,6 +4535,10 @@
         if (dash) dash.classList.remove('prem-demo-active');
         setPremToggleUI(false);
         renderBundles();
+        return;
+      }
+      if (!(await checkToggleAvailable())) {
+        showToggleUnavailablePopup();
         return;
       }
       // Turning on — play the blur + scroll + price-drop reveal.
@@ -4551,6 +4561,36 @@
   }
 
   
+  // Lightweight pre-check against the toggle pool, called the instant the
+  // toggle is tapped ON — before the camera ever opens.
+  async function checkToggleAvailable() {
+    try {
+      const data = await callEdge('check-toggle-pool', {});
+      return !!(data && data.available);
+    } catch (e) {
+      return false; // fail closed rather than let a doomed purchase through
+    }
+  }
+
+  function showToggleUnavailablePopup() {
+    const popId = 'toggle-unavailable-pop';
+    const existing = document.getElementById(popId);
+    if (existing) existing.remove();
+    const pop = document.createElement('div');
+    pop.id = popId;
+    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;padding:24px;';
+    pop.innerHTML = `
+      <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;">
+        <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,80,80,.08);border:1.5px solid rgba(255,80,80,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <span style="font-size:28px;">⚠️</span>
+        </div>
+        <div style="font-size:14px;color:#ff6b6b;margin-bottom:24px;line-height:1.6;">Not available right now.<br>Try again later.</div>
+        <button onclick="document.getElementById('${popId}').remove();" style="width:100%;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">OK</button>
+      </div>`;
+    document.body.appendChild(pop);
+    pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
+  }
+
   function showPremCooldownPopup(msLeft) {
     const popId = 'prem-cooldown-pop';
     // Remove any existing

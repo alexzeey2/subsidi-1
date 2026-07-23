@@ -2010,8 +2010,22 @@
       try {
         // Step 1: validate session token if we have one (32hr auto-logout)
         if (savedSessionToken) {
-          const tokenCheck = await callEdge('validate-session', { sessionToken: savedSessionToken });
-          if (!tokenCheck || !tokenCheck.valid) {
+          let tokenCheck = null;
+          try {
+            tokenCheck = await callEdge('validate-session', { sessionToken: savedSessionToken });
+          } catch (e) {
+            // Request failed outright (flaky network, iOS throttling a
+            // backgrounded/standalone PWA's fetch, etc). This is NOT the same
+            // as the server telling us the session is invalid — don't log
+            // the user out over it. Fall through and let get-user confirm
+            // the account either way.
+            console.warn('[load] validate-session request failed, skipping check:', e);
+          }
+          // Only force a logout when the server EXPLICITLY says invalid.
+          // A missing/malformed/empty response must never be treated the
+          // same as an explicit invalid — that false-positive was logging
+          // iPhone users out on ordinary refreshes.
+          if (tokenCheck && tokenCheck.valid === false) {
             localStorage.removeItem('subsidi_userId');
             localStorage.removeItem('subsidi_session_token');
             hideSpinner();

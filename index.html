@@ -1892,8 +1892,10 @@
         balance = data.balance ?? balance;
         const whole = Math.floor(balance).toLocaleString();
         const dec = (balance % 1).toFixed(2).slice(1);
-        document.getElementById('bal-display').innerHTML =
-          '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+        const balHtml = '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+        document.getElementById('bal-display').innerHTML = balHtml;
+        const balRepeatEl = document.getElementById('bal-display-repeat');
+        if (balRepeatEl) balRepeatEl.innerHTML = balHtml;
 
         // Update other fields safely
         isGuest = false;
@@ -2045,14 +2047,18 @@
           (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
           const whole = Math.floor(balance).toLocaleString();
           const dec = (balance % 1).toFixed(2).slice(1);
-          document.getElementById('bal-display').innerHTML =
-            '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+          const balHtml = '<span class="bal-cur">&#x20A6;</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+          document.getElementById('bal-display').innerHTML = balHtml;
+          const balRepeatEl0 = document.getElementById('bal-display-repeat');
+          if (balRepeatEl0) balRepeatEl0.innerHTML = balHtml;
           updateSubsidyUI();
           if (typeof data.trialUsed !== 'undefined') bossTrialAvailable = !data.trialUsed;
 
-          // Cashback pool — was missing on the initial-load path, so the pool
-          // stayed at its default (0) until a nav-triggered fetchUserData()
-          // call filled it in. Load it here too, same as fetchUserData does.
+          // Cashback pool balance — this was never being set on the
+          // initial page-load path, so it silently stayed at its default
+          // of 0 and rendered as "₦0.00" on every refresh, only correcting
+          // itself once fetchUserData() ran later (e.g. after navigating
+          // to another page and back).
           if (typeof data.poolBalance === 'number') {
             poolBalance = data.poolBalance;
             if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
@@ -4606,11 +4612,8 @@
         renderBundles();
         return;
       }
-      if (!(await checkToggleAvailable())) {
-        showToggleUnavailablePopup();
-        return;
-      }
-      // Turning on — play the blur + scroll + price-drop reveal.
+      // Trial users aren't gated by the discount-fund availability check —
+      // that message is only relevant to actual premium subscribers.
       pickPremDiscount('basic');
       return;
     }
@@ -4653,7 +4656,7 @@
         <div style="width:64px;height:64px;border-radius:50%;background:rgba(245,166,35,.08);border:1.5px solid rgba(245,166,35,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
           <span style="font-size:30px;">😊</span>
         </div>
-        <div style="font-size:14px;background:linear-gradient(90deg,#fff,#F5A623,#fff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:24px;line-height:1.6;font-weight:600;">discount fund is being refilled.<br>Please come back later</div>
+        <div style="font-size:14px;background:linear-gradient(90deg,#fff,#F5A623,#fff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:24px;line-height:1.6;font-weight:600;">Discount Fund is being refilled.<br>Please come Back later</div>
         <button onclick="document.getElementById('${popId}').remove();" style="width:100%;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">OK</button>
       </div>`;
     document.body.appendChild(pop);
@@ -4985,6 +4988,31 @@
           </div>
         </div>
 
+        <!-- Delivery / contact details -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:10px;padding-left:4px">Your details</div>
+          <div style="margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+              <input id="prem-name-input" type="text" placeholder="Full name"
+                style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit">
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+              <input id="prem-phone-input" type="tel" inputmode="numeric" maxlength="11" placeholder="Phone number (08012345678)"
+                style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit"
+                oninput="this.value=this.value.replace(/\D/g,'').slice(0,11)">
+            </div>
+          </div>
+          <div style="margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+              <input id="prem-location-input" type="text" placeholder="Location (city, state)"
+                style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit">
+            </div>
+          </div>
+          <div class="reg-err" id="prem-details-err" style="margin-bottom:4px"></div>
+        </div>
+
         <!-- Buttons -->
         <div style="display:flex;gap:12px;">
           <button onclick="document.getElementById('${popId}').remove();" style="flex:1;padding:15px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w50);font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
@@ -4996,11 +5024,25 @@
   }
 
   function _submitPremTerms(plan, popId) {
+    const name = (document.getElementById('prem-name-input')?.value || '').trim();
+    const phone = (document.getElementById('prem-phone-input')?.value || '').trim();
+    const location = (document.getElementById('prem-location-input')?.value || '').trim();
+    const errEl = document.getElementById('prem-details-err');
+
+    if (!name || !phone || !location) {
+      if (errEl) errEl.textContent = 'Please fill in your name, phone number, and location.';
+      return;
+    }
+    if (phone.length !== 11) {
+      if (errEl) errEl.textContent = 'Enter a valid 11-digit phone number.';
+      return;
+    }
+
     document.getElementById(popId)?.remove();
-    _proceedPremPayment(plan);
+    _proceedPremPayment(plan, name, phone, location);
   }
 
-  async function _proceedPremPayment(plan) {
+  async function _proceedPremPayment(plan, name, phone, location) {
     // Ask the backend what this plan actually costs for this user — CEO
     // renewals are cheaper since the subscriber already owns the card, and
     // that fact only lives in the database, not in anything client-side.
@@ -5037,7 +5079,10 @@
             const result = await callEdge('premium-verify', {
               reference: response.reference,
               userId,
-              plan
+              plan,
+              name,
+              phone,
+              location
             });
             hideSpinner();
             if (result && result.success) {

@@ -2067,6 +2067,7 @@
           show('dash');
           renderBundles();
           fetchLeaderboardBadge();
+          maybeShowFeedbackForRecentTxn();
         } else {
           localStorage.removeItem('subsidi_userId');
           localStorage.removeItem('subsidi_session_token');
@@ -2907,7 +2908,7 @@
     document.getElementById('sbody').textContent = cur.size + ' has been delivered to ' + ph2;
     document.getElementById('samt').textContent = '₦' + cur.price.toLocaleString() + ' deducted';
     show('success');
-    setTimeout(showFeedbackPrompt, 1200);
+    setTimeout(maybeShowFeedbackForRecentTxn, 1200);
     return true;
   }
 
@@ -3549,7 +3550,7 @@
               }
               closeDepOv();
               alert('₦' + amount.toLocaleString() + ' added to your wallet!');
-              setTimeout(showFeedbackPrompt, 800);
+              setTimeout(maybeShowFeedbackForRecentTxn, 800);
             } else {
               alert('Payment verification failed. Contact support with ref: ' + response.reference);
             }
@@ -3592,7 +3593,7 @@
         saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
         await fetchUserData();
         alert('₦' + amount.toLocaleString() + ' added to your wallet!');
-        setTimeout(showFeedbackPrompt, 800);
+        setTimeout(maybeShowFeedbackForRecentTxn, 800);
       }
       // If not successful yet, Paystack may still be processing — leave
       // pendingDeposit in place so the next trigger (app resume) retries it.
@@ -3805,6 +3806,25 @@
       </div>`;
     document.body.appendChild(pop);
     pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
+  }
+
+  // Only shows the feedback prompt when there's an actual successful
+  // transaction (deposit or data purchase) from within the last 2 minutes —
+  // e.g. right after it completes, or if the user refreshes right after.
+  // Each transaction is only ever prompted for once, so refreshing again
+  // later (or opening the app fresh) won't keep re-asking about old activity.
+  function maybeShowFeedbackForRecentTxn() {
+    if (!userId) return;
+    const txns = getLocalTxns();
+    if (!txns.length) return;
+    const latest = txns[0];
+    if (latest.status !== 'success') return;
+    const txnTime = new Date(latest.created_at).getTime();
+    if (!txnTime || (Date.now() - txnTime) > 2 * 60 * 1000) return; // too old — not "just happened"
+    const lastPromptedKey = 'subsidi_last_feedback_txn_' + userId;
+    if (localStorage.getItem(lastPromptedKey) === latest.created_at) return; // already asked about this one
+    localStorage.setItem(lastPromptedKey, latest.created_at);
+    showFeedbackPrompt();
   }
 
   // ── Leaderboard (top 20 monthly spenders) ──

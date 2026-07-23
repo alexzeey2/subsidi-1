@@ -2893,6 +2893,7 @@
     document.getElementById('sbody').textContent = cur.size + ' has been delivered to ' + ph2;
     document.getElementById('samt').textContent = '₦' + cur.price.toLocaleString() + ' deducted';
     show('success');
+    setTimeout(showFeedbackPrompt, 1200);
     return true;
   }
 
@@ -3534,6 +3535,7 @@
               }
               closeDepOv();
               alert('₦' + amount.toLocaleString() + ' added to your wallet!');
+              setTimeout(showFeedbackPrompt, 800);
             } else {
               alert('Payment verification failed. Contact support with ref: ' + response.reference);
             }
@@ -3576,6 +3578,7 @@
         saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
         await fetchUserData();
         alert('₦' + amount.toLocaleString() + ' added to your wallet!');
+        setTimeout(showFeedbackPrompt, 800);
       }
       // If not successful yet, Paystack may still be processing — leave
       // pendingDeposit in place so the next trigger (app resume) retries it.
@@ -3765,6 +3768,30 @@
 
   // ── WhatsApp number (shared) ──
   const WHATSAPP_NUMBER = '2349058150220';
+
+  // ── Post-success feedback prompt ──
+  // Shown after a successful deposit or data purchase. "Yes" opens WhatsApp
+  // with a pre-filled message; "No" just closes the popup.
+  function showFeedbackPrompt() {
+    const popId = 'feedback-prompt-pop';
+    const existing = document.getElementById(popId);
+    if (existing) existing.remove();
+    const pop = document.createElement('div');
+    pop.id = popId;
+    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;padding:24px;';
+    pop.innerHTML = `
+      <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;">
+        <div style="font-size:32px;margin-bottom:12px;">🤔</div>
+        <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:8px;">Was there a problem?</div>
+        <div style="font-size:13px;color:var(--w40);margin-bottom:24px;line-height:1.6;">Let us know if anything didn't go as expected.</div>
+        <div style="display:flex;gap:10px;">
+          <button onclick="document.getElementById('${popId}').remove();" style="flex:1;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">No</button>
+          <button onclick="window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent('I have a problem on Subsidi'), '_blank');document.getElementById('${popId}').remove();" style="flex:1;padding:14px;background:#25D366;border:none;border-radius:14px;color:#000;font-size:14px;font-weight:800;cursor:pointer;">Yes</button>
+        </div>
+      </div>`;
+    document.body.appendChild(pop);
+    pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
+  }
 
   // ── Leaderboard (top 20 monthly spenders) ──
   function maskPhone(phone) {
@@ -4581,10 +4608,10 @@
     pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;padding:24px;';
     pop.innerHTML = `
       <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;">
-        <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,80,80,.08);border:1.5px solid rgba(255,80,80,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-          <span style="font-size:28px;">⚠️</span>
+        <div style="width:64px;height:64px;border-radius:50%;background:rgba(245,166,35,.08);border:1.5px solid rgba(245,166,35,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <span style="font-size:30px;">😊</span>
         </div>
-        <div style="font-size:14px;color:#ff6b6b;margin-bottom:24px;line-height:1.6;">Not available right now.<br>Try again later.</div>
+        <div style="font-size:14px;background:linear-gradient(90deg,#fff,#F5A623,#fff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:24px;line-height:1.6;font-weight:600;">discount fund is being refilled.<br>Please come back later</div>
         <button onclick="document.getElementById('${popId}').remove();" style="width:100%;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">OK</button>
       </div>`;
     document.body.appendChild(pop);

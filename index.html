@@ -1036,7 +1036,13 @@
   <div class="prof-header">
     <div class="prof-hglow"></div>
     <div class="prof-avatar" id="prof-avatar">SW</div>
-    <div class="prof-name" id="prof-name">swiftwave</div>
+    <div class="prof-name" id="prof-name" style="display:inline-flex;align-items:center;gap:8px;justify-content:center;">
+      <span id="prof-name-text">swiftwave</span>
+      <svg onclick="showEditUsernameOv()" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer;flex-shrink:0;">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/>
+      </svg>
+    </div>
     <div class="prof-id" id="prof-id">ID · subsidi.app/ref/swiftwave</div>
   </div>
 
@@ -3281,7 +3287,7 @@
     const el = document.getElementById('prof-avatar');
     if (el) el.textContent = initials;
 
-    const nameEl = document.getElementById('prof-name');
+    const nameEl = document.getElementById('prof-name-text');
     if (nameEl) nameEl.textContent = username || '—';
 
     const idEl = document.getElementById('prof-id');
@@ -3340,6 +3346,80 @@
           if (lbl) { lbl.textContent = 'Copy'; lbl.style.color = ''; }
         }, 2000);
       });
+    }
+  }
+
+  // ── Edit username ──
+  function showEditUsernameOv() {
+    const popId = 'edit-username-pop';
+    const existing = document.getElementById(popId);
+    if (existing) existing.remove();
+    const pop = document.createElement('div');
+    pop.id = popId;
+    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;padding:24px;';
+    pop.innerHTML = `
+      <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;">
+        <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:16px;">Edit Username</div>
+        <input id="edit-username-input" type="text" maxlength="20" value="${(username || '').replace(/"/g, '&quot;')}" placeholder="Enter username" style="width:100%;box-sizing:border-box;padding:14px 16px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:#fff;font-size:15px;text-align:center;margin-bottom:8px;outline:none;">
+        <div id="edit-username-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:12px;"></div>
+        <div style="display:flex;gap:10px;">
+          <button onclick="closeEditUsernameOv()" style="flex:1;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
+          <button id="edit-username-save-btn" onclick="submitUsernameChange()" style="flex:1;padding:14px;background:#F5A623;border:none;border-radius:14px;color:#000;font-size:14px;font-weight:800;cursor:pointer;">Save</button>
+        </div>
+      </div>`;
+    document.body.appendChild(pop);
+    pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
+    setTimeout(() => {
+      const inp = document.getElementById('edit-username-input');
+      if (inp) { inp.focus(); inp.select(); }
+    }, 50);
+  }
+
+  function closeEditUsernameOv() {
+    const pop = document.getElementById('edit-username-pop');
+    if (pop) pop.remove();
+  }
+
+  async function submitUsernameChange() {
+    const inp = document.getElementById('edit-username-input');
+    const errEl = document.getElementById('edit-username-err');
+    const saveBtn = document.getElementById('edit-username-save-btn');
+    const raw = (inp.value || '').trim().toLowerCase();
+
+    // Basic client-side validation — the edge function is still the
+    // authority on uniqueness, this just avoids an obviously-wasted round trip.
+    if (raw.length < 3 || raw.length > 20) {
+      errEl.textContent = 'Must be 3–20 characters';
+      return;
+    }
+    if (!/^[a-z0-9_]+$/.test(raw)) {
+      errEl.textContent = 'Letters, numbers, underscores only';
+      return;
+    }
+    if (raw === (username || '').toLowerCase()) {
+      closeEditUsernameOv();
+      return;
+    }
+
+    errEl.textContent = '';
+    saveBtn.textContent = '...';
+    saveBtn.style.pointerEvents = 'none';
+    try {
+      const data = await callEdge('update-username', { userId, newUsername: raw });
+      if (data && data.success) {
+        username = data.username || raw;
+        updateProfileUI();
+        (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
+        closeEditUsernameOv();
+      } else {
+        errEl.textContent = (data && data.error) || 'That username is taken';
+        saveBtn.textContent = 'Save';
+        saveBtn.style.pointerEvents = '';
+      }
+    } catch (e) {
+      errEl.textContent = 'Something went wrong, try again';
+      saveBtn.textContent = 'Save';
+      saveBtn.style.pointerEvents = '';
     }
   }
 

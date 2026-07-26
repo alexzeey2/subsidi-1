@@ -5076,61 +5076,17 @@
           </div>
         </div>
 
-        <!-- Delivery / contact details -->
-        <div style="margin-bottom:20px">
-          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:10px;padding-left:4px">Your details</div>
-          <div style="margin-bottom:12px">
-            <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
-              <input id="prem-name-input" type="text" placeholder="Full name"
-                style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit">
-            </div>
-          </div>
-          <div style="margin-bottom:12px">
-            <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
-              <input id="prem-phone-input" type="tel" inputmode="numeric" maxlength="11" placeholder="Phone number (08012345678)"
-                style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit"
-                oninput="this.value=this.value.replace(/\D/g,'').slice(0,11)">
-            </div>
-          </div>
-          <div style="margin-bottom:8px">
-            <div style="display:flex;align-items:center;gap:0;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden">
-              <input id="prem-location-input" type="text" placeholder="Location (city, state)"
-                style="flex:1;background:transparent;border:none;outline:none;padding:16px 16px;font-size:15px;color:#fff;font-family:inherit">
-            </div>
-          </div>
-          <div class="reg-err" id="prem-details-err" style="margin-bottom:4px"></div>
-        </div>
-
         <!-- Buttons -->
         <div style="display:flex;gap:12px;">
           <button onclick="document.getElementById('${popId}').remove();" style="flex:1;padding:15px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w50);font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
-          <button onclick="_submitPremTerms('${plan}','${popId}')" style="flex:1;padding:15px;background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));border:none;border-radius:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;">I Agree</button>
+          <button onclick="document.getElementById('${popId}')?.remove(); _proceedPremPayment('${plan}');" style="flex:1;padding:15px;background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));border:none;border-radius:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;">I Agree</button>
         </div>
       </div>`;
     document.body.appendChild(pop);
     pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
   }
 
-  function _submitPremTerms(plan, popId) {
-    const name = (document.getElementById('prem-name-input')?.value || '').trim();
-    const phone = (document.getElementById('prem-phone-input')?.value || '').trim();
-    const location = (document.getElementById('prem-location-input')?.value || '').trim();
-    const errEl = document.getElementById('prem-details-err');
-
-    if (!name || !phone || !location) {
-      if (errEl) errEl.textContent = 'Please fill in your name, phone number, and location.';
-      return;
-    }
-    if (phone.length !== 11) {
-      if (errEl) errEl.textContent = 'Enter a valid 11-digit phone number.';
-      return;
-    }
-
-    document.getElementById(popId)?.remove();
-    _proceedPremPayment(plan, name, phone, location);
-  }
-
-  async function _proceedPremPayment(plan, name, phone, location) {
+  async function _proceedPremPayment(plan) {
     // Ask the backend what this plan actually costs for this user — CEO
     // renewals are cheaper since the subscriber already owns the card, and
     // that fact only lives in the database, not in anything client-side.
@@ -5167,10 +5123,7 @@
             const result = await callEdge('premium-verify', {
               reference: response.reference,
               userId,
-              plan,
-              name,
-              phone,
-              location
+              plan
             });
             hideSpinner();
             if (result && result.success) {

@@ -965,7 +965,7 @@
   <div class="sheet">
     <div class="sh-bar"></div>
     <div class="sh-title">Top Up Wallet</div>
-    <div class="sh-sub">Select an amount to add to your balance</div>
+    <div class="sh-sub"><span class="price-gold" style="font-weight:800;font-size:14px;">+₦50</span><span class="price-gold"> added on every top-up, goes to the cashback pool</span></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
       <div onclick="selectDep(this,100)"  class="dep-opt">₦100</div>
       <div onclick="selectDep(this,500)"  class="dep-opt">₦500</div>
@@ -3578,7 +3578,10 @@
     document.getElementById('dep-ov').classList.add('open');
   }
 
-  const DEPOSIT_FEE = 15;
+  // Flat ₦50 fee on every deposit, charged on top of the amount credited.
+  function getDepositFee(amount) {
+    return 50;
+  }
 
   function selectDep(el, amt) {
     document.querySelectorAll('.dep-opt').forEach(o => o.classList.remove('sel'));
@@ -3610,7 +3613,7 @@
   async function confirmDep() {
     if (!selectedDep) return;
     const amount = selectedDep;
-    const chargeAmount = amount + DEPOSIT_FEE; // ₦15 fee is charged on top, not deducted from what's credited
+    const chargeAmount = amount + getDepositFee(amount); // fee is charged on top, not deducted from what's credited
 
     const ref = 'subsidi-' + userId + '-' + Date.now();
     const email = (username || userId) + '@subsidi.app';
@@ -5086,7 +5089,8 @@
           <div id="prem-policy-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
               <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Flat Discount</strong> — Every premium plan (Basic, Standard, Pro) gives you ₦300 off every data plan, no matter the size. It's a fixed amount, not a percentage.</p>
-              <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Cashback Pool</strong> — Premium subscribers can claim daily from the shared cashback pool: up to ₦100/day on Basic, ₦350/day on Standard, and ₦1,000/day on Pro. The pool is funded by platform fees and purchase margin, not any one user's money — if it's empty, the claim button goes faded until it refills.</p>
+              <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Cashback Pool</strong> — Premium subscribers can claim daily from the shared cashback pool: up to ₦100/day on Basic, ₦350/day on Standard, and ₦1,000/day on Pro. The pool is funded by the ₦50 shared contribution added to every wallet top-up — never taken from any one user's balance — so it grows with community activity. If it's empty, the claim button goes faded until it refills.</p>
+              <p style="margin:0 0 10px;">🎯 <strong style="color:var(--w70);">Golden Plan Discounts</strong> — Half of that same ₦50 top-up contribution also feeds a separate pool that funds cheaper pricing on lower-tier data plans — higher-margin purchases help subsidize the rest.</p>
               <p style="margin:0 0 10px;">📇 <strong style="color:var(--w70);">Card Scan Required</strong> — Every premium purchase asks you to scan your Subsidi card at checkout to apply the discount. There's no toggle to reactivate — just scan each time you buy.</p>
               <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">Basic Free Trial</strong> — New users get 3 days free on the Basic plan, no payment required. Nothing is auto-charged when it ends — you'll need to manually subscribe to keep the discount.</p>
             </div>

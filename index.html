@@ -1537,7 +1537,7 @@
         <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off, every plan</div>
       </div>
     </div>
-    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">Basic comes with a 3-day free trial. All plans: ₦300 off every purchase, claim daily from the cashback pool — just scan your card at checkout.</div>
+    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">New users get ₦100 free from the cashback pool. All plans: ₦300 off every purchase, claim daily from the cashback pool — just scan your card at checkout.</div>
   </div>
 </div>
 
@@ -1563,7 +1563,6 @@
         <div id="prem-current-badge-basic" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--p);color:#fff;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
         <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Basic</div>
         <div style="font-size:15px;font-weight:900;color:var(--w40);">₦290<span style="font-size:9px;font-weight:700;">/wk</span></div>
-        <div style="font-size:7.5px;font-weight:600;color:var(--w40);opacity:.75;margin-top:2px;">3-day free trial</div>
       </div>
 
       <!-- Standard -->
@@ -1589,13 +1588,12 @@
         <!-- Basic benefits -->
         <div style="flex-shrink:0;width:33.333%;box-sizing:border-box;padding-right:6px;">
           <div style="background:var(--dark-3);border:1px solid rgba(108,43,217,.4);border-radius:16px;padding:16px 20px;">
-            <div style="font-size:20px;font-weight:900;color:var(--p-light);margin-bottom:2px;">Try it free</div>
-            <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">3 days, no payment</div>
+            <div style="font-size:20px;font-weight:900;color:var(--p-light);margin-bottom:2px;">Basic Plan</div>
+            <div style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:12px;">₦290/week</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> ₦300 off every plan</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Claim up to ₦100/day from the cashback pool</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> Scan your card at checkout to apply the discount</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:var(--p-light);font-weight:800;">✓</span> ₦290/week after your free trial</div>
             </div>
           </div>
         </div>
@@ -2743,16 +2741,6 @@
 
     const isExpensive = subCostCount === 0;
 
-    // Any plan (cheap or Golden) tapped while a premium discount preview is active
-    // but not actually confirmed yet → show the real Unlock Premium sheet with actual
-    // prices instead of letting the previewed discount go through. Guests never
-    // reach this — the gateCheck above already sent them to login/register first.
-    const notYetConfirmed = !premiumUnlocked;
-    if ((premDemoActive || premDemoSeen) && notYetConfirmed) {
-      showPremUnlockSheet(true);
-      return;
-    }
-
     // Subscribed but the cooldown has lapsed and the card hasn't been rescanned
     // yet this cycle → send them to the premium sheet to confirm their plan and
     // scan, every time, instead of buying at full price silently.
@@ -3255,12 +3243,11 @@
       return;
     }
 
-    // Phone valid — ask for PIN to authorize
-    buyPinEntry = '';
-    updateBuyPinDots('');
-    document.getElementById('buy-pin-err').classList.remove('show');
-    document.getElementById('buy-pin-lbl').textContent = '4-digit PIN';
-    document.getElementById('pin-buy-ov').classList.add('open');
+    // Not premium — show the upsell instead of buying at full price silently.
+    // Closing this sheet (via _closePremUnlockOv, already wired) cancels the
+    // purchase and returns to the dashboard with the toggle off.
+    showPremUnlockSheet(true);
+    return;
   }
 
   // ── Card expiry ──
@@ -4427,7 +4414,7 @@
   const FAQ_ITEMS = [
     {
       q: "What is Subsidi?",
-      a: "Subsidi is a membership that gets you mobile data cheaper than market price. Basic comes with a 3-day free trial. After that, Basic, Standard, and Pro are all paid plans that keep every purchase discounted by ₦300, plus daily claims from the cashback pool."
+      a: "Subsidi is a membership that gets you mobile data cheaper than market price. New users get ₦100 free from the cashback pool, no payment required. Basic, Standard, and Pro are all paid plans that keep every purchase discounted by ₦300, plus daily claims from the cashback pool."
     },
     {
       q: "What is a Golden Plan?",
@@ -4435,7 +4422,7 @@
     },
     {
       q: "How do I keep my discount active?",
-      a: "Every premium purchase — Basic, Standard, or Pro — asks you to scan your Subsidi card at checkout to apply the ₦300 discount. Your free trial works the same way for its first 3 days. After the trial ends, you'll need to manually subscribe and pay to keep the discount — nothing is auto-charged."
+      a: "Every premium purchase — Basic, Standard, or Pro — asks you to scan your Subsidi card at checkout to apply the ₦300 discount. Nothing is auto-charged — you subscribe and pay whenever you're ready."
     },
     {
       q: "Is my money safe?",
@@ -4555,22 +4542,15 @@
       const s = PREM_PLAN_STYLE[plan];
       const isCurrentPlan = premiumUnlocked && plan === premiumPlan;
       if (plan === 'basic' && !premiumUnlocked && bossTrialAvailable) {
-        // Brand-new, trial-eligible user — activate the trial directly with
-        // one tap. No card scan here; scanning only happens later, at the
-        // point of an actual data purchase (replacing PIN entry there).
+        // Brand-new user, hasn't claimed the one-time signup bonus yet —
+        // a straight ₦100 wallet credit from the cashback pool, no premium
+        // or discount unlock attached. One tap, no card scan.
         btn.style.background = s.btnGradient;
         btn.style.color = s.btnText;
         btn.style.cursor = 'pointer';
-        btn.textContent = 'Try it FREE — 3 Days';
-        btn.setAttribute('onclick', 'activateFreeTrialDirect()');
+        btn.textContent = 'Claim ₦100 Free';
+        btn.setAttribute('onclick', 'claimSignupBonus()');
         btn.classList.add('trial-glow');
-      } else if (isCurrentPlan && premiumIsTrial) {
-        btn.style.background = 'var(--dark-4)';
-        btn.style.color = 'var(--w40)';
-        btn.textContent = '✓ Free trial active — scan at checkout to use it';
-        btn.setAttribute('onclick', '');
-        btn.style.cursor = 'default';
-        btn.classList.remove('trial-glow');
       } else if (isCurrentPlan) {
         // No more standalone "Scan Card to Reactivate" state — the scan now
         // happens automatically inside the purchase flow every time.
@@ -4846,11 +4826,10 @@
   }
 
   function turnOffPremiumAfterPurchase() {
-    // Every premium purchase — trial or paid — turns the toggle off and
-    // starts the cooldown. The free trial still only covers its 3-day
-    // window (enforced server-side against premium_expires_at), but within
-    // that window it now cools down like any paid plan instead of going
-    // fully dark after a single use.
+    // Every premium purchase turns the toggle off and starts the cooldown
+    // (enforced server-side against premium_expires_at). The one-time
+    // signup bonus (claimSignupBonus) never sets premiumUnlocked, so this
+    // only ever fires for real paid subscriptions.
     premiumToggleOn = false;
     premiumLastUsed = Date.now(); // cooldown starts now; will be confirmed from DB on next fetchUserData
     needsScanToActivate = false;  // false during the cooldown itself — nothing to scan yet, just waiting
@@ -5092,7 +5071,7 @@
               <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Cashback Pool</strong> — Premium subscribers can claim daily from the shared cashback pool: up to ₦100/day on Basic, ₦350/day on Standard, and ₦1,000/day on Pro. The pool is funded by the ₦50 shared contribution added to every wallet top-up — never taken from any one user's balance — so it grows with community activity. If it's empty, the claim button goes faded until it refills.</p>
               <p style="margin:0 0 10px;">🎯 <strong style="color:var(--w70);">Golden Plan Discounts</strong> — Half of that same ₦50 top-up contribution also feeds a separate pool that funds cheaper pricing on lower-tier data plans — higher-margin purchases help subsidize the rest.</p>
               <p style="margin:0 0 10px;">📇 <strong style="color:var(--w70);">Card Scan Required</strong> — Every premium purchase asks you to scan your Subsidi card at checkout to apply the discount. There's no toggle to reactivate — just scan each time you buy.</p>
-              <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">Basic Free Trial</strong> — New users get 3 days free on the Basic plan, no payment required. Nothing is auto-charged when it ends — you'll need to manually subscribe to keep the discount.</p>
+              <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">Signup Bonus</strong> — New users can claim a one-time ₦100 from the cashback pool, no payment or subscription required. First come, first served — the button fades once the pool's low.</p>
             </div>
           </div>
         </div>
@@ -5440,6 +5419,11 @@
       return;
     }
 
+    if (scanContext === 'signup-bonus') {
+      processSignupBonusScan(cardCode);
+      return;
+    }
+
     document.getElementById('free-scan-view').style.display = 'none';
     // Card recognition is front-end only (the isValidCard check already ran
     // before this was called) — so a network blip alone never shows as
@@ -5517,7 +5501,16 @@
   async function processPurchaseScan(cardCode) {
     document.getElementById('free-scan-status').textContent = 'Verifying card...';
 
-    const wasUnlockedBefore = premiumUnlocked;
+    // Only actual premium subscribers get the discount purchase completed on
+    // scan. A card scan is proof of card ownership, not proof of a paid
+    // subscription — a never-subscribed (or lapsed) user gets routed to the
+    // premium sheet instead of being silently auto-enrolled into a trial.
+    if (!premiumUnlocked) {
+      closeFreeScan();
+      showPremUnlockSheet(true);
+      return;
+    }
+
     let data;
     try {
       data = await callEdge('activate-premium-scan', { userId, context: 'purchase', cardCode });
@@ -5528,7 +5521,7 @@
     if (!data || data.error) {
       // The QR was already validated as a real Subsidi card before we ever
       // called the backend, so a rejection here is a business-logic reason
-      // (toggle pool below the ₦300 floor, trial already used, etc.) —
+      // (toggle pool below the ₦300 floor, cooldown not actually elapsed, etc.) —
       // never actually "card not recognized." Show the real reason, and
       // don't leave the toggle looking ON when nothing actually activated.
       premiumToggleOn = false;
@@ -5541,13 +5534,6 @@
       return;
     }
 
-    // A brand-new trial can only start from here now that the trial started
-    // when the account had no active subscription at all.
-    if (!wasUnlockedBefore) {
-      premiumUnlocked = true;
-      premiumIsTrial = true;
-      bossTrialAvailable = false;
-    }
     premiumPlan = data.plan || premiumPlan;
     premiumToggleOn = true;
     needsScanToActivate = false;
@@ -5562,48 +5548,37 @@
     await completePurchase(true);
   }
 
-  async function activateFreeTrialDirect() {
-    const btn = document.getElementById('prem-unlock-btn');
-    if (btn) {
-      btn.textContent = 'Activating...';
-      btn.style.cursor = 'default';
-      btn.setAttribute('onclick', '');
-    }
+  function claimSignupBonus() {
+    openFreeScan('signup-bonus');
+  }
+
+  async function processSignupBonusScan(cardCode) {
+    document.getElementById('free-scan-status').textContent = 'Verifying card...';
 
     let data;
     try {
-      data = await callEdge('activate-premium-scan', { userId, context: 'activate' });
+      data = await callEdge('claim-signup-bonus', { userId, cardCode });
     } catch (e) {
       data = null;
     }
 
     if (!data || data.error) {
-      alert(data && data.error ? data.error : 'Could not activate your free trial. Please try again.');
-      selectPremPlan('basic'); // restore the button to its normal tappable state
+      // Same pattern as processPurchaseScan — the QR was already validated
+      // as a real Subsidi card before this ran, so a rejection here is a
+      // business-logic reason (already claimed, pool empty), not "card not
+      // recognized."
+      document.getElementById('free-scan-view').style.display = 'none';
+      document.getElementById('free-error-msg').textContent =
+        (data && typeof data.error === 'string' && data.error) ? data.error : 'Not available right now, please try again later.';
+      document.getElementById('free-error-view').style.display = 'block';
       return;
     }
 
-    premiumUnlocked = true;
-    premiumPlan = data.plan || 'basic';
-    premiumIsTrial = true;
     bossTrialAvailable = false;
-    premiumToggleOn = true;
-    needsScanToActivate = false;
-    setPremToggleUI(true);
+    await fetchUserData();
+    closeFreeScan();
 
-    if (data.cardCode && data.cardCode !== registeredCard) {
-      registeredCard = data.cardCode;
-      if (typeof renderMyCard === 'function') renderMyCard();
-    }
-
-    // Real activation, not a preview — no blur here.
-    const dash = document.getElementById('dash');
-    if (dash) dash.classList.remove('prem-demo-active');
-
-    _closePremUnlockOv();
-    renderBundles();
-
-    alert('🎉 Congratulations!\n\nYou\'re now a Basic premium user.\n\n⚠️ Your free trial ends in 3 days — after that, you\'ll need to subscribe to keep the discount.');
+    alert('🎉 ₦100 added to your wallet!\n\nSubscribe anytime to a paid plan for ₦300 off every purchase plus daily cashback claims.');
   }
 
   function retryFreeScan() {
@@ -5636,12 +5611,11 @@
     const collectBtn = document.getElementById('actions-card-1');
     const collectLabel = document.getElementById('cashback-collect-btn-label');
     if (collectBtn) {
-      const canCollect = premiumUnlocked && poolBalance > 0;
-      collectBtn.style.filter = canCollect ? 'none' : 'grayscale(1)';
+      collectBtn.style.filter = 'none';
       collectBtn.style.opacity = collectBtn.style.opacity; // leave swipe-controlled opacity alone
     }
     if (collectLabel) {
-      collectLabel.textContent = premiumUnlocked ? 'Collect' : 'Unlock to Claim';
+      collectLabel.textContent = 'Collect';
     }
   }
   renderCashbackBalance();

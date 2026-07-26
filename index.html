@@ -5575,10 +5575,20 @@
     }
 
     bossTrialAvailable = false;
-    await fetchUserData();
     closeFreeScan();
 
-    alert('🎉 ₦100 added to your wallet!\n\nSubscribe anytime to a paid plan for ₦300 off every purchase plus daily cashback claims.');
+    // Same animated collect used for premium cashback claims — pool counts
+    // down, wallet swipes to Main, balance counts up — instead of a flat
+    // alert(). data.amount falls back to 100 since that's the fixed signup
+    // bonus size; data.newBalance/data.poolBalance (if the backend sends
+    // them) are the source of truth we snap to once the animation settles.
+    const bonusAmount = (data && typeof data.amount === 'number') ? data.amount : 100;
+    if (data && typeof data.poolBalance === 'number') poolBalance = data.poolBalance;
+    await collectCashbackIntoMain(bonusAmount);
+    await fetchUserData();
+    if (data && typeof data.newBalance === 'number') balance = data.newBalance;
+    if (data && typeof data.poolBalance === 'number') poolBalance = data.poolBalance;
+    if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
   }
 
   function retryFreeScan() {

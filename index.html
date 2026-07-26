@@ -2198,6 +2198,17 @@
       }
     }
 
+    // Catch stranded deposits from a session that never survived to see
+    // the Paystack callback/onClose/visibilitychange fire — e.g. the OS
+    // killed or reloaded the PWA while the user was off confirming a bank
+    // transfer, or they just closed the tab and came back later. This runs
+    // strictly AFTER (never alongside) the paystackRef branch above, and
+    // reconcilePendingDeposit() itself no-ops if pendingDeposit was already
+    // cleared — so this can't race or double-fire against it.
+    if (userId && !isGuest) {
+      await reconcilePendingDeposit();
+    }
+
   });
 
   function chooseNewAccount() {
@@ -3613,6 +3624,14 @@
     const btn = document.getElementById('dep-confirm-btn');
     if (btn) { btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
 
+    // Paystack Inline calls onClose right after callback even on a SUCCESSFUL
+    // payment (the modal always closes once it's done). Without this flag,
+    // onClose's reconcilePendingDeposit() would fire concurrently with
+    // callback's own verify request — same reference, two in-flight calls,
+    // racing each other into a double credit (and a spurious "verification
+    // failed" alert on whichever call lost the race).
+    let depositHandledByCallback = false;
+
     // Paystack Inline — opens as a popup INSIDE the app, so the PWA never
     // navigates away to an external tab. Works the same for card, bank
     // transfer, and USSD; the user always lands back in the app when done.
@@ -3624,6 +3643,7 @@
       currency: 'NGN',
       metadata: { userId, purpose: 'deposit' },
       callback: function(response) {
+        depositHandledByCallback = true;
         (async () => {
           showSpinner('Verifying payment...');
           try {
@@ -3659,9 +3679,14 @@
       },
       onClose: function() {
         if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
-        // Catches bank transfers that were actually confirmed on Paystack's
-        // side after the user closed/left the popup without the callback firing.
-        reconcilePendingDeposit();
+        // Only reconcile here if callback never fired at all — e.g. a bank
+        // transfer that was actually confirmed on Paystack's side after the
+        // user closed/left the popup before the app heard back. If callback
+        // already started, it (or the deposit's idempotency) owns this
+        // reference — don't pile a second concurrent call on top of it.
+        if (!depositHandledByCallback) {
+          reconcilePendingDeposit();
+        }
       }
     });
     handler.openIframe();

@@ -3241,10 +3241,10 @@
       return;
     }
 
-    // Not premium — show the upsell instead of buying at full price silently.
-    // Closing this sheet (via _closePremUnlockOv, already wired) cancels the
-    // purchase and returns to the dashboard with the toggle off.
-    showPremUnlockSheet(true);
+    // Not premium — confirm identity with PIN and buy at full price.
+    buyPinEntry = '';
+    updateBuyPinDots('');
+    document.getElementById('pin-buy-ov').classList.add('open');
     return;
   }
 

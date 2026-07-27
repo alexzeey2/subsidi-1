@@ -3570,6 +3570,25 @@
     return 50;
   }
 
+  // Bank transfers (and sometimes USSD) aren't confirmed by Paystack the
+  // instant the popup closes — confirmation can take anywhere from a few
+  // seconds to a couple minutes. Checking once and declaring failure is
+  // what caused real transfers to get told "verification failed" and never
+  // credited. This polls a few times with a short gap before giving up, so
+  // a slightly-delayed bank transfer still resolves to success in-app.
+  async function verifyDepositWithRetry(reference, userId, amount, attempts = 5, delayMs = 4000) {
+    for (let i = 0; i < attempts; i++) {
+      try {
+        const result = await callEdge('deposit', { reference, userId, amount });
+        if (result && result.success) return result;
+      } catch (e) {
+        console.warn('[deposit] verify attempt', i + 1, 'failed:', e);
+      }
+      if (i < attempts - 1) await new Promise(r => setTimeout(r, delayMs));
+    }
+    return null;
+  }
+
   function selectDep(el, amt) {
     document.querySelectorAll('.dep-opt').forEach(o => o.classList.remove('sel'));
     el.classList.add('sel');
@@ -3637,11 +3656,7 @@
         (async () => {
           showSpinner('Verifying payment...');
           try {
-            const result = await callEdge('deposit', {
-              reference: response.reference,
-              userId,
-              amount
-            });
+            const result = await verifyDepositWithRetry(response.reference, userId, amount);
             hideSpinner();
             if (result && result.success) {
               localStorage.removeItem('pendingDeposit');
@@ -3656,12 +3671,18 @@
               alert('₦' + amount.toLocaleString() + ' added to your wallet!');
               setTimeout(maybeShowFeedbackForRecentTxn, 800);
             } else {
-              alert('Payment verification failed. Contact support with ref: ' + response.reference);
+              // Not a real failure — most likely a bank transfer still
+              // clearing on Paystack's side. pendingDeposit stays in
+              // localStorage, so reconcilePendingDeposit (on next app
+              // open, tab focus, or resume) will keep checking and credit
+              // the wallet automatically once it confirms — no need to
+              // contact support or re-pay.
+              alert('Still confirming your transfer — this can take a few minutes for bank transfers. We\'ll add it to your wallet automatically once it clears, no need to pay again.');
             }
           } catch (e) {
             hideSpinner();
             console.error('Deposit verify error:', e);
-            alert('Payment verification failed. Contact support with ref: ' + response.reference);
+            alert('Still confirming your transfer — this can take a few minutes for bank transfers. We\'ll add it to your wallet automatically once it clears, no need to pay again.');
           } finally {
             if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
           }

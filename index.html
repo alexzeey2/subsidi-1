@@ -2128,37 +2128,35 @@
     // Check if returning from Paystack redirect
     const urlParams = new URLSearchParams(window.location.search);
     const paystackRef = urlParams.get('reference') || urlParams.get('trxref');
-    const pending = localStorage.getItem('pendingDeposit');
+    const matchingPending = paystackRef ? getPendingDeposits().find(d => d && d.ref === paystackRef) : null;
 
-    if (paystackRef && pending) {
+    if (paystackRef && matchingPending) {
       try {
-        const { ref, userId: pendingUserId, amount } = JSON.parse(pending);
-        if (paystackRef === ref) {
-          showSpinner('Verifying payment...');
-          const result = await callEdge('deposit', {
-            reference: paystackRef,
-            userId: pendingUserId,
-            amount
-          });
-          hideSpinner();
-          if (result && result.success) {
-            localStorage.removeItem('pendingDeposit');
-            saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
-            // Always fetch from DB — ensures balance shown is exactly what's in Supabase
-            // Retry once if balance hasn't updated yet (guards against Supabase write lag)
-            const balanceBefore = balance;
+        const { userId: pendingUserId, amount } = matchingPending;
+        showSpinner('Verifying payment...');
+        const result = await callEdge('deposit', {
+          reference: paystackRef,
+          userId: pendingUserId,
+          amount
+        });
+        hideSpinner();
+        if (result && result.success) {
+          removePendingDeposit(paystackRef);
+          saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
+          // Always fetch from DB — ensures balance shown is exactly what's in Supabase
+          // Retry once if balance hasn't updated yet (guards against Supabase write lag)
+          const balanceBefore = balance;
+          await fetchUserData();
+          if (balance === balanceBefore) {
+            await new Promise(r => setTimeout(r, 1500));
             await fetchUserData();
-            if (balance === balanceBefore) {
-              await new Promise(r => setTimeout(r, 1500));
-              await fetchUserData();
-            }
-            alert('₦' + amount.toLocaleString() + ' added to your wallet!');
-          } else {
-            alert('Payment verification failed. Contact support with ref: ' + paystackRef);
           }
-          // Clean URL
-          window.history.replaceState({}, '', window.location.pathname);
+          alert('₦' + amount.toLocaleString() + ' added to your wallet!');
+        } else {
+          alert('Payment verification failed. Contact support with ref: ' + paystackRef);
         }
+        // Clean URL
+        window.history.replaceState({}, '', window.location.pathname);
       } catch(e) {
         hideSpinner();
         console.error('Deposit verify error:', e);
@@ -3570,6 +3568,49 @@
     return 50;
   }
 
+  // Pending deposits are stored as a LIST, not a single value. A user can
+  // retry a failed payment method several times before one finally clears
+  // (Paystack fraud-check denials, "transaction not completed", etc), and
+  // each retry uses a new reference. If we only remembered the latest one,
+  // an earlier attempt that silently succeeds later on Paystack's side
+  // would get overwritten and forgotten — charged, but never credited.
+  // Keeping a list means every attempt gets checked and credited once it
+  // clears, no matter how many retries happened in between.
+  function getPendingDeposits() {
+    try {
+      const raw = localStorage.getItem('pendingDeposits');
+      if (raw) {
+        const list = JSON.parse(raw);
+        return Array.isArray(list) ? list : [];
+      }
+      // One-time migration from the old single-value key, if present.
+      const legacy = localStorage.getItem('pendingDeposit');
+      if (legacy) {
+        const dep = JSON.parse(legacy);
+        localStorage.removeItem('pendingDeposit');
+        return dep ? [dep] : [];
+      }
+    } catch (e) {
+      console.warn('[deposit] failed to read pendingDeposits, resetting:', e);
+    }
+    return [];
+  }
+
+  function savePendingDeposits(list) {
+    localStorage.setItem('pendingDeposits', JSON.stringify(list));
+  }
+
+  function addPendingDeposit(dep) {
+    const list = getPendingDeposits();
+    list.push(dep);
+    savePendingDeposits(list);
+  }
+
+  function removePendingDeposit(ref) {
+    const list = getPendingDeposits().filter(d => d.ref !== ref);
+    savePendingDeposits(list);
+  }
+
   // Bank transfers (and sometimes USSD) aren't confirmed by Paystack the
   // instant the popup closes — confirmation can take anywhere from a few
   // seconds to a couple minutes. Checking once and declaring failure is
@@ -3624,11 +3665,12 @@
     const ref = 'subsidi-' + userId + '-' + Date.now();
     const email = (username || userId) + '@subsidi.app';
 
-    // Persist the pending deposit so it can be reconciled even if the
-    // Paystack callback never fires (e.g. bank transfer takes minutes and
-    // the OS suspends the app in the background while the user is away
-    // confirming in their bank app).
-    localStorage.setItem('pendingDeposit', JSON.stringify({ ref, userId, amount }));
+    // Persist this attempt so it can be reconciled even if the Paystack
+    // callback never fires (e.g. bank transfer takes minutes and the OS
+    // suspends the app in the background while the user is away confirming
+    // in their bank app). Added to the list, not overwritten — if the user
+    // retries with a different method, earlier attempts stay tracked too.
+    addPendingDeposit({ ref, userId, amount });
 
     const btn = document.getElementById('dep-confirm-btn');
     if (btn) { btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
@@ -3659,7 +3701,7 @@
             const result = await verifyDepositWithRetry(response.reference, userId, amount);
             hideSpinner();
             if (result && result.success) {
-              localStorage.removeItem('pendingDeposit');
+              removePendingDeposit(response.reference);
               saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
               const balanceBefore = balance;
               await fetchUserData();
@@ -3672,8 +3714,8 @@
               setTimeout(maybeShowFeedbackForRecentTxn, 800);
             } else {
               // Not a real failure — most likely a bank transfer still
-              // clearing on Paystack's side. pendingDeposit stays in
-              // localStorage, so reconcilePendingDeposit (on next app
+              // clearing on Paystack's side. This attempt stays in
+              // pendingDeposits, so reconcilePendingDeposit (on next app
               // open, tab focus, or resume) will keep checking and credit
               // the wallet automatically once it confirms — no need to
               // contact support or re-pay.
@@ -3703,32 +3745,40 @@
     handler.openIframe();
   }
 
-  // Re-checks a deposit that was started but never confirmed client-side.
-  // Safe to call repeatedly — the deposit edge function is idempotent on
-  // the reference, so this will not double-credit a wallet.
+  // Re-checks every deposit attempt that was started but never confirmed
+  // client-side — there can be more than one if the user retried a failed
+  // payment method a few times. Safe to call repeatedly — the deposit edge
+  // function is idempotent on the reference, so this will not double-credit
+  // a wallet.
   async function reconcilePendingDeposit() {
-    const pending = localStorage.getItem('pendingDeposit');
-    if (!pending || !userId || isGuest) return;
-    let ref, pendingUserId, amount;
-    try {
-      ({ ref, userId: pendingUserId, amount } = JSON.parse(pending));
-    } catch (e) {
-      localStorage.removeItem('pendingDeposit');
-      return;
-    }
-    try {
-      const result = await callEdge('deposit', { reference: ref, userId: pendingUserId, amount });
-      if (result && result.success) {
-        localStorage.removeItem('pendingDeposit');
-        saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
-        await fetchUserData();
-        alert('₦' + amount.toLocaleString() + ' added to your wallet!');
-        setTimeout(maybeShowFeedbackForRecentTxn, 800);
+    const pending = getPendingDeposits();
+    if (!pending.length || !userId || isGuest) return;
+
+    let creditedAny = false;
+    for (const dep of pending) {
+      const { ref, userId: pendingUserId, amount } = dep || {};
+      if (!ref || !pendingUserId || !amount) {
+        removePendingDeposit(ref); // malformed entry — drop it, nothing to check
+        continue;
       }
-      // If not successful yet, Paystack may still be processing — leave
-      // pendingDeposit in place so the next trigger (app resume) retries it.
-    } catch (e) {
-      console.warn('[deposit] reconcile failed, will retry later:', e);
+      try {
+        const result = await callEdge('deposit', { reference: ref, userId: pendingUserId, amount });
+        if (result && result.success) {
+          removePendingDeposit(ref);
+          saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
+          creditedAny = true;
+          alert('₦' + amount.toLocaleString() + ' added to your wallet!');
+        }
+        // If not successful yet, Paystack may still be processing — leave
+        // this entry in place so the next trigger (app resume) retries it.
+      } catch (e) {
+        console.warn('[deposit] reconcile failed for', ref, '— will retry later:', e);
+      }
+    }
+
+    if (creditedAny) {
+      await fetchUserData();
+      setTimeout(maybeShowFeedbackForRecentTxn, 800);
     }
   }
 

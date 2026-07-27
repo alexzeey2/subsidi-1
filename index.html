@@ -2159,31 +2159,47 @@
       }
     }
 
-    // One-shot recovery for the single most recent deposit attempt, in case
-    // the connection dropped mid-verification last time (phone backgrounded,
-    // network hiccup) and the wallet was charged but never credited. Quiet
-    // by design — no retry loop, no polling, just one check on load.
+    // Deposit recovery / return-from-redirect check. Covers two cases with
+    // one piece of logic: (1) Paystack just redirected the user straight
+    // back here after the checkout page (paystackRef will match dep.ref),
+    // and (2) the tab was closed/backgrounded mid-payment and the user is
+    // only now reopening the app (no paystackRef in the URL, but the
+    // pending record is still there from before). Either way we just ask
+    // the deposit fn to verify+credit this reference — it's a no-op if
+    // it's already been credited.
     if (userId && !isGuest) {
       try {
         const lastDep = localStorage.getItem('subsidi_last_deposit');
         if (lastDep) {
           const dep = JSON.parse(lastDep);
           if (dep && dep.ref && dep.userId && dep.amount) {
+            if (paystackRef && paystackRef === dep.ref) showSpinner('Confirming payment...');
             const result = await callEdge('deposit', { reference: dep.ref, userId: dep.userId, amount: dep.amount });
+            hideSpinner();
             if (result && result.success) {
               localStorage.removeItem('subsidi_last_deposit');
               saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount: dep.amount, status: 'success' });
               await fetchUserData();
               alert('₦' + dep.amount.toLocaleString() + ' added to your wallet!');
+              setTimeout(maybeShowFeedbackForRecentTxn, 800);
+            } else if (paystackRef && paystackRef === dep.ref) {
+              // Just came back from Paystack and it's still not confirmed —
+              // common for bank transfers, which can clear a bit later.
+              // Leave the pending record in place so the next app load
+              // (or the recovery check itself) picks it up automatically.
+              alert('Still confirming your transfer — this can take a minute or two. We\'ll add it automatically once it clears. If it doesn\'t after a few minutes, contact support with this reference: ' + dep.ref);
             }
-            // Not successful yet — leave it in place, we'll check again
-            // next time the app loads rather than polling right now.
+            // Not successful and not a fresh return from Paystack — leave
+            // it in place quietly, we'll check again next load.
           }
         }
       } catch (e) {
+        hideSpinner();
         console.warn('[deposit] recovery check failed, will retry next load:', e);
       }
     }
+
+    if (paystackRef) window.history.replaceState({}, '', window.location.pathname);
 
   });
 
@@ -3575,9 +3591,16 @@
     btn.textContent = 'Add ₦' + amt.toLocaleString() + ' to Wallet';
   }
 
-  // Simple, direct deposit flow: open Paystack -> user pays -> Paystack tells
-  // us it's done -> we ask the edge function to verify + credit -> show the
-  // result. No pending-deposit storage, no background reconciliation.
+  // Redirect-based deposit flow: ask our own server to open a Paystack
+  // checkout session, then send the whole browser tab there (not an
+  // inline iframe). This matters because bank-transfer/USSD/other
+  // channels routinely refuse to load inside Paystack's inline iframe —
+  // banks send X-Frame-Options headers that block embedding — and when
+  // that happens inline.js force-redirects out of the iframe into a full
+  // page with no defined way back into the app (the "standard.paystack.co"
+  // dead-end screen). The redirect flow is built for full-page navigation
+  // from the start, and Paystack sends the user straight back to our own
+  // URL (with the reference attached) once they're done, success or not.
   async function confirmDep() {
     if (!selectedDep) return;
     const amount = selectedDep;
@@ -3586,67 +3609,38 @@
     const ref = 'subsidi-' + userId + '-' + Date.now();
     const email = (username || userId) + '@subsidi.app';
 
-    // Remember this one attempt so that if the connection drops mid-way
-    // (phone backgrounded, network hiccup — the exact "EarlyDrop" case
-    // where Paystack completes the charge but our verify call never
-    // finishes crediting the wallet) it can be recovered automatically
-    // next time the app loads. Deliberately a single slot, not a list —
-    // this is just a recovery net for the current attempt, not a full
-    // reconciliation system.
+    // Remember this attempt so that when Paystack redirects back (or if
+    // the tab is closed/backgrounded mid-payment and the user reopens the
+    // app later), we know which reference to check and credit.
     localStorage.setItem('subsidi_last_deposit', JSON.stringify({ ref, userId, amount }));
 
     const btn = document.getElementById('dep-confirm-btn');
     if (btn) { btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
 
-    const handler = PaystackPop.setup({
-      key: PAYSTACK_PUBLIC_KEY,
-      email: email,
-      amount: chargeAmount * 100, // Paystack expects amount in kobo — includes the ₦50 fee
-      ref: ref,
-      currency: 'NGN',
-      metadata: { userId, purpose: 'deposit' },
-      callback: function(response) {
-        (async () => {
-          showSpinner('Confirming payment...');
-          try {
-            let result = await callEdge('deposit', { reference: response.reference, userId, amount });
-            if (!(result && result.success)) {
-              // Not confirmed yet — very common for bank transfers, which
-              // can take a bit longer than card payments to clear on
-              // Paystack's side. Wait briefly and check once more before
-              // telling the user anything went wrong.
-              showSpinner('Still confirming...');
-              await new Promise(r => setTimeout(r, 6000));
-              result = await callEdge('deposit', { reference: response.reference, userId, amount });
-            }
-            hideSpinner();
-            if (result && result.success) {
-              localStorage.removeItem('subsidi_last_deposit');
-              saveLocalTxn({ type: 'deposit', data_plan: 'deposit', amount, status: 'success' });
-              await fetchUserData();
-              closeDepOv();
-              alert('₦' + amount.toLocaleString() + ' added to your wallet!');
-              setTimeout(maybeShowFeedbackForRecentTxn, 800);
-            } else {
-              // Still not confirmed — leave subsidi_last_deposit in place
-              // (set before the popup opened) so reopening the app will
-              // quietly recheck this same reference automatically.
-              alert('Still confirming your transfer — this can take a minute or two. We\'ll add it automatically once it clears. If it doesn\'t after a few minutes, contact support with this reference: ' + response.reference);
-            }
-          } catch (e) {
-            hideSpinner();
-            console.error('Deposit verify error:', e);
-            alert('Still confirming your transfer — this can take a minute or two. We\'ll add it automatically once it clears. If it doesn\'t after a few minutes, contact support with this reference: ' + response.reference);
-          } finally {
-            if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
-          }
-        })();
-      },
-      onClose: function() {
+    showSpinner('Opening payment...');
+    try {
+      // callback_url: strip any existing query params so we always land
+      // back on a clean app URL; the redirect itself appends
+      // ?reference=...&trxref=... automatically.
+      const callbackUrl = window.location.origin + window.location.pathname;
+      const result = await callEdge('deposit-initialize', {
+        userId, email, reference: ref, chargeAmount, callbackUrl
+      });
+      hideSpinner();
+      if (result && result.success && result.authorization_url) {
+        window.location.href = result.authorization_url;
+      } else {
+        localStorage.removeItem('subsidi_last_deposit');
         if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+        alert('Could not start payment. Please try again.');
       }
-    });
-    handler.openIframe();
+    } catch (e) {
+      hideSpinner();
+      console.error('Deposit initialize error:', e);
+      localStorage.removeItem('subsidi_last_deposit');
+      if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+      alert('Could not start payment. Please try again.');
+    }
   }
 
   function closeDepOv(e) {

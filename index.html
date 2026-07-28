@@ -979,6 +979,7 @@
       <input id="dep-custom-input" type="number" inputmode="numeric" min="1" placeholder="Enter a different amount" oninput="selectCustomDep(this.value)" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px 16px 16px 34px;font-size:16px;font-weight:700;color:var(--w);">
     </div>
     <button class="cbtn" id="dep-confirm-btn" onclick="confirmDep()" style="opacity:.4;pointer-events:none;">Add to Wallet</button>
+    <div style="font-size:11px;color:var(--w40);line-height:1.6;margin-top:12px;text-align:center;">If you pay with your bank app and see "Transaction was not completed" after returning, check your wallet balance first — it often means the payment actually went through.</div>
   </div>
 </div>
 
@@ -1106,6 +1107,37 @@
         <div class="prof-row-body">
           <div class="prof-row-title">My Card</div>
           <div class="prof-row-sub" id="mycard-row-sub">View your Subsidi card</div>
+        </div>
+        <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Premium -->
+  <div class="prof-sec">
+    <div class="prof-sec-title">Premium</div>
+    <div class="prof-card">
+      <div class="prof-row" onclick="showPremUnlockSheet(false)">
+        <div class="prof-row-ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15 8.5 22 9.3 17 14.1 18.2 21 12 17.6 5.8 21 7 14.1 2 9.3 9 8.5 12 2"/>
+          </svg>
+        </div>
+        <div class="prof-row-body">
+          <div class="prof-row-title">Premium</div>
+          <div class="prof-row-sub">Unlock cheaper prices with Basic, Standard, or Pro</div>
+        </div>
+        <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="prof-row" onclick="showPremiumPolicySheet()">
+        <div class="prof-row-ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <div class="prof-row-body">
+          <div class="prof-row-title">Premium Policy</div>
+          <div class="prof-row-sub">How Basic, Standard, and Pro plans work</div>
         </div>
         <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
@@ -4981,6 +5013,33 @@
     // Show terms agreement popup before payment
     _closePremUnlockOv();
     showPremTermsPopup(plan);
+  }
+
+  function showPremiumPolicySheet() {
+    const popId = 'prem-policy-sheet';
+    const existing = document.getElementById(popId);
+    if (existing) existing.remove();
+
+    const pop = document.createElement('div');
+    pop.id = popId;
+    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:700;display:flex;align-items:flex-end;justify-content:center;padding:0;';
+    pop.innerHTML = `
+      <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+        <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+        <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:16px;">Premium Policy</div>
+        <div style="font-size:12px;color:var(--w50);line-height:1.8;">
+          <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Flat Discount</strong> — Every premium plan (Basic, Standard, Pro) gives you ₦300 off every data plan, no matter the size. It's a fixed amount, not a percentage.</p>
+          <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Cashback Pool</strong> — Premium subscribers can claim daily from the shared cashback pool: up to ₦100/day on Basic, ₦350/day on Standard, and ₦1,000/day on Pro. The pool is funded by the ₦50 shared contribution added to every wallet top-up — never taken from any one user's balance — so it grows with community activity. If it's empty, the claim button goes faded until it refills.</p>
+          <p style="margin:0 0 10px;">📇 <strong style="color:var(--w70);">Card Scan Required</strong> — Every premium purchase asks you to scan your Subsidi card at checkout to apply the ₦300 discount. Nothing is auto-charged — you subscribe and pay whenever you're ready.</p>
+          <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">Signup Bonus</strong> — New users get ₦100 free from the cashback pool, no payment required.</p>
+          <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Pricing</strong> — Basic is ₦290/week, Standard is ₦790/month, Pro is ₦6,000/year. You can switch plans any time from the Premium screen.</p>
+          <p style="margin:0 0 10px;">🥇 <strong style="color:var(--w70);">Golden Plans</strong> — Bigger data plans (₦1,100 wholesale and above) are priced the same way as every other plan — a small 1% markup — and get the same ₦300 flat discount if you're on Basic, Standard, or Pro.</p>
+          <p style="margin:0;">❓ Questions about your specific plan or billing? Reach out via <strong style="color:var(--w70);">Report Issue</strong> in Support.</p>
+        </div>
+        <button onclick="document.getElementById('${popId}').remove();" style="width:100%;margin-top:24px;padding:15px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">Close</button>
+      </div>`;
+    document.body.appendChild(pop);
+    pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
   }
 
   function showPremTermsPopup(plan) {

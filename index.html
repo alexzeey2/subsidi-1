@@ -349,7 +349,7 @@
   /* ── REFERRAL OVERLAY ── */
   .refer-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(7px);z-index:300;align-items:flex-end}
   .refer-ov.open{display:flex}
-  .refer-sheet{background:var(--dark-2);border:1px solid var(--border);border-radius:28px 28px 0 0;padding:10px 24px 48px;width:100%;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:up .32s cubic-bezier(.22,1,.36,1)}
+  .refer-sheet{background:var(--dark-2);border:1px solid var(--border);border-radius:28px 28px 0 0;padding:10px 24px 48px;width:100%;animation:up .32s cubic-bezier(.22,1,.36,1)}
   .refer-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(108,43,217,.12);border:1px solid rgba(108,43,217,.25);border-radius:20px;padding:5px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--p-light);margin-bottom:16px}
   .refer-link-box{background:var(--dark-4);border:1.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;opacity:.45;cursor:not-allowed;margin-bottom:8px}
   .refer-link-text{font-size:13px;font-weight:600;color:var(--p-light);letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -573,8 +573,8 @@
       <div class="reg-title">Scan your Subsidi card</div>
       <div class="reg-sub">Hold your card up to the camera — we'll set you up automatically</div>
 
-      <div style="position:relative;width:100%;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
-        <video id="reg-video" style="width:100%;display:block;border-radius:20px;" autoplay playsinline muted></video>
+      <div style="position:relative;width:100%;aspect-ratio:1/1;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
+        <video id="reg-video" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:20px;" autoplay playsinline muted></video>
         <!-- Scanner frame -->
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
           <div style="width:180px;height:180px;position:relative;">
@@ -1220,8 +1220,8 @@
         <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold your Subsidi card up to the camera to enter the ₦50,000 draw</div>
       </div>
 
-      <div style="position:relative;width:100%;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
-        <video id="raffle-video" style="width:100%;display:block;border-radius:20px;" autoplay playsinline muted></video>
+      <div style="position:relative;width:100%;aspect-ratio:1/1;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
+        <video id="raffle-video" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:20px;" autoplay playsinline muted></video>
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
           <div style="width:160px;height:160px;position:relative;">
             <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-top:3px solid #F5A623;border-left:3px solid #F5A623;border-radius:4px 0 0 0;"></div>
@@ -1280,8 +1280,8 @@
         <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold your Subsidi card up to the camera to activate</div>
       </div>
 
-      <div style="position:relative;width:100%;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
-        <video id="free-scan-video" style="width:100%;display:block;border-radius:20px;" autoplay playsinline muted></video>
+      <div style="position:relative;width:100%;aspect-ratio:1/1;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
+        <video id="free-scan-video" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:20px;" autoplay playsinline muted></video>
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
           <div style="width:160px;height:160px;position:relative;">
             <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-top:3px solid #fff;border-left:3px solid #fff;border-radius:4px 0 0 0;"></div>
@@ -1342,8 +1342,8 @@
         <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold your Subsidi card up to the camera to collect your cashback</div>
       </div>
 
-      <div style="position:relative;width:100%;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
-        <video id="cashback-scan-video" style="width:100%;display:block;border-radius:20px;" autoplay playsinline muted></video>
+      <div style="position:relative;width:100%;aspect-ratio:1/1;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
+        <video id="cashback-scan-video" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:20px;" autoplay playsinline muted></video>
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
           <div style="width:160px;height:160px;position:relative;">
             <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-top:3px solid #F5A623;border-left:3px solid #F5A623;border-radius:4px 0 0 0;"></div>

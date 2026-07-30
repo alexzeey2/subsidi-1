@@ -2981,7 +2981,7 @@
   // ── Plans data (ClubKonnect / Nellobytesystems) ──
   // Filtered from the full ClubKonnect catalog down to what's suitable for
   // this app: 1GB and up only, no weekend/night plans, no router plans, no
-  // mixed data+minutes bundles. Validity of 1–6 days is "daily", 7–14 days is
+  // mixed data+minutes bundles. Validity of 1–3 days is "daily", 7–14 days is
   // "weekly", and 30-day plans are "monthly" (60/90/365-day plans were
   // dropped — they don't fit any of the three buckets cleanly).
   //
@@ -3063,13 +3063,13 @@
         { size:'125MB', val:'1 Day', planId:'100.01', ck:97, provider:'ck' },
         { size:'260MB', val:'2 Days', planId:'200.01', ck:194, provider:'ck' },
         { size:'2GB', val:'1 Day', planId:'500.02', ck:485, provider:'ck' },
+        { size:'1GB', val:'3 Days', planId:'1000.11', ck:322, provider:'ck' },
+        { size:'3GB', val:'3 Days', planId:'3000.11', ck:968, provider:'ck' },
+        { size:'5GB', val:'3 Days', planId:'5000.11', ck:1614, provider:'ck' },
       ],
       weekly: [
         { size:'200MB', val:'14 Days', planId:'200', ck:94, provider:'ck' },
         { size:'500MB', val:'7 Days', planId:'500', ck:230, provider:'ck' },
-        { size:'1GB', val:'3 Days', planId:'1000.11', ck:322, provider:'ck' },
-        { size:'3GB', val:'3 Days', planId:'3000.11', ck:968, provider:'ck' },
-        { size:'5GB', val:'3 Days', planId:'5000.11', ck:1614, provider:'ck' },
         { size:'1GB', val:'7 Days', planId:'1000.12', ck:357, provider:'ck' },
         { size:'3GB', val:'7 Days', planId:'3000.12', ck:1072, provider:'ck' },
         { size:'5GB', val:'7 Days', planId:'5000.12', ck:1787, provider:'ck' },
@@ -3103,9 +3103,9 @@
         { size:'100MB', val:'1 Day', planId:'100.01', ck:93, provider:'ck' },
         { size:'250MB', val:'1 Day', planId:'200.01', ck:186, provider:'ck' },
         { size:'450MB', val:'1 Day', planId:'350.01', ck:325.50, provider:'ck' },
+        { size:'650MB', val:'3 Days', planId:'500.01', ck:465, provider:'ck' },
       ],
       weekly: [
-        { size:'650MB', val:'3 Days', planId:'500.01', ck:465, provider:'ck' },
         { size:'650MB', val:'14 Days', planId:'600.01', ck:558, provider:'ck' },
         { size:'1.75GB', val:'7 Days', planId:'1500.01', ck:1395, provider:'ck' },
       ],
@@ -4370,10 +4370,6 @@
       a: "Subsidi is a membership that gets you mobile data cheaper than market price. New users get ₦100 free from the cashback pool, no payment required. Basic, Standard, and Pro are all paid plans that keep every purchase discounted by ₦300, plus daily claims from the cashback pool."
     },
     {
-      q: "What is a Golden Plan?",
-      a: "Golden Plans are the bigger data plans (₦1,100 and above wholesale). They're priced the same way as every other plan — a small 1% markup — and get the same ₦300 flat discount if you're on Basic, Standard, or Pro."
-    },
-    {
       q: "How do I keep my discount active?",
       a: "Every premium purchase — Basic, Standard, or Pro — asks you to scan your Subsidi card at checkout to apply the ₦300 discount. Nothing is auto-charged — you subscribe and pay whenever you're ready."
     },
@@ -5014,7 +5010,6 @@
           <p style="margin:0 0 10px;">📇 <strong style="color:var(--w70);">Card Scan Required</strong> — Every premium purchase asks you to scan your Subsidi card at checkout to apply the ₦300 discount. Nothing is auto-charged — you subscribe and pay whenever you're ready.</p>
           <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">Signup Bonus</strong> — New users get ₦100 free from the cashback pool, no payment required.</p>
           <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Pricing</strong> — Basic is ₦290/week, Standard is ₦790/month, Pro is ₦6,000/year. You can switch plans any time from the Premium screen.</p>
-          <p style="margin:0 0 10px;">🥇 <strong style="color:var(--w70);">Golden Plans</strong> — Bigger data plans (₦1,100 wholesale and above) are priced the same way as every other plan — a small 1% markup — and get the same ₦300 flat discount if you're on Basic, Standard, or Pro.</p>
           <p style="margin:0;">❓ Questions about your specific plan or billing? Reach out via <strong style="color:var(--w70);">Report Issue</strong> in Support.</p>
         </div>
         <button onclick="document.getElementById('${popId}').remove();" style="width:100%;margin-top:24px;padding:15px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">Close</button>
@@ -5049,7 +5044,6 @@
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
               <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Flat Discount</strong> — Every premium plan (Basic, Standard, Pro) gives you ₦300 off every data plan, no matter the size. It's a fixed amount, not a percentage.</p>
               <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Cashback Pool</strong> — Premium subscribers can claim daily from the shared cashback pool: up to ₦100/day on Basic, ₦350/day on Standard, and ₦1,000/day on Pro. The pool is funded by the ₦50 shared contribution added to every wallet top-up — never taken from any one user's balance — so it grows with community activity. If it's empty, the claim button goes faded until it refills.</p>
-              <p style="margin:0 0 10px;">🎯 <strong style="color:var(--w70);">Golden Plan Discounts</strong> — Half of that same ₦50 top-up contribution also feeds a separate pool that funds cheaper pricing on lower-tier data plans — higher-margin purchases help subsidize the rest.</p>
               <p style="margin:0 0 10px;">📇 <strong style="color:var(--w70);">Card Scan Required</strong> — Every premium purchase asks you to scan your Subsidi card at checkout to apply the discount. There's no toggle to reactivate — just scan each time you buy.</p>
               <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">Signup Bonus</strong> — New users can claim a one-time ₦100 from the cashback pool, no payment or subscription required. First come, first served — the button fades once the pool's low.</p>
             </div>

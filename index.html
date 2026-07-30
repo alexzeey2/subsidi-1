@@ -349,7 +349,7 @@
   /* ── REFERRAL OVERLAY ── */
   .refer-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(7px);z-index:300;align-items:flex-end}
   .refer-ov.open{display:flex}
-  .refer-sheet{background:var(--dark-2);border:1px solid var(--border);border-radius:28px 28px 0 0;padding:10px 24px 48px;width:100%;animation:up .32s cubic-bezier(.22,1,.36,1)}
+  .refer-sheet{background:var(--dark-2);border:1px solid var(--border);border-radius:28px 28px 0 0;padding:10px 24px 48px;width:100%;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:up .32s cubic-bezier(.22,1,.36,1)}
   .refer-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(108,43,217,.12);border:1px solid rgba(108,43,217,.25);border-radius:20px;padding:5px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--p-light);margin-bottom:16px}
   .refer-link-box{background:var(--dark-4);border:1.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;opacity:.45;cursor:not-allowed;margin-bottom:8px}
   .refer-link-text{font-size:13px;font-weight:600;color:var(--p-light);letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

@@ -235,6 +235,9 @@
   .overlay.open{display:flex}
   .sheet{background:var(--dark-2);border:1px solid var(--border);border-radius:28px 28px 0 0;padding:10px 24px 44px;width:100%;animation:up .32s cubic-bezier(.22,1,.36,1)}
   @keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  @keyframes giftWave{0%,100%{transform:rotate(0deg)}10%{transform:rotate(16deg)}20%{transform:rotate(-10deg)}30%{transform:rotate(16deg)}40%{transform:rotate(-6deg)}50%{transform:rotate(12deg)}60%,100%{transform:rotate(0deg)}}
+  @keyframes giftGlow{0%,100%{filter:drop-shadow(0 0 0px rgba(245,166,35,0))}50%{filter:drop-shadow(0 0 12px rgba(245,166,35,.95))}}
+  #gift-bubble-hand{display:inline-block;animation:giftWave 2.2s ease-in-out infinite,giftGlow 2s ease-in-out infinite;transform-origin:70% 70%;}
   .sh-bar{width:36px;height:4px;background:var(--w15);border-radius:2px;margin:10px auto 24px}
   .sh-title{font-family:'Georgia',serif;font-size:24px;font-style:italic;margin-bottom:4px}
   .sh-sub{font-size:13px;color:var(--w40);margin-bottom:20px}
@@ -818,11 +821,21 @@
           </svg>
           <span>Add Money</span>
         </div>
-        <div class="act-rect" onclick="if(gateCheck('Transaction History','Create a free account to view your transaction history.'))return;showHistoryOv()" style="flex:1;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        <div class="act-rect" onclick="openGetGiftSheet()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
+          <div style="position:relative;width:15px;height:15px;display:flex;align-items:center;justify-content:center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/>
+              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+            </svg>
+            <span id="gift-badge" class="ni-badge">0</span>
+          </div>
+          <span>Get Gift</span>
+        </div>
+        <div id="hist-icon-wrap" onclick="if(gateCheck('Transaction History','Create a free account to view your transaction history.'))return;showHistoryOv()" style="position:relative;width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
-          <span>History</span>
+          <span id="hist-badge" class="ni-badge">0</span>
         </div>
       </div>
 
@@ -841,7 +854,7 @@
 
 
   <div class="sec">
-    <div class="sec-title">Network</div>
+    <div class="sec-title" id="network-sec-title">Network</div>
     <div class="net-grid">
       <div class="net sel" onclick="selNet(this,'MTN')"><div class="net-logo mtn">MTN</div><div class="net-n">MTN</div></div>
       <div class="net" onclick="selNet(this,'Airtel')"><div class="net-logo airt">AIR</div><div class="net-n">Airtel</div></div>
@@ -980,6 +993,52 @@
     </div>
     <button class="cbtn" id="dep-confirm-btn" onclick="confirmDep()" style="opacity:.4;pointer-events:none;">Add to Wallet</button>
     <div style="font-size:11px;color:var(--w40);line-height:1.6;margin-top:12px;text-align:center;">If you pay with your bank app and see "Transaction was not completed" after returning, check your wallet balance first — it often means the payment actually went through.</div>
+  </div>
+</div>
+
+<!-- ── GET GIFT SHEET (prototype — no backend yet) ── -->
+<div class="overlay" id="gift-ov" onclick="closeGiftOv(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sh-bar"></div>
+
+    <div style="display:flex;gap:20px;margin-bottom:14px;">
+      <div id="gift-ov-tab-new" onclick="setGiftOvPanel(0)" style="font-size:13px;font-weight:800;color:#fff;cursor:pointer;padding-bottom:6px;border-bottom:2px solid #F5A623;">New Request</div>
+      <div id="gift-ov-tab-mine" onclick="setGiftOvPanel(1)" style="font-size:13px;font-weight:800;color:var(--w40);cursor:pointer;padding-bottom:6px;border-bottom:2px solid transparent;">My Requests<span id="gift-mine-count-label"></span></div>
+    </div>
+
+    <div id="gift-ov-panel-new">
+      <div class="sh-sub">Min ₦50, max ₦1,000 per person, 20 requests a month.</div>
+      <input id="gift-phone-input" type="tel" inputmode="numeric" placeholder="Search by phone number" maxlength="11" oninput="renderGiftSearchResults(this.value)" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;font-size:15px;font-weight:600;color:var(--w);margin-bottom:8px;">
+      <div id="gift-search-results" style="display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto;margin-bottom:8px;"></div>
+
+      <div style="position:relative;margin-bottom:8px;">
+        <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--w40);font-size:16px;font-weight:700;pointer-events:none;">₦</span>
+        <input id="gift-amount-input" type="number" inputmode="numeric" min="50" max="1000" placeholder="Amount (₦50 – ₦1,000)" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px 16px 16px 34px;font-size:16px;font-weight:700;color:var(--w);">
+      </div>
+      <div id="gift-amount-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:12px;"></div>
+      <button class="cbtn" onclick="submitGiftRequest()">Request Gift</button>
+    </div>
+
+    <div id="gift-ov-panel-mine" style="display:none;">
+      <div class="sh-sub">Requests expire after 24 hours.</div>
+      <div id="my-gift-requests-list" style="display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Floating incoming-gift-request bubble (draggable) ── -->
+<div id="gift-bubble" onclick="openGiftRequestsList()" style="display:none;position:fixed;width:56px;height:56px;z-index:900;align-items:center;justify-content:center;font-size:40px;cursor:grab;touch-action:none;">
+  <span id="gift-bubble-hand" style="display:inline-block;">👋</span>
+  <div id="gift-bubble-count" style="display:none;position:absolute;top:0;right:0;background:#ff4444;color:#fff;font-size:11px;font-weight:800;min-width:18px;height:18px;border-radius:9px;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 2px 6px rgba(0,0,0,.5);"></div>
+</div>
+
+<!-- ── Incoming gift requests list ── -->
+<div class="overlay" id="gift-requests-ov" onclick="closeGiftRequestsOv(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sh-bar"></div>
+    <div class="sh-title">Gift Requests</div>
+    <div class="sh-sub">Requests expire after 24 hours. Sending deducts from your wallet balance.</div>
+    <div id="gift-requests-list" style="display:flex;flex-direction:column;gap:10px;max-height:360px;overflow-y:auto;margin-top:14px;"></div>
   </div>
 </div>
 
@@ -1825,6 +1884,25 @@
     txns.unshift({ ...txn, created_at: new Date().toISOString() });
     // Keep last 100
     localStorage.setItem('subsidi_txns_' + userId, JSON.stringify(txns.slice(0, 100)));
+    updateHistoryBadge();
+  }
+
+  // ── History notification badge ──
+  // Counts local transactions that happened since History was last opened —
+  // same "unseen count" idea as the leaderboard badge, just tracking a
+  // different thing. Cleared (and the "last seen" mark updated) the moment
+  // the user actually opens History.
+  function historyLastSeenKey() {
+    return 'subsidi_history_last_seen_' + userId;
+  }
+  function updateHistoryBadge() {
+    const badge = document.getElementById('hist-badge');
+    if (!badge || !userId) return;
+    const lastSeen = localStorage.getItem(historyLastSeenKey());
+    const txns = getLocalTxns();
+    const count = lastSeen ? txns.filter(t => new Date(t.created_at) > new Date(lastSeen)).length : txns.length;
+    badge.textContent = count > 9 ? '9+' : String(count);
+    badge.classList.toggle('show', count > 0);
   }
 
   // ── Balance visibility (hide/blur) ──
@@ -1922,11 +2000,11 @@
           (document.getElementById('prof-ref-link')||{}).textContent = 'subsidi.app/ref/' + username;
         }
         if (data.cardCode) registeredCard = data.cardCode;
+        if (typeof data.trialUsed !== 'undefined') bossTrialAvailable = !data.trialUsed;
         if (typeof data.poolBalance === 'number') {
           poolBalance = data.poolBalance;
           if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
         }
-        if (typeof data.trialUsed !== 'undefined') bossTrialAvailable = !data.trialUsed;
 
         // Load premium state from DB — never from localStorage
         if (typeof data.isPremium !== 'undefined') {
@@ -2098,6 +2176,12 @@
           show('dash');
           renderBundles();
           fetchLeaderboardBadge();
+          updateHistoryBadge();
+          fetchPendingGiftRequests();
+          // Defensive retry — on a true cold launch (vs. a refresh) this has
+          // shown up empty once before with no clear cause found yet; a
+          // second quiet check shortly after catches it either way.
+          setTimeout(fetchPendingGiftRequests, 2000);
           maybeShowFeedbackForRecentTxn();
         } else {
           localStorage.removeItem('subsidi_userId');
@@ -3668,6 +3752,420 @@
     if (e.target === document.getElementById('dep-ov')) document.getElementById('dep-ov').classList.remove('open');
   }
 
+  // ══════════════════════════════════════════════════════════════════
+  // GET GIFT — wired to the real backend. Requires 4 edge functions:
+  // search-gift-user, create-gift-request, get-gift-requests,
+  // respond-gift-request.
+  // ══════════════════════════════════════════════════════════════════
+
+  const GIFT_MIN = 50;
+  const GIFT_MAX = 1000;
+
+  let pendingGiftRequests = []; // [{ id, name, amount, created_at }] — incoming, from get-gift-requests
+  let myGiftRequests = []; // [{ id, name, amount, created_at, status }] — outgoing (mine), from get-gift-requests
+  let giftResolvedRecipient = null; // { userId, username } — set only once search finds a real match
+
+  function openGetGiftSheet() {
+    if (gateCheck('Get Gift', 'Create a free account to request gifts from other users.')) return;
+    document.getElementById('gift-phone-input').value = '';
+    document.getElementById('gift-amount-input').value = '';
+    document.getElementById('gift-amount-err').textContent = '';
+    document.getElementById('gift-search-results').innerHTML = '';
+    giftResolvedRecipient = null;
+    setGiftOvPanel(0);
+    document.getElementById('gift-ov').classList.add('open');
+    fetchPendingGiftRequests(); // keeps the "My Requests" tab/count fresh
+  }
+
+  function closeGiftOv(e) {
+    if (e.target === document.getElementById('gift-ov')) document.getElementById('gift-ov').classList.remove('open');
+  }
+
+  // Only searches once a full phone number has been typed (10-11 digits) —
+  // avoids a network call on every keystroke, and matches the "you already
+  // know this person's number" trust model the feature is built around.
+  let giftSearchInFlight = 0;
+  async function renderGiftSearchResults(query) {
+    const box = document.getElementById('gift-search-results');
+    const digits = (query || '').replace(/\D/g, '');
+    giftResolvedRecipient = null;
+
+    if (digits.length < 10) {
+      box.innerHTML = '';
+      return;
+    }
+
+    const thisSearch = ++giftSearchInFlight;
+    box.innerHTML = '<div style="text-align:center;color:var(--w40);font-size:13px;padding:10px 0;">Searching...</div>';
+
+    let result = null;
+    try {
+      result = await callEdge('search-gift-user', { phone: digits, requesterId: userId });
+    } catch (e) {
+      console.warn('[gift] search failed:', e);
+    }
+    if (thisSearch !== giftSearchInFlight) return; // a newer search superseded this one
+
+    if (!result || !result.found) {
+      box.innerHTML = '<div style="text-align:center;color:var(--w40);font-size:13px;padding:10px 0;">' +
+        (result && result.error ? result.error : 'This number isn\'t a Subsidi user.') + '</div>';
+      return;
+    }
+
+    giftResolvedRecipient = { userId: result.userId, username: result.username };
+    box.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:10px 14px;">' +
+        '<div style="width:32px;height:32px;border-radius:50%;background:var(--dark-4);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--w70);flex-shrink:0;font-size:13px;">' + result.username.charAt(0).toUpperCase() + '</div>' +
+        '<div style="flex:1;"><div style="font-weight:700;color:#fff;font-size:13px;">' + result.username + '</div><div style="color:var(--w40);font-size:12px;">Found</div></div>' +
+      '</div>';
+  }
+
+  // Opens the real premium subscription sheet (plan cards + benefits +
+  // "Unlock Premium" payment button) — the same one used everywhere else
+  // in the app.
+  function promptPremiumPlansForGift() {
+    showPremUnlockSheet();
+  }
+
+  // Replaces the ugly native alert() popup everywhere in this feature with
+  // something that actually matches the app's look.
+  function showGiftMessage(text, isError) {
+    const popId = 'gift-msg-pop';
+    const existing = document.getElementById(popId);
+    if (existing) existing.remove();
+    const pop = document.createElement('div');
+    pop.id = popId;
+    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:700;display:flex;align-items:center;justify-content:center;padding:24px;';
+    pop.innerHTML =
+      '<div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;">' +
+        '<div style="font-size:32px;margin-bottom:12px;">' + (isError ? '⚠️' : '🎉') + '</div>' +
+        '<div style="font-size:15px;font-weight:700;color:' + (isError ? '#ff6b6b' : '#fff') + ';margin-bottom:20px;line-height:1.5;">' + text + '</div>' +
+        '<button onclick="document.getElementById(\'' + popId + '\').remove();" style="width:100%;padding:14px;background:' + (isError ? 'var(--dark-4)' : '#F5A623') + ';border:' + (isError ? '1px solid var(--border)' : 'none') + ';border-radius:14px;color:' + (isError ? 'var(--w70)' : '#000') + ';font-size:14px;font-weight:800;cursor:pointer;">OK</button>' +
+      '</div>';
+    document.body.appendChild(pop);
+    pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
+  }
+
+  async function submitGiftRequest() {
+    const errEl = document.getElementById('gift-amount-err');
+    const amt = parseInt(document.getElementById('gift-amount-input').value, 10);
+
+    if (!giftResolvedRecipient) {
+      errEl.textContent = 'Search and confirm a Subsidi user first';
+      return;
+    }
+    if (!amt || amt < GIFT_MIN || amt > GIFT_MAX) {
+      errEl.textContent = 'Amount must be between ₦' + GIFT_MIN + ' and ₦' + GIFT_MAX;
+      return;
+    }
+
+    // No client-side premium gate here anymore — everyone gets 3 free
+    // lifetime requests before Premium is actually required, and only the
+    // server (create-gift-request) knows that count. If they've genuinely
+    // used up their free requests and aren't Premium, the server sends back
+    // "Premium required" below and we redirect then.
+    errEl.textContent = '';
+    showSpinner('Sending request...');
+    let result = null;
+    try {
+      result = await callEdge('create-gift-request', {
+        requesterId: userId,
+        recipientId: giftResolvedRecipient.userId,
+        amount: amt,
+      });
+    } catch (e) {
+      console.error('[gift] create-gift-request failed:', e);
+    }
+    hideSpinner();
+
+    if (result && result.success) {
+      document.getElementById('gift-ov').classList.remove('open');
+      showGiftMessage('Request sent to ' + giftResolvedRecipient.username + ' for ₦' + amt.toLocaleString() + '.');
+      fetchPendingGiftRequests(); // so "My Requests" reflects it right away
+    } else if (result && result.error === 'Premium required') {
+      // Cached premiumUnlocked was stale — server is the real authority.
+      document.getElementById('gift-ov').classList.remove('open');
+      promptPremiumPlansForGift();
+    } else {
+      errEl.textContent = (result && result.error) || 'Something went wrong, try again.';
+    }
+  }
+
+  function giftLastSeenKey() {
+    return 'subsidi_gift_last_seen_' + userId;
+  }
+
+  // Unseen incoming = requests that arrived since the bubble was last
+  // opened. This is what the bubble's badge NUMBER shows and clears on
+  // open — the bubble now only tracks incoming ("For You") requests.
+  // My Requests moved into the Get Gift sheet, so it no longer factors
+  // into the bubble at all.
+  function giftUnseenCount() {
+    const lastSeen = localStorage.getItem(giftLastSeenKey());
+    if (!lastSeen) return pendingGiftRequests.length;
+    return pendingGiftRequests.filter(r => new Date(r.created_at) > new Date(lastSeen)).length;
+  }
+
+  // Pulls both incoming and outgoing requests from the server — call on
+  // load, after opening the bubble or Get Gift sheet, and after
+  // responding to/collecting one.
+  async function fetchPendingGiftRequests() {
+    if (!userId || isGuest) return;
+    try {
+      const result = await callEdge('get-gift-requests', { userId });
+      if (result && result.success) {
+        pendingGiftRequests = result.incoming || [];
+        myGiftRequests = result.mine || [];
+        updateGiftBubble();
+        updateGiftMineCount();
+      }
+    } catch (e) {
+      console.warn('[gift] fetchPendingGiftRequests failed:', e);
+    }
+  }
+
+  function updateGiftBubble() {
+    const bubble = document.getElementById('gift-bubble');
+    const countEl = document.getElementById('gift-bubble-count');
+    const unseen = giftUnseenCount();
+
+    if (pendingGiftRequests.length > 0) {
+      if (bubble.style.display !== 'flex' && typeof window.resetGiftBubblePosition === 'function') {
+        window.resetGiftBubblePosition();
+      }
+      bubble.style.display = 'flex';
+      if (unseen > 0) {
+        countEl.style.display = 'flex';
+        countEl.textContent = unseen > 9 ? '9+' : String(unseen);
+      } else {
+        countEl.style.display = 'none';
+      }
+    } else {
+      bubble.style.display = 'none';
+    }
+  }
+
+  // The Get Gift button's own badge — shows how many outgoing requests are
+  // ready to Collect right now (status 'sent'). Always accurate the moment
+  // data refreshes, no separate seen/unseen tracking needed here since the
+  // number itself IS "how many need collecting."
+  function updateGiftMineCount() {
+    const collectable = myGiftRequests.filter(r => r.status === 'sent').length;
+
+    const giftBadge = document.getElementById('gift-badge');
+    if (giftBadge) {
+      giftBadge.textContent = collectable > 9 ? '9+' : String(collectable);
+      giftBadge.classList.toggle('show', collectable > 0);
+    }
+
+    const tabLabel = document.getElementById('gift-mine-count-label');
+    if (tabLabel) {
+      tabLabel.textContent = myGiftRequests.length > 0 ? ' (' + myGiftRequests.length + ')' : '';
+    }
+  }
+
+  function renderGiftRequestsList() {
+    const box = document.getElementById('gift-requests-list');
+    if (!pendingGiftRequests.length) {
+      box.innerHTML = '<div style="text-align:center;color:var(--w40);font-size:13px;padding:16px 0;">No pending requests.</div>';
+      return;
+    }
+    box.innerHTML = pendingGiftRequests.map(req =>
+      '<div style="background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:12px 14px;">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
+          '<div style="width:36px;height:36px;border-radius:50%;background:var(--dark-4);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--w70);flex-shrink:0;">' + req.name.charAt(0).toUpperCase() + '</div>' +
+          '<div style="flex:1;"><div style="font-weight:700;color:#fff;font-size:14px;">' + req.name + '</div><div style="color:var(--w40);font-size:12px;">wants ₦' + req.amount.toLocaleString() + '</div></div>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button onclick="declineGiftRequest(\'' + req.id + '\')" style="flex:1;padding:10px;background:var(--dark-4);border:1px solid var(--border);border-radius:12px;color:var(--w70);font-size:13px;font-weight:700;cursor:pointer;">Decline</button>' +
+          '<button onclick="sendGiftRequest(\'' + req.id + '\')" style="flex:1;padding:10px;background:#F5A623;border:none;border-radius:12px;color:#000;font-size:13px;font-weight:800;cursor:pointer;">Send ₦' + req.amount.toLocaleString() + '</button>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  function renderMyGiftRequestsList() {
+    const box = document.getElementById('my-gift-requests-list');
+    if (!myGiftRequests.length) {
+      box.innerHTML = '<div style="text-align:center;color:var(--w40);font-size:13px;padding:16px 0;">No outgoing requests.</div>';
+      return;
+    }
+    box.innerHTML = myGiftRequests.map(req => {
+      const actionHtml = req.status === 'sent'
+        ? '<button onclick="collectGiftRequest(\'' + req.id + '\')" style="flex-shrink:0;padding:9px 14px;background:#F5A623;border:none;border-radius:12px;color:#000;font-size:13px;font-weight:800;cursor:pointer;">Collect ₦' + req.amount.toLocaleString() + '</button>'
+        : '<div style="flex-shrink:0;padding:9px 4px;color:var(--w40);font-size:12px;font-weight:700;">Waiting...</div>';
+      return '<div style="display:flex;align-items:center;gap:10px;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:10px 14px;">' +
+        '<div style="width:32px;height:32px;border-radius:50%;background:var(--dark-4);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--w70);flex-shrink:0;font-size:13px;">' + req.name.charAt(0).toUpperCase() + '</div>' +
+        '<div style="flex:1;"><div style="font-weight:700;color:#fff;font-size:13px;">' + req.name + '</div><div style="color:var(--w40);font-size:12px;">requested ₦' + req.amount.toLocaleString() + '</div></div>' +
+        actionHtml +
+      '</div>';
+    }).join('');
+  }
+
+  async function sendGiftRequest(id) {
+    const req = pendingGiftRequests.find(r => r.id === id);
+    if (!req) return;
+    if (balance < req.amount) {
+      showGiftMessage('Insufficient balance to send this gift.', true);
+      return;
+    }
+
+    let result = null;
+    try {
+      result = await callEdge('respond-gift-request', { requestId: id, responderId: userId, action: 'send' });
+    } catch (e) {
+      console.error('[gift] respond-gift-request (send) failed:', e);
+    }
+
+    if (!result || !result.success) {
+      showGiftMessage((result && result.error) || 'Something went wrong sending this gift, try again.', true);
+      return;
+    }
+
+    // This debits YOUR balance right away — the recipient still has to
+    // scan their card to actually collect it, at which point their
+    // balance goes up. That's why only your own balance updates here.
+    if (typeof result.newBalance === 'number') {
+      balance = result.newBalance;
+      const whole = Math.floor(balance).toLocaleString();
+      const dec = (balance % 1).toFixed(2).slice(1);
+      const balHtml = '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+      document.getElementById('bal-display').innerHTML = balHtml;
+      const balRepeatEl = document.getElementById('bal-display-repeat');
+      if (balRepeatEl) balRepeatEl.innerHTML = balHtml;
+    } else {
+      await fetchUserData(); // fallback: refetch balance from DB if it wasn't returned directly
+    }
+
+    pendingGiftRequests = pendingGiftRequests.filter(r => r.id !== id);
+    updateGiftBubble();
+    renderGiftRequestsList();
+    showGiftMessage('₦' + req.amount.toLocaleString() + ' sent to ' + req.name + '.');
+  }
+
+  // The requester's side of collecting a gift that's been sent — this is
+  // the actual moment their balance goes up, triggered by a REAL card scan
+  // (the same camera+QR flow used for Premium activation), not a fake delay.
+  let scanTargetGiftRequest = null;
+  function collectGiftRequest(id) {
+    const req = myGiftRequests.find(r => r.id === id);
+    if (!req) return;
+    scanTargetGiftRequest = req;
+    openFreeScan('collect-gift');
+  }
+
+  async function declineGiftRequest(id) {
+    try {
+      await callEdge('respond-gift-request', { requestId: id, responderId: userId, action: 'decline' });
+    } catch (e) {
+      console.warn('[gift] respond-gift-request (decline) failed:', e);
+    }
+    pendingGiftRequests = pendingGiftRequests.filter(r => r.id !== id);
+    updateGiftBubble();
+    renderGiftRequestsList();
+  }
+
+  async function openGiftRequestsList() {
+    document.getElementById('gift-requests-ov').classList.add('open');
+    await fetchPendingGiftRequests(); // refresh in case anything changed since the badge last updated
+    localStorage.setItem(giftLastSeenKey(), new Date().toISOString());
+    updateGiftBubble();
+    renderGiftRequestsList();
+  }
+
+  function closeGiftRequestsOv(e) {
+    if (e.target === document.getElementById('gift-requests-ov')) document.getElementById('gift-requests-ov').classList.remove('open');
+  }
+
+  // ── Tab toggle between "New Request" and "My Requests" inside the Get Gift sheet ──
+  function setGiftOvPanel(idx) {
+    const newPanel = document.getElementById('gift-ov-panel-new');
+    const minePanel = document.getElementById('gift-ov-panel-mine');
+    const newTab = document.getElementById('gift-ov-tab-new');
+    const mineTab = document.getElementById('gift-ov-tab-mine');
+    if (!newPanel || !minePanel || !newTab || !mineTab) return;
+
+    newPanel.style.display = idx === 0 ? '' : 'none';
+    minePanel.style.display = idx === 1 ? '' : 'none';
+    newTab.style.color = idx === 0 ? '#fff' : 'var(--w40)';
+    newTab.style.borderBottomColor = idx === 0 ? '#F5A623' : 'transparent';
+    mineTab.style.color = idx === 1 ? '#fff' : 'var(--w40)';
+    mineTab.style.borderBottomColor = idx === 1 ? '#F5A623' : 'transparent';
+
+    if (idx === 1) renderMyGiftRequestsList();
+  }
+
+  // ── Draggable bubble ──
+  // Distinguishes a tap (opens the list) from a drag (repositions the
+  // bubble) using a small movement threshold, same idea used for the
+  // balance-card swipe elsewhere in the app.
+  (function setupGiftBubbleDrag() {
+    const bubble = document.getElementById('gift-bubble');
+    let dragging = false, moved = false, startX = 0, startY = 0, origX = 0, origY = 0;
+
+    function pointerDown(x, y) {
+      dragging = true; moved = false;
+      startX = x; startY = y;
+      const rect = bubble.getBoundingClientRect();
+      origX = rect.left; origY = rect.top;
+      bubble.style.right = 'auto';
+      bubble.style.bottom = 'auto';
+      bubble.style.left = origX + 'px';
+      bubble.style.top = origY + 'px';
+    }
+    function pointerMove(x, y) {
+      if (!dragging) return;
+      const dx = x - startX, dy = y - startY;
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) moved = true;
+      let newLeft = origX + dx;
+      let newTop = origY + dy;
+      newLeft = Math.max(4, Math.min(window.innerWidth - 56, newLeft));
+      newTop = Math.max(4, Math.min(window.innerHeight - 56, newTop));
+      bubble.style.left = newLeft + 'px';
+      bubble.style.top = newTop + 'px';
+    }
+    function pointerUp(e) {
+      if (dragging && moved) {
+        // It was a drag, not a tap — swallow the click that would otherwise
+        // fire and open the requests list right after dragging.
+        e.stopPropagation();
+        e.preventDefault();
+      }
+      dragging = false;
+    }
+
+    bubble.addEventListener('touchstart', e => { const t = e.touches[0]; pointerDown(t.clientX, t.clientY); }, { passive: true });
+    bubble.addEventListener('touchmove', e => { const t = e.touches[0]; pointerMove(t.clientX, t.clientY); }, { passive: true });
+    bubble.addEventListener('touchend', pointerUp);
+
+    bubble.addEventListener('mousedown', e => pointerDown(e.clientX, e.clientY));
+    document.addEventListener('mousemove', e => pointerMove(e.clientX, e.clientY));
+    document.addEventListener('mouseup', pointerUp);
+
+    // Default starting position: right next to the "Network" section
+    // label, matching the requested screenshot — anchored to that actual
+    // element rather than a guessed pixel value, so it lands in the same
+    // visual spot regardless of balance digit length or other layout shifts
+    // above it. Falls back to a fixed position if that element isn't
+    // there for some reason.
+    function setGiftBubbleDefaultPosition() {
+      const anchor = document.getElementById('network-sec-title');
+      if (anchor) {
+        const rect = anchor.getBoundingClientRect();
+        bubble.style.right = '20px';
+        bubble.style.left = 'auto';
+        bubble.style.top = Math.max(8, rect.top - 12) + 'px';
+        bubble.style.bottom = 'auto';
+      } else {
+        bubble.style.right = '20px';
+        bubble.style.bottom = '90px';
+      }
+    }
+    setGiftBubbleDefaultPosition();
+    window.addEventListener('resize', setGiftBubbleDefaultPosition);
+    window.resetGiftBubblePosition = setGiftBubbleDefaultPosition;
+  })();
+
   // ── Standalone / Replacement Card Order ──
   // Anyone can buy the physical card on its own for ₦3,000, premium or not.
   // This never touches premium status — it's just the card.
@@ -4209,6 +4707,8 @@
   async function showHistoryOv() {
     document.getElementById('hist-ov').classList.add('open');
     document.getElementById('hist-body').innerHTML = '<div class="hist-loader" id="hist-loader">Loading...</div>';
+    localStorage.setItem(historyLastSeenKey(), new Date().toISOString());
+    updateHistoryBadge();
     try {
       const data = await callEdge('get-transactions', { userId });
       const txns = (data && data.transactions && data.transactions.length > 0)
@@ -4490,17 +4990,7 @@
     if (btn) {
       const s = PREM_PLAN_STYLE[plan];
       const isCurrentPlan = premiumUnlocked && plan === premiumPlan;
-      if (plan === 'basic' && !premiumUnlocked && bossTrialAvailable) {
-        // Brand-new user, hasn't claimed the one-time signup bonus yet —
-        // a straight ₦100 wallet credit from the cashback pool, no premium
-        // or discount unlock attached. One tap, no card scan.
-        btn.style.background = s.btnGradient;
-        btn.style.color = s.btnText;
-        btn.style.cursor = 'pointer';
-        btn.textContent = 'Claim ₦100 Free';
-        btn.setAttribute('onclick', 'claimSignupBonus()');
-        btn.classList.add('trial-glow');
-      } else if (isCurrentPlan) {
+      if (isCurrentPlan) {
         // No more standalone "Scan Card to Reactivate" state — the scan now
         // happens automatically inside the purchase flow every time.
         btn.style.background = 'var(--dark-4)';
@@ -5351,6 +5841,12 @@
       return;
     }
 
+    if (scanContext === 'collect-gift') {
+      document.getElementById('free-scan-status').textContent = 'Verifying card...';
+      processCollectGiftScan(cardCode);
+      return;
+    }
+
     document.getElementById('free-scan-view').style.display = 'none';
     // Card recognition is front-end only (the isValidCard check already ran
     // before this was called) — so a network blip alone never shows as
@@ -5524,6 +6020,50 @@
     document.getElementById('free-scan-status').textContent = 'Starting camera...';
     startFreeScan();
   }
+
+  async function processCollectGiftScan(cardCode) {
+    const req = scanTargetGiftRequest;
+    if (!req) {
+      document.getElementById('free-scan-view').style.display = 'none';
+      document.getElementById('free-error-msg').textContent = 'Something went wrong, try again.';
+      document.getElementById('free-error-view').style.display = 'block';
+      return;
+    }
+
+    let result = null;
+    try {
+      result = await callEdge('collect-gift-request', { requestId: req.id, requesterId: userId });
+    } catch (e) {
+      console.error('[gift] collect-gift-request failed:', e);
+    }
+
+    if (!result || !result.success) {
+      document.getElementById('free-scan-view').style.display = 'none';
+      document.getElementById('free-error-msg').textContent = (result && result.error) || 'Could not collect this gift, try again.';
+      document.getElementById('free-error-view').style.display = 'block';
+      return;
+    }
+
+    closeFreeScan();
+    document.getElementById('gift-ov').classList.remove('open');
+
+    if (typeof result.newBalance === 'number') {
+      balance = result.newBalance;
+      const whole = Math.floor(balance).toLocaleString();
+      const dec = (balance % 1).toFixed(2).slice(1);
+      const balHtml = '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
+      document.getElementById('bal-display').innerHTML = balHtml;
+      const balRepeatEl = document.getElementById('bal-display-repeat');
+      if (balRepeatEl) balRepeatEl.innerHTML = balHtml;
+    } else {
+      await fetchUserData();
+    }
+
+    myGiftRequests = myGiftRequests.filter(r => r.id !== req.id);
+    updateGiftMineCount();
+    showGiftMessage('₦' + req.amount.toLocaleString() + ' was added to your balance!');
+    scanTargetGiftRequest = null;
+  }
 </script>
 
 <script>
@@ -5552,15 +6092,19 @@
       collectBtn.style.opacity = collectBtn.style.opacity; // leave swipe-controlled opacity alone
     }
     if (collectLabel) {
-      collectLabel.textContent = 'Collect';
+      collectLabel.textContent = (bossTrialAvailable && !premiumUnlocked) ? 'Collect ₦100 Free' : 'Collect';
     }
   }
   renderCashbackBalance();
 
-  // Non-premium users never see the scan/claim flow at all — tapping the
-  // button sends them straight to the unlock sheet instead of a dead-end
-  // rejection popup.
+  // Brand-new users (trial not yet used) get the ₦100 signup bonus here now
+  // instead of via a hidden button inside the premium plan picker — this is
+  // the visible, obvious home for "free money from the cashback pool."
   function handleCashbackCollectTap() {
+    if (bossTrialAvailable && !premiumUnlocked) {
+      claimSignupBonus();
+      return;
+    }
     if (!premiumUnlocked) {
       showPremUnlockSheet();
       return;

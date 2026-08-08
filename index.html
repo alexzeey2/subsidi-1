@@ -3781,22 +3781,32 @@
     if (e.target === document.getElementById('gift-ov')) document.getElementById('gift-ov').classList.remove('open');
   }
 
-  // Only searches once a full phone number has been typed (10-11 digits) —
-  // avoids a network call on every keystroke, and matches the "you already
-  // know this person's number" trust model the feature is built around.
+  // Live search — starts showing candidates from 3 digits in and keeps
+  // narrowing as more are typed, so you don't have to type the whole
+  // number before you can pick from the list. Debounced so it's not
+  // firing a network call on every single keystroke.
   let giftSearchInFlight = 0;
-  async function renderGiftSearchResults(query) {
+  let giftSearchDebounce = null;
+
+  function renderGiftSearchResults(query) {
     const box = document.getElementById('gift-search-results');
     const digits = (query || '').replace(/\D/g, '');
     giftResolvedRecipient = null;
 
-    if (digits.length < 10) {
+    clearTimeout(giftSearchDebounce);
+
+    if (digits.length < 3) {
       box.innerHTML = '';
       return;
     }
 
-    const thisSearch = ++giftSearchInFlight;
     box.innerHTML = '<div style="text-align:center;color:var(--w40);font-size:13px;padding:10px 0;">Searching...</div>';
+    giftSearchDebounce = setTimeout(() => runGiftSearch(digits), 300);
+  }
+
+  async function runGiftSearch(digits) {
+    const box = document.getElementById('gift-search-results');
+    const thisSearch = ++giftSearchInFlight;
 
     let result = null;
     try {
@@ -3806,17 +3816,31 @@
     }
     if (thisSearch !== giftSearchInFlight) return; // a newer search superseded this one
 
-    if (!result || !result.found) {
-      box.innerHTML = '<div style="text-align:center;color:var(--w40);font-size:13px;padding:10px 0;">' +
-        (result && result.error ? result.error : 'This number isn\'t a Subsidi user.') + '</div>';
+    const matches = (result && result.results) || [];
+    if (!matches.length) {
+      box.innerHTML = '<div style="text-align:center;color:var(--w40);font-size:13px;padding:10px 0;">No matching Subsidi users.</div>';
       return;
     }
 
-    giftResolvedRecipient = { userId: result.userId, username: result.username };
+    window._giftSearchMatches = matches;
+    box.innerHTML = matches.map((u, i) =>
+      '<div onclick="selectGiftSearchResult(' + i + ')" style="display:flex;align-items:center;gap:10px;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:10px 14px;cursor:pointer;">' +
+        '<div style="width:32px;height:32px;border-radius:50%;background:var(--dark-4);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--w70);flex-shrink:0;font-size:13px;">' + u.username.charAt(0).toUpperCase() + '</div>' +
+        '<div style="flex:1;"><div style="font-weight:700;color:#fff;font-size:13px;">' + u.username + '</div><div style="color:var(--w40);font-size:12px;">' + u.phone + '</div></div>' +
+      '</div>'
+    ).join('');
+  }
+
+  function selectGiftSearchResult(i) {
+    const u = window._giftSearchMatches[i];
+    if (!u) return;
+    giftResolvedRecipient = { userId: u.userId, username: u.username };
+    document.getElementById('gift-phone-input').value = u.phone;
+    const box = document.getElementById('gift-search-results');
     box.innerHTML =
       '<div style="display:flex;align-items:center;gap:10px;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:10px 14px;">' +
-        '<div style="width:32px;height:32px;border-radius:50%;background:var(--dark-4);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--w70);flex-shrink:0;font-size:13px;">' + result.username.charAt(0).toUpperCase() + '</div>' +
-        '<div style="flex:1;"><div style="font-weight:700;color:#fff;font-size:13px;">' + result.username + '</div><div style="color:var(--w40);font-size:12px;">Found</div></div>' +
+        '<div style="width:32px;height:32px;border-radius:50%;background:var(--dark-4);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--w70);flex-shrink:0;font-size:13px;">' + u.username.charAt(0).toUpperCase() + '</div>' +
+        '<div style="flex:1;"><div style="font-weight:700;color:#fff;font-size:13px;">' + u.username + '</div><div style="color:var(--w40);font-size:12px;">Selected</div></div>' +
       '</div>';
   }
 

@@ -2963,6 +2963,12 @@
     document.getElementById('sbody').textContent = cur.size + ' has been delivered to ' + ph2;
     document.getElementById('samt').textContent = '₦' + cur.price.toLocaleString() + ' deducted';
     show('success');
+    
+    // Show big spender celebration if purchase is ₦7k+
+    if (cur.orig >= 7000) {
+      showBigSpenderCelebration();
+    }
+    
     setTimeout(maybeShowFeedbackForRecentTxn, 1200);
     return true;
   }
@@ -3216,6 +3222,11 @@
       const basePrice = Math.round(rawCost * 1.01);
       let displayPriceFinal = basePrice;
 
+      // Add ₦500 pure profit markup for plans ≥ ₦7k (doesn't split, pure profit)
+      if (basePrice >= 7000) {
+        displayPriceFinal += 500;
+      }
+
       // Premium toggle logic — only active right after a fresh card scan (not needing re-scan),
       // or during the picker demo preview.
       let isPremiumActive = false;
@@ -3227,7 +3238,7 @@
         // Discount is funded from the subscription fee already collected — never from this
         // sale's margin, since there is none extra beyond the 1% markup above. Floored so
         // price never goes negative.
-        displayPriceFinal = Math.max(0, basePrice - flatDiscount);
+        displayPriceFinal = Math.max(0, displayPriceFinal - flatDiscount);
       }
 
       // Card styling — gold now follows the premium toggle only, not plan price
@@ -5222,6 +5233,79 @@
       </div>`;
     document.body.appendChild(pop);
     pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
+  }
+
+  function showBigSpenderCelebration() {
+    const popId = 'big-spender-celebration';
+    const existing = document.getElementById(popId);
+    if (existing) existing.remove();
+
+    const pop = document.createElement('div');
+    pop.id = popId;
+    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:650;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeInScale .3s cubic-bezier(.34,1.56,.64,1);';
+    pop.innerHTML = `
+      <div style="background:linear-gradient(135deg,rgba(184,112,16,.2),rgba(245,166,35,.15));border:1.5px solid rgba(245,166,35,.4);border-radius:28px;padding:40px 32px;width:100%;max-width:320px;text-align:center;">
+        <div style="font-size:28px;font-weight:900;color:#F5A623;margin-bottom:8px;line-height:1.2;">Odogwu!</div>
+        <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:6px;">Number one Boss!</div>
+        <div style="font-size:16px;font-weight:700;color:var(--w70);margin-bottom:28px;">Respect for you</div>
+        <div id="celebration-icon" style="font-size:56px;margin:0 auto;animation:celebrationClap .6s ease-in-out infinite;display:inline-block;">👏</div>
+      </div>`;
+    
+    document.body.appendChild(pop);
+    
+    // Add animation keyframes if not already present
+    if (!document.getElementById('celebration-keyframes')) {
+      const style = document.createElement('style');
+      style.id = 'celebration-keyframes';
+      style.textContent = `
+        @keyframes fadeInScale {
+          from { opacity: 0; transform: scale(0.8); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes celebrationClap {
+          0%, 100% { transform: scale(1) rotate(0deg); }
+          25% { transform: scale(1.1) rotate(-5deg); }
+          75% { transform: scale(1.1) rotate(5deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    // Play subtle celebration sound
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+      
+      osc.start(now);
+      osc.stop(now + 0.1);
+    } catch (e) {
+      // Silently fail if audio context is not available
+    }
+    
+    // Auto-close after 2.5 seconds
+    setTimeout(() => {
+      if (document.getElementById(popId)) {
+        pop.style.animation = 'fadeInScale .3s cubic-bezier(.34,1.56,.64,1) reverse';
+        setTimeout(() => pop.remove(), 300);
+      }
+    }, 2500);
+    
+    // Dismiss on tap
+    pop.addEventListener('click', (e) => {
+      if (e.target === pop) {
+        pop.style.animation = 'fadeInScale .3s cubic-bezier(.34,1.56,.64,1) reverse';
+        setTimeout(() => pop.remove(), 300);
+      }
+    });
   }
 
   function setPremToggleUI(on) {

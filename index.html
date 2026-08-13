@@ -6355,27 +6355,27 @@
     const balanceBefore = balance;
 
     // 1. Pool wipes down to 0 — the full pool visually moves to the user
-    await animateBalanceNumber(poolBefore, 0, 500, (v) => {
+    await animateBalanceNumber(poolBefore, 0, 650, (v) => {
       poolBalance = v;
       renderCashbackBalance();
     });
 
     // 2. Auto-swipe the wallet card back to Main
     if (window._walletSwipeToMain) window._walletSwipeToMain();
-    await new Promise(r => setTimeout(r, 370)); // matches the .35s swipe transition
+    await new Promise(r => setTimeout(r, 400)); // matches the .35s swipe transition
 
     // 3. Main balance jumps all the way up to the full pool amount
-    await animateBalanceNumber(balanceBefore, balanceBefore + poolBefore, 550, (v) => {
+    await animateBalanceNumber(balanceBefore, balanceBefore + poolBefore, 800, (v) => {
       balance = v;
       _paintMainBalance(v);
     });
 
     // 4. Brief pause so the full jump registers before it drains
-    await new Promise(r => setTimeout(r, 350));
+    await new Promise(r => setTimeout(r, 600));
 
     // 5. Balance drains back down to what's actually kept, pool refills
     // with the difference — both animate together
-    await animateBalanceNumber(balanceBefore + poolBefore, balanceBefore + amount, 700, (v) => {
+    await animateBalanceNumber(balanceBefore + poolBefore, balanceBefore + amount, 900, (v) => {
       balance = v;
       poolBalance = poolBefore - (v - balanceBefore);
       _paintMainBalance(v);

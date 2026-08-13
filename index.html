@@ -233,6 +233,18 @@
   /* SHEET (buy details) */
   .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;align-items:flex-end}
   .overlay.open{display:flex}
+
+  .gift-win-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);z-index:600;align-items:center;justify-content:center}
+  .gift-win-ov.open{display:flex}
+  .gift-win-card{background:linear-gradient(180deg,var(--dark-3),var(--dark-2));border:1px solid rgba(245,166,35,.35);border-radius:26px;padding:36px 30px 28px;width:min(320px,86vw);text-align:center;animation:giftWinPop .42s cubic-bezier(.22,1.4,.36,1);box-shadow:0 0 60px rgba(245,166,35,.18)}
+  @keyframes giftWinPop{0%{opacity:0;transform:scale(.82) translateY(10px)}60%{opacity:1;transform:scale(1.03)}100%{opacity:1;transform:scale(1) translateY(0)}}
+  .gift-win-icon{width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:radial-gradient(circle,rgba(245,166,35,.25),rgba(245,166,35,.05));display:flex;align-items:center;justify-content:center;animation:giftWinIconPulse 1.8s ease-in-out infinite}
+  @keyframes giftWinIconPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,166,35,.25)}50%{box-shadow:0 0 0 10px rgba(245,166,35,0)}}
+  .gift-win-label{font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--w40);font-weight:600;margin-bottom:6px}
+  .gift-win-amount{font-size:38px;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:-.5px}
+  .gift-win-amount .cur{color:#F5A623;margin-right:2px}
+  .gift-win-sub{font-size:12.5px;color:var(--w40);margin-bottom:24px;line-height:1.5}
+  .gift-win-btn{width:100%;padding:14px;background:linear-gradient(135deg,#F5A623,#E8A500);border:none;border-radius:14px;color:#241800;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.2px}
   .sheet{background:var(--dark-2);border:1px solid var(--border);border-radius:28px 28px 0 0;padding:10px 24px 44px;width:100%;animation:up .32s cubic-bezier(.22,1,.36,1)}
   @keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
   @keyframes giftWave{0%,100%{transform:rotate(0deg)}10%{transform:rotate(16deg)}20%{transform:rotate(-10deg)}30%{transform:rotate(16deg)}40%{transform:rotate(-6deg)}50%{transform:rotate(12deg)}60%,100%{transform:rotate(0deg)}}
@@ -6340,6 +6352,23 @@
 
   // ── Collect flow: cashback counts down to 0, wallet swipes to Main,
   // then Main counts up by the collected amount ──
+  function showGiftPopup(amount) {
+    const amt = Math.round(amount);
+    const amtEl = document.getElementById('gift-win-amount');
+    const subEl = document.getElementById('gift-win-sub');
+    if (amtEl) amtEl.innerHTML = '<span class="cur">₦</span>' + amt.toLocaleString();
+    if (subEl) subEl.textContent = amt > 0
+      ? 'Added straight to your wallet balance.'
+      : 'No cashback this time — the pool resets often, try again soon.';
+    const ov = document.getElementById('gift-win-ov');
+    if (ov) ov.classList.add('open');
+  }
+
+  function closeGiftPopup() {
+    const ov = document.getElementById('gift-win-ov');
+    if (ov) ov.classList.remove('open');
+  }
+
   function _paintMainBalance(v) {
     const whole = Math.floor(v).toLocaleString();
     const dec = (v % 1).toFixed(2).slice(1);
@@ -6532,5 +6561,19 @@
   window.addEventListener('appinstalled',()=>{installPrompt=null;const e=document.getElementById('_pwa');if(e)e.remove();});
 })();
 </script>
+  <div class="gift-win-ov" id="gift-win-ov" onclick="if(event.target===this) closeGiftPopup()">
+    <div class="gift-win-card">
+      <div class="gift-win-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/>
+          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+        </svg>
+      </div>
+      <div class="gift-win-label">You Got</div>
+      <div class="gift-win-amount" id="gift-win-amount"><span class="cur">₦</span>0</div>
+      <div class="gift-win-sub" id="gift-win-sub">Added straight to your wallet balance.</div>
+      <button class="gift-win-btn" onclick="closeGiftPopup()">Nice!</button>
+    </div>
+  </div>
 </body>
 </html>

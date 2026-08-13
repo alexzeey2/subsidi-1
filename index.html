@@ -6337,7 +6337,7 @@
       const start = performance.now();
       function tick(now) {
         const t = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+        const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; // ease-in-out cubic
         onUpdate(from + (to - from) * eased);
         if (t < 1) {
           requestAnimationFrame(tick);
@@ -6384,7 +6384,7 @@
     const balanceBefore = balance;
 
     // 1. Pool wipes down to 0 — the full pool visually moves to the user
-    await animateBalanceNumber(poolBefore, 0, 650, (v) => {
+    await animateBalanceNumber(poolBefore, 0, 900, (v) => {
       poolBalance = v;
       renderCashbackBalance();
     });
@@ -6394,7 +6394,7 @@
     await new Promise(r => setTimeout(r, 400)); // matches the .35s swipe transition
 
     // 3. Main balance jumps all the way up to the full pool amount
-    await animateBalanceNumber(balanceBefore, balanceBefore + poolBefore, 800, (v) => {
+    await animateBalanceNumber(balanceBefore, balanceBefore + poolBefore, 1100, (v) => {
       balance = v;
       _paintMainBalance(v);
     });
@@ -6404,7 +6404,7 @@
 
     // 5. Balance drains back down to what's actually kept, pool refills
     // with the difference — both animate together
-    await animateBalanceNumber(balanceBefore + poolBefore, balanceBefore + amount, 900, (v) => {
+    await animateBalanceNumber(balanceBefore + poolBefore, balanceBefore + amount, 1200, (v) => {
       balance = v;
       poolBalance = poolBefore - (v - balanceBefore);
       _paintMainBalance(v);

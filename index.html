@@ -1130,7 +1130,7 @@
         </div>
         <div class="prof-row-body">
           <div class="prof-row-title">Premium</div>
-          <div class="prof-row-sub">₦900/week — build your own discount pot</div>
+          <div class="prof-row-sub">₦1,300/week — 2 discounted purchases</div>
         </div>
         <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
@@ -1142,7 +1142,7 @@
         </div>
         <div class="prof-row-body">
           <div class="prof-row-title">Premium Policy</div>
-          <div class="prof-row-sub">How Premium and your discount pot work</div>
+          <div class="prof-row-sub">How Premium's weekly discounts work</div>
         </div>
         <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
@@ -1594,11 +1594,11 @@
     <div style="display:flex;gap:6px;padding:0 16px;">
       <div id="pick-card-premium" onclick="pickPremDiscount('premium')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-3);border:1.5px solid var(--border);opacity:0.55;">
         <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px;">Premium</div>
-        <div id="pick-card-premium-amt" style="font-size:19px;font-weight:900;color:var(--w40);">Up to ₦2,000</div>
+        <div id="pick-card-premium-amt" style="font-size:19px;font-weight:900;color:var(--w40);">Up to ₦500</div>
         <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off, from your pot</div>
       </div>
     </div>
-    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">New users get ₦100 free from the cashback pool. Premium builds you your own discount pot every week, plus a bonus on what you spend — cheaper data every 6 days, just scan your card at checkout.</div>
+    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">New users get ₦100 free from the cashback pool. Premium gets you 2 discounted purchases a week, plus scans to win from the cashback pool — just scan your card at checkout.</div>
   </div>
 </div>
 
@@ -1620,7 +1620,7 @@
       <div id="prem-btn-premium" onclick="selectPremPlan('premium')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(245,166,35,0.1);border:1.5px solid #F5A623;opacity:1;position:relative;">
         <div id="prem-current-badge-premium" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#F5A623;color:#000;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
         <div style="font-size:9.5px;font-weight:800;color:#F5A623;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Premium</div>
-        <div style="font-size:26px;font-weight:900;color:#F5A623;">₦900<span style="font-size:12px;font-weight:700;">/wk</span></div>
+        <div style="font-size:26px;font-weight:900;color:#F5A623;">₦1,300<span style="font-size:12px;font-weight:700;">/wk</span></div>
       </div>
     </div>
 
@@ -1634,8 +1634,7 @@
           <div style="background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
             <div style="font-size:20px;font-weight:900;color:#F5A623;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Cheaper data every 6 days</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Your discount grows the more you buy</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> 2 discounted purchases every week</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Scan to win up to ₦10,000 from the cashback pool</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Unlocks Get Gift</div>
             </div>
@@ -1648,7 +1647,7 @@
     <!-- Unlock button -->
     <div style="padding:0 20px;">
       <button id="prem-unlock-btn" class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('premium')">
-        Unlock Premium — ₦900/week
+        Unlock Premium — ₦1,300/week
       </button>
     </div>
 
@@ -1749,21 +1748,19 @@
   let userId = null;
   let premiumUnlocked = false;   // true once user has paid for Premium
   let premiumToggleOn = false;   // current toggle state (on/off) — only true right after a fresh card scan
-  let premiumLastUsed = 0;       // timestamp of the user's FIRST purchase after subscribing — start of the recurring 6-day cooldown clock
   let premiumPlan = 'premium';   // single tier now — kept as a field for backward compat with DB rows/edge functions
-  let needsScanToActivate = false; // true once cooldown has elapsed and user must scan card again before toggle can turn on
-  let premiumPot = 0;            // user's own hidden discount pot balance — loaded from data.premiumPot (server-authoritative; grows via ₦500/week floor + ₦50+1% skim, never computed client-side)
-  // Single Premium tier: ₦900/week. ₦500 of every week's payment is
-  // allocated straight into the user's own pot (floor), on top of whatever
-  // the existing ₦50+1% skim adds from their actual purchases. Pot starts
-  // at ₦0 — no starter credit. One discounted purchase allowed per 6-day
-  // cooldown (clock starts from the user's FIRST purchase after
-  // subscribing, not the payment date); the discount equals whatever's in
-  // the pot, capped at ₦2,000. All of this math (pot balance, skim,
-  // allocation, cap) is server-authoritative — computed in edge functions,
-  // never trusted from the client. This object is just pricing/display config.
+  let needsScanToActivate = false; // true once this week's 2 discount uses are both spent — nothing left to toggle on until renewal
+  let premiumDiscountUsesLeft = 0; // 0, 1, or 2 — server-authoritative, loaded from data.premiumDiscountUsesLeft. Resets to 2 only on a fresh Premium payment.
+  // Single Premium tier: ₦1,300/week, hard 7-day expiry — no grace, no
+  // extension. Two discounted purchases allowed per cycle, any order, any
+  // time within the 7 days: the FIRST purchase used is ₦500 off, the
+  // SECOND is ₦300 off. Nothing carries over between cycles — a fresh
+  // payment always resets to 2 uses regardless of what was left before.
+  // All of this (uses remaining, which discount applies next, expiry) is
+  // server-authoritative — computed in edge functions, never trusted from
+  // the client. This object is just pricing/display config.
   const PREMIUM_PLANS = {
-    premium: { price: 900, billing: 'week', cooldownDays: 6, floorPerWeek: 500, discountCap: 2000, claimCapPerDay: 350 }
+    premium: { price: 1300, billing: 'week', cycleDays: 7, discountSlots: [500, 300] }
   };
   let premDemoActive = false;    // is the demo blur/animation running
   let scanContext = 'reactivate'; // 'reactivate' (Boss/CEO cooldown scan) or 'activate' (one-time Boss trial scan)
@@ -1778,22 +1775,17 @@
   let trialScansUsed = 0; // 0–5; the ₦100 signup bonus is split across up to 5 random unequal scans
   let premiumIsTrial = false;    // true while the ACTIVE premium session is the free trial, not a paid subscription
 
-  // Discount amount for this purchase = whatever's in the user's pot, capped
-  // at discountCap. The real number always comes from the server (it knows
-  // the true pot balance) — this is only a client-side display estimate.
-  // Before a real pot exists yet (not subscribed, or pot hasn't accrued
-  // past the floor), fall back to showing the guaranteed floor (₦500) so
-  // the toggle preview still visibly drops the price — same as the old
-  // flat ₦300 discount used to.
-  function rollDiscountAmount(planKey, isExpensive) {
+  // Which discount applies to the user's NEXT purchase this cycle: the
+  // first use is ₦500, the second (and final) use is ₦300. Once both are
+  // spent, there's nothing left until the next Premium payment. The real
+  // number always comes from the server (premiumDiscountUsesLeft) — this
+  // is just display/eligibility logic on top of that server-confirmed count.
+  function rollDiscountAmount(planKey, isRealSubscriber) {
     const p = PREMIUM_PLANS[planKey] || PREMIUM_PLANS.premium;
-    const live = Math.min(premiumPot, p.discountCap);
-    return live > 0 ? live : Math.min(p.floorPerWeek, p.discountCap);
-  }
-
-  // Cooldown length (in days) for whichever plan is active.
-  function getCooldownDays(planKey) {
-    return (PREMIUM_PLANS[planKey] || PREMIUM_PLANS.premium).cooldownDays;
+    const slots = p.discountSlots; // [500, 300]
+    if (!isRealSubscriber) return slots[0]; // demo/picker preview — always show the best-case first discount
+    if (premiumDiscountUsesLeft <= 0) return 0;
+    return slots[slots.length - premiumDiscountUsesLeft] ?? 0;
   }
 
   async function callEdge(fnName, body) {
@@ -1971,9 +1963,8 @@
           premiumPlan = data.premiumPlan || 'premium';
           premiumIsTrial = !!data.premiumIsTrial;
           if (typeof renderMyCard === 'function') renderMyCard();
-          premiumLastUsed = data.premiumLastUsed ? new Date(data.premiumLastUsed).getTime() : 0;
-          premiumPot = typeof data.premiumPot === 'number' ? data.premiumPot : 0;
-          needsScanToActivate = false;
+          premiumDiscountUsesLeft = typeof data.premiumDiscountUsesLeft === 'number' ? data.premiumDiscountUsesLeft : 0;
+          needsScanToActivate = premiumDiscountUsesLeft <= 0;
 
           // Toggle never auto-restores to on at true session start (handled
           // separately, at boot) — but this function runs constantly in the
@@ -2127,10 +2118,9 @@
             premiumPlan = data.premiumPlan || 'premium';
             premiumIsTrial = !!data.premiumIsTrial;
             if (typeof renderMyCard === 'function') renderMyCard();
-            premiumLastUsed = data.premiumLastUsed ? new Date(data.premiumLastUsed).getTime() : 0;
-            premiumPot = typeof data.premiumPot === 'number' ? data.premiumPot : 0;
+            premiumDiscountUsesLeft = typeof data.premiumDiscountUsesLeft === 'number' ? data.premiumDiscountUsesLeft : 0;
             premiumToggleOn = false;
-            needsScanToActivate = false;
+            needsScanToActivate = premiumDiscountUsesLeft <= 0;
             setPremToggleUI(premiumToggleOn);
             if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
           }
@@ -3238,7 +3228,7 @@
       if (toggleReallyOn || premDemoActive) {
         const activePlan = premiumUnlocked ? premiumPlan : demoSelectedPlan;
         isPremiumActive = true;
-        const flatDiscount = rollDiscountAmount(activePlan, !isCheapDiscountBand);
+        const flatDiscount = rollDiscountAmount(activePlan, premiumUnlocked);
         // Discount is funded from the subscription fee already collected — never from this
         // sale's margin, since there is none extra beyond the 1% markup above. Floored so
         // price never goes negative.
@@ -4859,11 +4849,11 @@
   const FAQ_ITEMS = [
     {
       q: "What is Subsidi?",
-      a: "Subsidi is a membership that gets you mobile data cheaper than market price. New users get ₦100 free from the cashback pool, no payment required. Premium is ₦900/week and builds you your own discount pot, plus daily claims from the cashback pool."
+      a: "Subsidi is a membership that gets you mobile data cheaper than market price. New users get ₦100 free from the cashback pool, no payment required. Premium is ₦1,300/week and gets you 2 discounted purchases per week, plus scans to win from the cashback pool."
     },
     {
       q: "How do I keep my discount active?",
-      a: "Every premium purchase asks you to scan your Subsidi card at checkout to apply your discount, which comes from your own pot (up to ₦2,000 off), available once every 6 days. Nothing is auto-charged — you subscribe and pay whenever you're ready."
+      a: "Every premium purchase asks you to scan your Subsidi card at checkout to apply your discount. Nothing is auto-charged — you subscribe and pay whenever you're ready."
     },
     {
       q: "Is my money safe?",
@@ -5099,19 +5089,11 @@
         renderBundles();
         return;
       }
-      // Turning on — every premium purchase (trial or paid) is gated by
-      // the cooldown that starts on the last premium purchase.
-      if (premiumLastUsed > 0) {
-        const msLeft = (premiumLastUsed + getCooldownDays(premiumPlan) * 86400000) - Date.now();
-        if (msLeft > 0) {
-          showPremCooldownPopup(msLeft);
-          return;
-        }
-      }
-      // Check the toggle pool BEFORE opening the camera — no point walking
-      // someone through a scan that's going to fail anyway.
-      if (!(await checkToggleAvailable())) {
-        showToggleUnavailablePopup();
+      // Turning on — gated purely by how many of this cycle's 2 discount
+      // uses are left. No cooldown timer anymore: both uses are available
+      // any time within the 7-day Premium window, in any order.
+      if (premiumDiscountUsesLeft <= 0) {
+        showPremStatusPopup('No Discounts Left', "You've used both your discounted purchases for this cycle. They reset when you renew Premium.");
         return;
       }
       // Turning on — play the blur + scroll + price-drop reveal.
@@ -5323,13 +5305,14 @@
   }
 
   function turnOffPremiumAfterPurchase() {
-    // Every premium purchase turns the toggle off and starts the cooldown
-    // (enforced server-side against premium_expires_at). The one-time
-    // signup bonus (claimSignupBonus) never sets premiumUnlocked, so this
-    // only ever fires for real paid subscriptions.
+    // Every discounted purchase turns the toggle off and uses up one of
+    // this cycle's 2 discount slots (enforced server-side — this is just
+    // an optimistic client-side decrement, confirmed on next fetchUserData).
+    // The one-time signup bonus (claimSignupBonus) never sets premiumUnlocked,
+    // so this only ever fires for real paid subscriptions.
     premiumToggleOn = false;
-    premiumLastUsed = Date.now(); // cooldown starts now; will be confirmed from DB on next fetchUserData
-    needsScanToActivate = false;  // false during the cooldown itself — nothing to scan yet, just waiting
+    premiumDiscountUsesLeft = Math.max(0, premiumDiscountUsesLeft - 1);
+    needsScanToActivate = premiumDiscountUsesLeft <= 0;
     setPremToggleUI(false);
     renderBundles();
     updateSubsidyUI();
@@ -5345,14 +5328,14 @@
       const card = document.getElementById('pick-card-' + p);
       if (!card) return;
       const pctDiv = card.children[1];
-      // Before a user has actually built a pot (not premium yet, or pot
-      // hasn't started accruing), show the aspirational cap ("Up to
-      // ₦2,000") rather than a live ₦0 or any internal accrual number —
-      // the real balance only matters once they're subscribed.
+      // If already subscribed with uses left, show the actual next discount
+      // amount (₦500 first use, ₦300 second). Otherwise show the max ("Up
+      // to ₦500") as the aspirational pitch before they've paid.
       if (pctDiv) {
-        const cap = (PREMIUM_PLANS[p] || PREMIUM_PLANS.premium).discountCap;
-        const live = Math.min(premiumPot, cap);
-        pctDiv.textContent = live > 0 ? ('₦' + live.toLocaleString()) : ('Up to ₦' + cap.toLocaleString());
+        const slots = (PREMIUM_PLANS[p] || PREMIUM_PLANS.premium).discountSlots;
+        const maxSlot = slots[0];
+        const next = (premiumUnlocked && p === premiumPlan) ? rollDiscountAmount(p, true) : 0;
+        pctDiv.textContent = next > 0 ? ('₦' + next.toLocaleString()) : ('Up to ₦' + maxSlot.toLocaleString());
       }
       if (p === plan) {
         const s = PICK_CARD_STYLE[p].active;
@@ -5560,8 +5543,8 @@
         <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
         <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:16px;">Premium Policy</div>
         <div style="font-size:12px;color:var(--w50);line-height:1.8;">
-          <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Your Own Discount Pot</strong> — Premium is ₦900/week. Your personal discount pot grows automatically every week you're subscribed, plus a small bonus on every purchase you make. Your pot starts at ₦0 — there's no starter credit — and only grows from there.</p>
-          <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">One Discount Every 6 Days</strong> — You can use one discounted purchase every 6 days. The discount equals whatever's built up in your pot, capped at ₦2,000. The 6-day clock starts from your first purchase after subscribing, and resets each time you use it — check the Premium toggle to see when your next one lands.</p>
+          <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">2 Discounted Purchases a Week</strong> — Premium is ₦1,300/week. Every week you're subscribed, you get 2 discounted purchases to use whenever you like — in any order, any time during the week.</p>
+          <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">7-Day Cycle</strong> — Premium runs for exactly 7 days from the day you pay, then expires — no grace period. Unused discounts don't carry over once it expires. To keep going, just subscribe again — a fresh payment always gives you 2 new discounts and a new 7-day window.</p>
           <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Cashback Pool</strong> — Premium subscribers can also scan their card to claim from the shared cashback pool — each scan can win up to ₦10,000, added straight to your balance. After 5 scans in a row there's a 1-hour cooldown before you can scan again. The pool is funded by the ₦50 shared contribution added to every wallet top-up — never taken from any one user's balance. If it's empty, the claim button goes faded until it refills.</p>
           <p style="margin:0 0 10px;">📇 <strong style="color:var(--w70);">Card Scan Required</strong> — Every premium purchase asks you to scan your Subsidi card at checkout to apply your discount. Nothing is auto-charged — you subscribe and pay whenever you're ready.</p>
           <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">Signup Bonus</strong> — New users get ₦100 free from the cashback pool, no payment required.</p>
@@ -5597,10 +5580,10 @@
           </div>
           <div id="prem-policy-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
-              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Your Own Discount Pot</strong> — Premium is ₦900/week. Your personal discount pot grows automatically every week you're subscribed, plus a small bonus on every purchase. Pot starts at ₦0 — no starter credit.</p>
-              <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">One Discount Every 6 Days</strong> — Discount equals your pot balance, capped at ₦2,000. Clock starts from your first purchase after subscribing and resets each time you use it.</p>
+              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">2 Discounted Purchases a Week</strong> — Premium is ₦1,300/week. You get 2 discounted purchases per week — usable any time, any order.</p>
+              <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">7-Day Cycle</strong> — Runs 7 days from payment, then expires — no grace period, nothing carries over. Subscribe again for a fresh 7 days and 2 new discounts.</p>
               <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Cashback Pool</strong> — Premium subscribers can also scan their card to claim from the shared cashback pool — each scan can win up to ₦10,000. After 5 scans in a row there's a 1-hour cooldown. Funded by the ₦50 shared contribution on every wallet top-up. If it's empty, the claim button goes faded until it refills.</p>
-              <p style="margin:0 0 10px;">📇 <strong style="color:var(--w70);">Card Scan Required</strong> — Every premium purchase asks you to scan your Subsidi card at checkout to apply the discount. There's no toggle to reactivate — just scan each time you buy.</p>
+              <p style="margin:0 0 10px;">📇 <strong style="color:var(--w70);">Card Scan Required</strong> — Every premium purchase asks you to scan your Subsidi card at checkout to apply the discount.</p>
               <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">Signup Bonus</strong> — New users can claim a one-time ₦100 from the cashback pool, no payment or subscription required. First come, first served — the button fades once the pool's low.</p>
             </div>
           </div>

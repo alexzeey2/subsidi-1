@@ -566,7 +566,7 @@
 <!-- ── REGISTRATION SCREEN ── -->
 <div class="screen active" id="reg-screen">
   <div class="bg-glow"></div>
-  <div class="wordmark">subsidi<span class="wdot"></span></div>
+  <div class="wordmark">Subsidi<span class="wdot"></span></div>
   <div class="tagline">Data. Redefined.</div>
 
   <div class="reg-box">
@@ -781,7 +781,7 @@
   <div class="header">
     <div class="hglow"></div>
     <div class="topbar">
-      <div class="brand">subsidi<span class="bpip"></span></div>
+      <div class="brand">Subsidi<span class="bpip"></span></div>
       <div class="topbar-icons">
         <div class="prem-toggle-wrap" id="prem-toggle-wrap" onclick="onPremToggleClick()">
           <span class="prem-toggle-label" id="prem-toggle-label">Premium</span>
@@ -3224,7 +3224,7 @@
       // Premium toggle logic — only active right after a fresh card scan (not needing re-scan),
       // or during the picker demo preview.
       let isPremiumActive = false;
-      const toggleReallyOn = premiumToggleOn && !needsScanToActivate;
+      const toggleReallyOn = premiumToggleOn && (!premiumUnlocked || !needsScanToActivate);
       if (toggleReallyOn || premDemoActive) {
         const activePlan = premiumUnlocked ? premiumPlan : demoSelectedPlan;
         isPremiumActive = true;

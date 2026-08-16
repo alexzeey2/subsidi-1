@@ -1138,7 +1138,7 @@
         </div>
         <div class="prof-row-body">
           <div class="prof-row-title">Premium</div>
-          <div class="prof-row-sub">₦1,300/week — discounted purchases</div>
+          <div class="prof-row-sub" id="prof-row-premium-sub">Discounted purchases every week</div>
         </div>
         <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
@@ -1605,6 +1605,11 @@
         <div id="pick-card-premium-amt" style="font-size:19px;font-weight:900;color:var(--w40);">Special Pricing</div>
         <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off, from your pot</div>
       </div>
+      <div id="pick-card-premium_lite" onclick="pickPremDiscount('premium_lite')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-3);border:1.5px solid var(--border);opacity:0.55;">
+        <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px;">Premium Lite</div>
+        <div id="pick-card-premium_lite-amt" style="font-size:19px;font-weight:900;color:var(--w40);">Special Pricing</div>
+        <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off, from your pot</div>
+      </div>
     </div>
     <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">New users get ₦100 free from the Community Bonus. Premium gets you discounted purchases every week, plus scans to win from the Community Bonus — just scan your card at checkout.</div>
   </div>
@@ -1623,17 +1628,22 @@
       <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">Get the cheapest data prices in Nigeria.</div>
     </div>
 
-    <!-- Plan card (single tier) -->
+    <!-- Plan cards (two tiers) -->
     <div style="display:flex;gap:6px;padding:0 16px;margin-bottom:20px;">
       <div id="prem-btn-premium" onclick="selectPremPlan('premium')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(245,166,35,0.1);border:1.5px solid #F5A623;opacity:1;position:relative;">
         <div id="prem-current-badge-premium" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#F5A623;color:#000;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
         <div style="font-size:9.5px;font-weight:800;color:#F5A623;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Premium</div>
-        <div style="font-size:26px;font-weight:900;color:#F5A623;">₦1,300<span style="font-size:12px;font-weight:700;">/wk</span></div>
+        <div style="font-size:26px;font-weight:900;color:#F5A623;">₦1,300<span style="font-size:12px;font-weight:700;">/week</span></div>
+      </div>
+      <div id="prem-btn-premium_lite" onclick="selectPremPlan('premium_lite')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;position:relative;">
+        <div id="prem-current-badge-premium_lite" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#5AA0FF;color:#000;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
+        <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Premium Lite</div>
+        <div style="font-size:26px;font-weight:900;color:var(--w40);">₦970<span style="font-size:12px;font-weight:700;">/week</span></div>
       </div>
     </div>
 
     <!-- Benefits box (single panel now — carousel wrapper kept for minimal diff, but only one panel inside) -->
-    <div id="prem-benefits-wrap" style="overflow:hidden;position:relative;padding:0 20px;margin-bottom:20px;">
+    <div id="prem-benefits-wrap" style="overflow:hidden;position:relative;padding:0 20px;margin-bottom:20px;" ontouchstart="premSwipeStart(event)" ontouchmove="premSwipeMove(event)" ontouchend="premSwipeEnd(event)">
       <div id="prem-benefits-inner" style="display:flex;width:100%;transform:translateX(0%);transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
 
         <!-- Premium benefits — only things Premium actually gates, kept
@@ -1642,9 +1652,21 @@
           <div style="background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
             <div style="font-size:20px;font-weight:900;color:#F5A623;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Discounted purchases every week</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Bigger discount on every purchase</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Unlimited scan on Community Bonus</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Unlocks Get Gift</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Premium Lite benefits -->
+        <div style="flex-shrink:0;width:100%;box-sizing:border-box;">
+          <div style="background:var(--dark-3);border:1px solid rgba(90,160,255,.3);border-radius:16px;padding:16px 20px;">
+            <div style="font-size:20px;font-weight:900;color:#5AA0FF;margin-bottom:12px;">What you get</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#5AA0FF;font-weight:800;">✓</span> Discount on every purchase</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#5AA0FF;font-weight:800;">✓</span> 5 scans daily on Community Bonus</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#5AA0FF;font-weight:800;">✓</span> Unlocks Get Gift</div>
             </div>
           </div>
         </div>
@@ -1769,7 +1791,8 @@
   // server-authoritative — computed in edge functions, never trusted from
   // the client. This object is just pricing/display config.
   const PREMIUM_PLANS = {
-    premium: { price: 1300, billing: 'week', cycleDays: 7, discountSlots: [300, 300, 300] }
+    premium: { price: 1300, billing: 'week', cycleDays: 7, discountSlots: [300, 300, 300] }, // unlimited scan: 5 scans, 1hr cooldown, repeat
+    premium_lite: { price: 970, billing: 'week', cycleDays: 7, discountSlots: [166, 166, 166] } // 5 scans/day on Community Bonus, then locked out till next day
   };
   let premDemoActive = false;    // is the demo blur/animation running
   let scanContext = 'reactivate'; // 'reactivate' (Boss/CEO cooldown scan) or 'activate' (one-time Boss trial scan)
@@ -1988,6 +2011,7 @@
           premiumDiscountUsesLeft = typeof data.premiumDiscountUsesLeft === 'number' ? data.premiumDiscountUsesLeft : 0;
           premiumExpiresAt = data.premiumExpiresAt || null;
           needsScanToActivate = premiumDiscountUsesLeft <= 0;
+          renderPremiumProfileRow();
 
           // Toggle never auto-restores to on at true session start (handled
           // separately, at boot) — but this function runs constantly in the
@@ -2146,6 +2170,7 @@
             premiumToggleOn = false;
             needsScanToActivate = premiumDiscountUsesLeft <= 0;
             setPremToggleUI(premiumToggleOn);
+            renderPremiumProfileRow();
             if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
           }
 
@@ -4879,7 +4904,7 @@
   const FAQ_ITEMS = [
     {
       q: "What is Subsidi?",
-      a: "Subsidi is a membership that gets you mobile data cheaper than market price. New users get ₦100 free from the Community Bonus, no payment required. Premium is ₦1,300/week and gets you discounted purchases every week, plus scans to win from the Community Bonus."
+      a: "Subsidi is a membership that gets you mobile data cheaper than market price. New users get ₦100 free from the Community Bonus, no payment required. Premium starts at ₦970/week and gets you discounted purchases every week, plus scans to win from the Community Bonus — higher tiers unlock more scans."
     },
     {
       q: "How do I keep my discount active?",
@@ -4961,12 +4986,13 @@
 
   // ── PREMIUM PLAN SELECTOR ── (single tier now — array kept at length 1 so
   // the carousel/swipe code below still works unmodified, it just has one panel)
-  const PREM_PLAN_ORDER = ['premium'];
-  const PREM_PANEL_PCT = 100 / PREM_PLAN_ORDER.length; // % width per carousel panel
+  const PREM_PLAN_ORDER = ['premium', 'premium_lite'];
+  const PREM_PANEL_PCT = 100; // each panel is styled width:100% of the wrap — shift a full 100% per step, not 100/count
   const PREM_PLAN_STYLE = {
-    premium: { active: { bg: 'rgba(245,166,35,0.1)', border: '#F5A623', text: '#F5A623' }, btnGradient: 'linear-gradient(90deg,#b87010,#F5A623)', btnText: '#000' }
+    premium: { active: { bg: 'rgba(245,166,35,0.1)', border: '#F5A623', text: '#F5A623' }, btnGradient: 'linear-gradient(90deg,#b87010,#F5A623)', btnText: '#000' },
+    premium_lite: { active: { bg: 'rgba(90,160,255,0.1)', border: '#5AA0FF', text: '#5AA0FF' }, btnGradient: 'linear-gradient(90deg,#2f5fa8,#5AA0FF)', btnText: '#000' }
   };
-  const PREM_PLAN_LABEL = { premium: 'Premium' };
+  const PREM_PLAN_LABEL = { premium: 'Premium', premium_lite: 'Premium Lite' };
   let premSheetActivePlan = 'premium'; // single-tier now, but kept for the carousel code paths
 
   function selectPremPlan(plan) {
@@ -5350,7 +5376,8 @@
 
   // ── DISCOUNT PICKER (preview only) ──
   const PICK_CARD_STYLE = {
-    premium: { active: { bg: 'rgba(245,166,35,0.1)', border: '#F5A623', text: '#F5A623' } }
+    premium: { active: { bg: 'rgba(245,166,35,0.1)', border: '#F5A623', text: '#F5A623' } },
+    premium_lite: { active: { bg: 'rgba(90,160,255,0.1)', border: '#5AA0FF', text: '#5AA0FF' } }
   };
 
   function highlightPickCard(plan) {
@@ -5482,6 +5509,21 @@
       const badge = document.getElementById('prem-current-badge-' + p);
       if (badge) badge.style.display = (premiumUnlocked && premiumPlan === p) ? '' : 'none';
     });
+    renderPremiumProfileRow();
+  }
+
+  // Profile menu's "Premium" row — shows the subscription price for
+  // whichever plan the user actually has (never the discount ₦ amount,
+  // same vagueness as everywhere else). Falls back to a generic label
+  // pre-subscription so it never shows a specific price to a free user.
+  function renderPremiumProfileRow() {
+    const el = document.getElementById('prof-row-premium-sub');
+    if (!el) return;
+    if (premiumUnlocked && PREMIUM_PLANS[premiumPlan]) {
+      el.textContent = '₦' + PREMIUM_PLANS[premiumPlan].price.toLocaleString() + '/week — discounted purchases';
+    } else {
+      el.textContent = 'Discounted purchases every week';
+    }
   }
 
   // ── PREMIUM UNLOCK SHEET ──
@@ -5570,7 +5612,7 @@
         <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
         <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:16px;">Premium Policy</div>
         <div style="font-size:12px;color:var(--w50);line-height:1.8;">
-          <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Discounted Purchases Every Week</strong> — Premium is ₦1,300/week. Every week you're subscribed, you get discounted purchases to use whenever you like — in any order, any time during the week.</p>
+          <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Discounted Purchases Every Week</strong> — Premium plans start at ₦970/week. Every week you're subscribed, you get discounted purchases to use whenever you like — in any order, any time during the week.</p>
           <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">7-Day Cycle</strong> — Premium runs for exactly 7 days from the day you pay, then expires — no grace period. Unused discounts don't carry over once it expires. To keep going, just subscribe again.</p>
           <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Community Bonus</strong> — Premium subscribers get unlimited scan on the Community Bonus, added straight to your balance. After 5 scans in a row there's a 1-hour cooldown before you can scan again. The pool is funded by the ₦50 shared contribution added to every wallet top-up — never taken from any one user's balance. If it's empty, the claim button goes faded until it refills.</p>
           <p style="margin:0 0 10px;">📇 <strong style="color:var(--w70);">Card Scan Required</strong> — Every premium purchase asks you to scan your Subsidi card at checkout to apply your discount. Nothing is auto-charged — you subscribe and pay whenever you're ready.</p>
@@ -5606,7 +5648,7 @@
           </div>
           <div id="prem-policy-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
-              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Discounted Purchases Every Week</strong> — Premium is ₦1,300/week. You get discounted purchases every week — usable any time, any order.</p>
+              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Discounted Purchases Every Week</strong> — Premium plans start at ₦970/week. You get discounted purchases every week — usable any time, any order.</p>
               <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">7-Day Cycle</strong> — Runs 7 days from payment, then expires — no grace period, nothing carries over. Subscribe again for a fresh 7 days.</p>
               <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Community Bonus</strong> — Premium subscribers get unlimited scan on the Community Bonus. After 5 scans in a row there's a 1-hour cooldown. Funded by the ₦50 shared contribution on every wallet top-up. If it's empty, the claim button goes faded until it refills.</p>
               <p style="margin:0 0 10px;">📇 <strong style="color:var(--w70);">Card Scan Required</strong> — Every premium purchase asks you to scan your Subsidi card at checkout to apply the discount.</p>
@@ -6035,6 +6077,7 @@
     premiumToggleOn = true;
     needsScanToActivate = false;
     setPremToggleUI(true);
+    renderPremiumProfileRow();
 
     if (data.cardCode && data.cardCode !== registeredCard) {
       registeredCard = data.cardCode;
@@ -6155,6 +6198,21 @@
     return Math.max(0, new Date(cashbackCooldownUntil).getTime() - Date.now());
   }
 
+  // Shows WHEN scanning opens back up — a clock time if it's later today,
+  // "tomorrow" or a weekday name if it's a day+ out — never a countdown or
+  // a number of scans left.
+  function formatCashbackCooldownLabel(msLeft) {
+    const resetDate = new Date(Date.now() + msLeft);
+    const now = new Date();
+    const isSameDay = resetDate.toDateString() === now.toDateString();
+    const isTomorrow = resetDate.toDateString() === new Date(Date.now() + 86400000).toDateString();
+    if (isSameDay) {
+      return 'at ' + resetDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    }
+    if (isTomorrow) return 'tomorrow';
+    return 'on ' + WEEKDAY_NAMES[resetDate.getDay()];
+  }
+
   function renderCashbackBalance() {
     const whole = Math.floor(poolBalance).toLocaleString();
     const dec = (poolBalance % 1).toFixed(2).slice(1);
@@ -6176,8 +6234,7 @@
       if (bossTrialAvailable && !premiumUnlocked) {
         collectLabel.textContent = 'Collect Free Bonus (' + (5 - trialScansUsed) + '/5)';
       } else if (msLeft > 0) {
-        const minsLeft = Math.ceil(msLeft / 60000);
-        collectLabel.textContent = 'Back in ' + minsLeft + 'm';
+        collectLabel.textContent = 'Back ' + formatCashbackCooldownLabel(msLeft);
       } else {
         collectLabel.textContent = 'Collect';
       }
@@ -6199,8 +6256,7 @@
     }
     const msLeft = cashbackCooldownMsLeft();
     if (msLeft > 0) {
-      const minsLeft = Math.ceil(msLeft / 60000);
-      alert('Too many scans — try again in ' + minsLeft + ' min.');
+      alert('Too many scans — try again ' + formatCashbackCooldownLabel(msLeft) + '.');
       return;
     }
     openCashbackScan();

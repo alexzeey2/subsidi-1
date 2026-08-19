@@ -5577,6 +5577,12 @@
       if (dash) dash.classList.remove('prem-demo-active');
       setPremToggleUI(false);
       renderBundles();
+      // The buy sheet underneath may still be open with a stale `cur.price`
+      // computed while the toggle looked on — never let that survive the
+      // toggle resetting. Close it so a fresh tap re-renders the real price.
+      const buySheet = document.getElementById('ov');
+      if (buySheet) buySheet.classList.remove('open');
+      cur = null;
     }
   }
 

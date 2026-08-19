@@ -2820,14 +2820,6 @@
 
     const isExpensive = subCostCount === 0;
 
-    // Subscribed but the cooldown has lapsed and the card hasn't been rescanned
-    // yet this cycle → send them to the premium sheet to confirm their plan and
-    // scan, every time, instead of buying at full price silently.
-    if (premiumUnlocked && needsScanToActivate) {
-      showPremUnlockSheet('reactivate');
-      return;
-    }
-
     const hasDiscount = premiumToggleOn && !needsScanToActivate;
     cur = { size, val, price, orig, planId: planId || '', planNetwork: planNetwork || NET, provider: provider || 'ds', hasDiscount, rawCk: (typeof rawCk === 'number' ? rawCk : orig) };
     document.getElementById('shtitle').textContent = 'Buy ' + size + ' Data';
@@ -3284,12 +3276,18 @@
         displayPriceFinal = Math.max(0, displayPriceFinal - flatDiscount);
       }
 
+      // The demo preview is visual-only — it must NEVER be the price actually
+      // charged for someone who isn't really entitled to the discount (real
+      // premium + already scanned this cycle). basePrice is what gets sent
+      // to checkout; displayPriceFinal (above) is only what's shown on the card.
+      const chargeablePrice = toggleReallyOn ? displayPriceFinal : basePrice;
+
       // Card styling — gold now follows the premium toggle only, not plan price
       const bundleClass = isPremiumActive ? 'bundle bundle-golden' : 'bundle';
       const btnLabel = isPremiumActive ? '⚡ Premium' : 'Best Price';
       const priceClass = isPremiumActive ? 'b-price b-price-gold' : 'b-price';
 
-      return `<div class="${bundleClass}" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${displayPriceFinal},${basePrice},'${p.planId}','${NET}',${isExpensive ? 0 : 1},${rawCost},'${p.provider || 'ds'}')">
+      return `<div class="${bundleClass}" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${chargeablePrice},${basePrice},'${p.planId}','${NET}',${isExpensive ? 0 : 1},${rawCost},'${p.provider || 'ds'}')">
         ${isPremiumActive && !premiumUnlocked ? '<div style="position:absolute;top:8px;right:8px;font-size:11px;color:#F5A623;opacity:0.8;">🔒</div>' : ''}
         <div class="b-val">${p.val}</div>
         <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
@@ -3327,13 +3325,16 @@
       return;
     }
 
-    if (cur && cur.hasDiscount) {
-      // Premium purchase — scan card instead of PIN
+    // Toggle on → always scan, whether or not this user turns out to be
+    // truly entitled. processPurchaseScan() is the real checkpoint: it
+    // routes a non-premium/lapsed user to the premium sheet, and only
+    // completes the discounted purchase for a genuine subscriber.
+    if (premiumToggleOn) {
       openFreeScan('purchase');
       return;
     }
 
-    // Not premium — confirm identity with PIN and buy at full price.
+    // Toggle off — confirm identity with PIN and buy at full price.
     buyPinEntry = '';
     updateBuyPinDots('');
     document.getElementById('pin-buy-ov').classList.add('open');

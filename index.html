@@ -3038,8 +3038,58 @@
     const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
     if (sub) sub.textContent = 'Confirm your identity to continue';
 
-    // Non-premium purchases always go through PIN, never through a card scan.
+    if (premiumToggleOn) {
+      await completePremiumPinPurchase();
+      return;
+    }
+
+    // Non-premium purchases confirm via PIN and buy at full price.
     await completePurchase(false);
+  }
+
+  // Premium purchases now confirm via the PIN sheet instead of a card scan.
+  // Mirrors processPurchaseScan()'s business logic (real-subscription check,
+  // discount activation) but uses the user's already-linked card
+  // (registeredCard) instead of a freshly scanned QR code.
+  async function completePremiumPinPurchase() {
+    // A verified PIN proves identity, not a paid subscription — a
+    // never-subscribed (or lapsed) user still gets routed to the premium
+    // sheet instead of being silently given the discount.
+    if (!premiumUnlocked) {
+      showPremUnlockSheet(true);
+      return;
+    }
+
+    let data;
+    try {
+      data = await callEdge('activate-premium-scan', { userId, context: 'purchase', cardCode: registeredCard });
+    } catch (e) {
+      data = null;
+    }
+
+    if (!data || data.error) {
+      // Business-logic rejection (toggle pool below the ₦300 floor, cooldown
+      // not actually elapsed, etc.) — don't leave the toggle looking ON when
+      // nothing actually activated.
+      premiumToggleOn = false;
+      setPremToggleUI(false);
+      renderBundles();
+      alert((data && typeof data.error === 'string' && data.error) ? data.error : 'Not available right now, please try again later.');
+      return;
+    }
+
+    premiumPlan = data.plan || premiumPlan;
+    premiumToggleOn = true;
+    needsScanToActivate = false;
+    setPremToggleUI(true);
+    renderPremiumProfileRow();
+
+    if (data.cardCode && data.cardCode !== registeredCard) {
+      registeredCard = data.cardCode;
+      if (typeof renderMyCard === 'function') renderMyCard();
+    }
+
+    await completePurchase(true);
   }
 
   function closePinBuy() {
@@ -3325,18 +3375,16 @@
       return;
     }
 
-    // Toggle on → always scan, whether or not this user turns out to be
-    // truly entitled. processPurchaseScan() is the real checkpoint: it
-    // routes a non-premium/lapsed user to the premium sheet, and only
-    // completes the discounted purchase for a genuine subscriber.
-    if (premiumToggleOn) {
-      openFreeScan('purchase');
-      return;
-    }
-
-    // Toggle off — confirm identity with PIN and buy at full price.
+    // Both premium and non-premium purchases now confirm identity with the
+    // PIN sheet — premium no longer requires a fresh card scan. The real
+    // entitlement checkpoint (routes a non-premium/lapsed user to the
+    // premium sheet, only completes the discounted purchase for a genuine
+    // subscriber) now runs in completePremiumPinPurchase(), after the PIN
+    // is verified.
     buyPinEntry = '';
     updateBuyPinDots('');
+    const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
+    if (sub) sub.textContent = premiumToggleOn ? 'Confirm your identity to apply your discount' : 'Confirm your identity to continue';
     document.getElementById('pin-buy-ov').classList.add('open');
     return;
   }

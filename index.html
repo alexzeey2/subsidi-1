@@ -864,6 +864,9 @@
         <div class="act-rect" id="cashback-collect-btn" onclick="event.stopPropagation();if(gateCheck('Collect Cashback','Create a free account to collect your cashback.'))return;handleCashbackCollectTap()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
           <span id="cashback-collect-btn-label">Collect</span>
         </div>
+        <div class="act-rect" id="cashback-borrow-btn" onclick="event.stopPropagation();if(gateCheck('Borrow','Create a free account to borrow.'))return;handleBorrowTap()" style="flex:1;background:rgba(139,79,232,0.08);border:1px solid rgba(139,79,232,0.35);color:#8B4FE8;">
+          <span id="cashback-borrow-btn-label">Borrow</span>
+        </div>
       </div>
 
     </div>
@@ -993,12 +996,171 @@
 
 <!-- ── CARD ACTIVE SHEET ── -->
 
+<!-- ── BORROW SHEET (premium users) ── -->
+<div class="overlay" id="borrow-ov" onclick="closeBorrowOv(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sh-bar"></div>
+
+    <div style="display:flex;gap:20px;margin-bottom:14px;">
+      <div id="borrow-ov-tab-borrow" onclick="setBorrowOvPanel(0)" style="font-size:13px;font-weight:800;color:#fff;cursor:pointer;padding-bottom:6px;border-bottom:2px solid #8B4FE8;">Borrow</div>
+      <div id="borrow-ov-tab-repay" onclick="setBorrowOvPanel(1)" style="font-size:13px;font-weight:800;color:var(--w40);cursor:pointer;padding-bottom:6px;border-bottom:2px solid transparent;">Repay<span id="borrow-owed-tab-label"></span></div>
+    </div>
+
+    <div id="borrow-ov-panel-borrow">
+      <div class="sh-title" style="display:none;">Borrow</div>
+      <div class="sh-sub">You can borrow up to <span id="borrow-max-label">₦0</span> — spendable on data only</div>
+      <div style="position:relative;margin:20px 0 20px;">
+        <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--w40);font-size:16px;font-weight:700;pointer-events:none;">₦</span>
+        <input id="borrow-amt-input" type="number" inputmode="numeric" min="1" placeholder="How much do you want to borrow" oninput="onBorrowAmtInput(this.value)" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px 16px 16px 34px;font-size:16px;font-weight:700;color:var(--w);">
+      </div>
+      <div id="borrow-amt-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:4px;"></div>
+      <button class="cbtn" id="borrow-confirm-btn" onclick="confirmBorrow()" style="opacity:.4;pointer-events:none;">Borrow</button>
+    </div>
+
+    <div id="borrow-ov-panel-repay" style="display:none;">
+      <div class="sh-sub">You owe <span id="borrow-owed-label" style="color:var(--w);font-weight:800;">₦0</span>. Repaying clears it and stops future ₦100 renewal fees.</div>
+      <div style="position:relative;margin:20px 0 20px;">
+        <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--w40);font-size:16px;font-weight:700;pointer-events:none;">₦</span>
+        <input id="repay-amt-input" type="number" inputmode="numeric" min="1" placeholder="How much do you want to repay" oninput="onRepayAmtInput(this.value)" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px 16px 16px 34px;font-size:16px;font-weight:700;color:var(--w);">
+      </div>
+      <div id="repay-amt-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:4px;"></div>
+      <button class="cbtn" id="repay-confirm-btn" onclick="confirmRepay()" style="opacity:.4;pointer-events:none;">Repay</button>
+      <button class="cbtn" id="repay-full-btn" onclick="confirmRepayFull()" style="margin-top:8px;background:transparent;border:1.5px solid var(--border);color:var(--w70);">Pay In Full</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── BORROW LOCKED (non-premium) POPUP ── -->
+<div class="gate-ov" id="borrow-lock-ov">
+  <div class="gate-sheet">
+    <div class="sh-bar"></div>
+    <div class="gate-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B4FE8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <div class="gate-title">Unlock Premium,<br>Borrow ₦240 - ₦10,000</div>
+    <div class="gate-sub" style="color:#FFD700;text-shadow:0 0 8px rgba(255,215,0,0.8),0 0 16px rgba(255,215,0,0.5);font-weight:700;letter-spacing:.3px;">PAY IN FULL, WHEN YOU WANT</div>
+    <button class="gate-btn" onclick="closeBorrowLockOv(); showPremUnlockSheet(false);">See Premium Plans</button>
+    <button class="gate-skip" onclick="closeBorrowLockOv()">Maybe later</button>
+  </div>
+</div>
+
+<!-- ── BIG-DATA SAVINGS BUBBLE (draggable, permanent) ── -->
+<div id="savings-bubble" onpointerdown="savingsBubbleDown(event)" style="position:fixed;bottom:170px;right:16px;width:64px;height:64px;display:none;align-items:center;justify-content:center;z-index:95;cursor:grab;touch-action:none;user-select:none;animation:savingsBubbleFloat 2.6s ease-in-out infinite;">
+  <svg id="savings-bubble-hand" width="52" height="52" viewBox="0 0 48 48" fill="#F5A623" stroke="none">
+    <path d="M14 24V11a3.2 3.2 0 0 1 6.4 0v9.5h1V7.5a3.2 3.2 0 0 1 6.4 0V20h1V9.5a3.2 3.2 0 0 1 6.4 0V20h1v-4a3.2 3.2 0 0 1 6.4 0v15c0 8-6 14.5-14.5 14.5h-1.8c-5.6 0-9-2.2-12.2-6.6l-6.4-9.3a3.2 3.2 0 0 1 5.3-3.3l3.1 4.2"/>
+  </svg>
+</div>
+<style>
+  @keyframes savingsBubbleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  #savings-bubble-hand{
+    transform-origin:58% 90%;
+    animation:savingsHandWave 2.2s ease-in-out infinite, savingsHandGlow 2.2s ease-in-out infinite;
+  }
+  @keyframes savingsHandWave{
+    0%,100%{transform:rotate(0deg) scale(1)}
+    10%{transform:rotate(26deg) scale(1.05)}
+    20%{transform:rotate(-14deg) scale(1.05)}
+    30%{transform:rotate(26deg) scale(1.05)}
+    40%{transform:rotate(-10deg) scale(1.05)}
+    50%{transform:rotate(18deg) scale(1.05)}
+    60%,100%{transform:rotate(0deg) scale(1)}
+  }
+  @keyframes savingsHandGlow{
+    0%,100%{filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
+    50%{filter:drop-shadow(0 0 16px rgba(245,166,35,1))}
+  }
+</style>
+
+<!-- ── BIG-DATA SAVINGS SHEET ── -->
+<div class="overlay" id="savings-ov" onclick="closeSavingsOv(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sh-bar"></div>
+
+    <!-- Network picker — shown when no active goal (savingsPlanId is null) -->
+    <div id="savings-panel-picker">
+      <div style="font-size:15px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;color:#F5A623;margin-bottom:10px;">Start Saving For Data</div>
+      <div class="sh-title" style="font-size:19px;">Which network do you use?</div>
+      <div id="savings-network-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0 8px;">
+        <div onclick="confirmSavingsNetwork('MTN','MTN')" class="dep-opt" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;">
+          <div style="width:36px;height:36px;border-radius:9px;background:#FFC107;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:#000;">MTN</div>
+          MTN
+        </div>
+        <div onclick="confirmSavingsNetwork('AIRTEL','Airtel')" class="dep-opt" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;">
+          <div style="width:36px;height:36px;border-radius:9px;background:#ED1C24;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10px;color:#fff;">AIR</div>
+          Airtel
+        </div>
+        <div onclick="confirmSavingsNetwork('GLO','Glo')" class="dep-opt" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;">
+          <div style="width:36px;height:36px;border-radius:9px;background:#00A651;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10px;color:#fff;">GLO</div>
+          Glo
+        </div>
+        <div onclick="confirmSavingsNetwork('9MOBILE','9mobile')" class="dep-opt" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;">
+          <div style="width:36px;height:36px;border-radius:9px;background:#00693C;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:9px;color:#fff;">9MB</div>
+          9mobile
+        </div>
+      </div>
+      <div id="savings-picker-err" style="font-size:12px;color:#ff6b6b;min-height:16px;text-align:center;"></div>
+    </div>
+
+    <!-- Network confirm step — "are you sure" before locking in the goal -->
+    <div id="savings-panel-confirm" style="display:none;text-align:center;">
+      <div class="sh-title">Use <span id="savings-confirm-network-label">this network</span>?</div>
+      <div class="sh-sub">Make sure this is right — your saved data will be delivered on this network.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0 8px;">
+        <button class="cbtn" onclick="cancelSavingsNetworkConfirm()" style="background:transparent;border:1.5px solid var(--border);color:var(--w70);">Cancel</button>
+        <button class="cbtn" id="savings-confirm-yes-btn" onclick="finalizeSavingsNetwork()" style="background:linear-gradient(135deg,#b87010,#F5A623);color:#241800;">Yes, this one</button>
+      </div>
+    </div>
+
+    <!-- Progress view — shown once a goal is active -->
+    <div id="savings-panel-progress" style="display:none;">
+      <div style="text-align:center;margin-bottom:4px;">
+        <div id="savings-plan-label" style="font-size:30px;font-weight:900;color:#F5A623;">0GB</div>
+        <div style="font-size:13px;color:var(--w40);font-weight:700;">Will be yours soon</div>
+      </div>
+      <div style="margin:22px 0 8px;background:var(--dark-3);border-radius:999px;height:14px;overflow:hidden;border:1px solid var(--border);">
+        <div id="savings-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#b87010,#F5A623);border-radius:999px;transition:width .6s cubic-bezier(.22,1,.36,1);"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800;margin-bottom:20px;">
+        <span id="savings-current-label" style="color:#F5A623;">₦0.00</span>
+        <span id="savings-target-label" style="color:var(--w40);">₦0</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <button class="cbtn" id="savings-add-btn" onclick="openSavingsAddMoney()" style="background:transparent;border:1.5px solid var(--border);color:var(--w70);">Add Money</button>
+        <button class="cbtn" id="savings-collect-btn" onclick="openSavingsCollect()" style="opacity:.4;pointer-events:none;">Collect</button>
+      </div>
+
+      <!-- Add money mini-form, hidden until "Add Money" tapped -->
+      <div id="savings-add-form" style="display:none;margin-top:16px;">
+        <div style="position:relative;margin-bottom:10px;">
+          <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--w40);font-size:16px;font-weight:700;pointer-events:none;">₦</span>
+          <input id="savings-add-input" type="number" inputmode="numeric" min="1" placeholder="How much to add" oninput="onSavingsAddInput(this.value)" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px 16px 16px 34px;font-size:16px;font-weight:700;color:var(--w);">
+        </div>
+        <div id="savings-add-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:4px;"></div>
+        <button class="cbtn" id="savings-add-confirm-btn" onclick="confirmSavingsAddMoney()" style="opacity:.4;pointer-events:none;">Add to Savings</button>
+      </div>
+
+      <!-- Collect mini-form, hidden until "Collect" tapped -->
+      <div id="savings-collect-form" style="display:none;margin-top:16px;">
+        <input id="savings-collect-phone" type="tel" inputmode="numeric" placeholder="Phone number to receive data" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-size:16px;font-weight:700;color:var(--w);margin-bottom:10px;">
+        <div id="savings-collect-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:4px;"></div>
+        <button class="cbtn" id="savings-collect-confirm-btn" onclick="confirmSavingsCollect()">Collect My Data</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── DEPOSIT SHEET ── -->
 <div class="overlay" id="dep-ov" onclick="closeDepOv(event)">
+
   <div class="sheet">
     <div class="sh-bar"></div>
     <div class="sh-title">Top Up Wallet</div>
-    <div class="sh-sub"><span class="price-gold" style="font-weight:800;font-size:14px;">+₦50</span><span class="price-gold"> added on every top-up, goes to the cashback pool</span></div>
+    <div class="sh-sub"><span class="price-gold" style="font-weight:800;font-size:14px;">+₦50</span><span class="price-gold"> fee on every top-up — ₦30 goes to the cashback pool</span></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
       <div onclick="selectDep(this,100)"  class="dep-opt">₦100</div>
       <div onclick="selectDep(this,500)"  class="dep-opt">₦500</div>
@@ -1013,52 +1175,6 @@
     </div>
     <button class="cbtn" id="dep-confirm-btn" onclick="confirmDep()" style="opacity:.4;pointer-events:none;">Add to Wallet</button>
     <div style="font-size:11px;color:var(--w40);line-height:1.6;margin-top:12px;text-align:center;">If you pay with your bank app and see "Transaction was not completed" after returning, check your wallet balance first — it often means the payment actually went through.</div>
-  </div>
-</div>
-
-<!-- ── GET GIFT SHEET (prototype — no backend yet) ── -->
-<div class="overlay" id="gift-ov" onclick="closeGiftOv(event)">
-  <div class="sheet" onclick="event.stopPropagation()">
-    <div class="sh-bar"></div>
-
-    <div style="display:flex;gap:20px;margin-bottom:14px;">
-      <div id="gift-ov-tab-new" onclick="setGiftOvPanel(0)" style="font-size:13px;font-weight:800;color:#fff;cursor:pointer;padding-bottom:6px;border-bottom:2px solid #F5A623;">New Request</div>
-      <div id="gift-ov-tab-mine" onclick="setGiftOvPanel(1)" style="font-size:13px;font-weight:800;color:var(--w40);cursor:pointer;padding-bottom:6px;border-bottom:2px solid transparent;">My Requests<span id="gift-mine-count-label"></span></div>
-    </div>
-
-    <div id="gift-ov-panel-new">
-      <div class="sh-sub">Min ₦50, max ₦1,000 per person, 20 requests a month.</div>
-      <input id="gift-phone-input" type="tel" inputmode="numeric" placeholder="Search by phone number" maxlength="11" oninput="renderGiftSearchResults(this.value)" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;font-size:15px;font-weight:600;color:var(--w);margin-bottom:8px;">
-      <div id="gift-search-results" style="display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto;margin-bottom:8px;"></div>
-
-      <div style="position:relative;margin-bottom:8px;">
-        <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--w40);font-size:16px;font-weight:700;pointer-events:none;">₦</span>
-        <input id="gift-amount-input" type="number" inputmode="numeric" min="50" max="1000" placeholder="Amount (₦50 – ₦1,000)" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px 16px 16px 34px;font-size:16px;font-weight:700;color:var(--w);">
-      </div>
-      <div id="gift-amount-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:12px;"></div>
-      <button class="cbtn" onclick="submitGiftRequest()">Request Gift</button>
-    </div>
-
-    <div id="gift-ov-panel-mine" style="display:none;">
-      <div class="sh-sub">Requests expire after 24 hours.</div>
-      <div id="my-gift-requests-list" style="display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ── Floating incoming-gift-request bubble (draggable) ── -->
-<div id="gift-bubble" onclick="openGiftRequestsList()" style="display:none;position:fixed;width:56px;height:56px;z-index:900;align-items:center;justify-content:center;font-size:40px;cursor:grab;touch-action:none;">
-  <span id="gift-bubble-hand" style="display:inline-block;">👋</span>
-  <div id="gift-bubble-count" style="display:none;position:absolute;top:0;right:0;background:#ff4444;color:#fff;font-size:11px;font-weight:800;min-width:18px;height:18px;border-radius:9px;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 2px 6px rgba(0,0,0,.5);"></div>
-</div>
-
-<!-- ── Incoming gift requests list ── -->
-<div class="overlay" id="gift-requests-ov" onclick="closeGiftRequestsOv(event)">
-  <div class="sheet" onclick="event.stopPropagation()">
-    <div class="sh-bar"></div>
-    <div class="sh-title">Gift Requests</div>
-    <div class="sh-sub">Requests expire after 24 hours. Sending deducts from your wallet balance.</div>
-    <div id="gift-requests-list" style="display:flex;flex-direction:column;gap:10px;max-height:360px;overflow-y:auto;margin-top:14px;"></div>
   </div>
 </div>
 
@@ -1633,12 +1749,12 @@
       <div id="prem-btn-premium" onclick="selectPremPlan('premium')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(245,166,35,0.1);border:1.5px solid #F5A623;opacity:1;position:relative;">
         <div id="prem-current-badge-premium" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#F5A623;color:#000;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
         <div style="font-size:9.5px;font-weight:800;color:#F5A623;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Premium</div>
-        <div style="font-size:26px;font-weight:900;color:#F5A623;">₦1,300<span style="font-size:12px;font-weight:700;">/week</span></div>
+        <div id="prem-price-premium" style="font-size:26px;font-weight:900;color:#F5A623;">₦1,800<span style="font-size:12px;font-weight:700;">/week</span></div>
       </div>
       <div id="prem-btn-premium_lite" onclick="selectPremPlan('premium_lite')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-4);border:1.5px solid var(--border);opacity:0.45;position:relative;">
         <div id="prem-current-badge-premium_lite" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#5AA0FF;color:#000;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
         <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Premium Lite</div>
-        <div style="font-size:26px;font-weight:900;color:var(--w40);">₦970<span style="font-size:12px;font-weight:700;">/week</span></div>
+        <div id="prem-price-premium_lite" style="font-size:26px;font-weight:900;color:var(--w40);">₦970<span style="font-size:12px;font-weight:700;">/4 days</span></div>
       </div>
     </div>
 
@@ -1652,9 +1768,10 @@
           <div style="background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
             <div style="font-size:20px;font-weight:900;color:#F5A623;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Bigger discount on every purchase</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Unlimited scan on Community Bonus</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Unlocks Get Gift</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> 1 big discount on any purchase</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> 3 scans a day on Community Bonus, guaranteed ₦100/day</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Unlock the Borrow feature</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> ₦300 added to your data savings goal every renewal</div>
             </div>
           </div>
         </div>
@@ -1664,9 +1781,10 @@
           <div style="background:var(--dark-3);border:1px solid rgba(90,160,255,.3);border-radius:16px;padding:16px 20px;">
             <div style="font-size:20px;font-weight:900;color:#5AA0FF;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#5AA0FF;font-weight:800;">✓</span> Discount on every purchase</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#5AA0FF;font-weight:800;">✓</span> 5 scans daily on Community Bonus</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#5AA0FF;font-weight:800;">✓</span> Unlocks Get Gift</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#5AA0FF;font-weight:800;">✓</span> 1 medium discount on any purchase</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#5AA0FF;font-weight:800;">✓</span> 3 scans a day on Community Bonus, guaranteed ₦100/day</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#5AA0FF;font-weight:800;">✓</span> Unlock the Borrow feature</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#5AA0FF;font-weight:800;">✓</span> ₦150 added to your data savings goal every renewal</div>
             </div>
           </div>
         </div>
@@ -1677,7 +1795,7 @@
     <!-- Unlock button -->
     <div style="padding:0 20px;">
       <button id="prem-unlock-btn" class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('premium')">
-        Unlock Premium — ₦1,300/week
+        Unlock Premium
       </button>
     </div>
 
@@ -1779,9 +1897,25 @@
   let premiumUnlocked = false;   // true once user has paid for Premium
   let premiumToggleOn = false;   // current toggle state (on/off) — only true right after a fresh card scan
   let premiumPlan = 'premium';   // single tier now — kept as a field for backward compat with DB rows/edge functions
-  let needsScanToActivate = false; // true once this week's 3 discount uses are all spent — nothing left to toggle on until renewal
+  let needsScanToActivate = false; // true once this cycle's 1 discount use is spent — nothing left to toggle on until renewal
   let premiumDiscountUsesLeft = 0; // 0, 1, 2, or 3 — server-authoritative, loaded from data.premiumDiscountUsesLeft. Resets to 3 only on a fresh Premium payment.
   let premiumExpiresAt = null; // ISO string from the server — used to compute the "come back on [day]" illusion date
+  let borrowCeiling = 0; // ₦ — server-authoritative, loaded from data.borrowCeiling. Builds up with each Premium renewal, persists across lapses (but can only be DRAWN while Premium is active).
+  let borrowOwed = 0; // ₦ — server-authoritative, loaded from data.borrowOwed. Outstanding debt from previous draws (principal + fees); while > 0, every renewal skims ₦100 off that cycle's ceiling top-up instead of chasing repayment.
+  let borrowPrincipalOwed = 0; // ₦ — server-authoritative, loaded from data.borrowPrincipalOwed. Principal only (excludes the flat ₦100 draw fee) — this is what's checked against borrowCeiling to compute remaining borrowing room.
+
+  // Big-data savings goal — server-authoritative, loaded from get-user.
+  // savingsPlanId null means no active goal (bubble tap should show the
+  // network picker); non-null means a goal is in progress (bubble tap
+  // shows the progress sheet instead).
+  let savingsNetwork = null;
+  let savingsPlanId = null;
+  let savingsPlanLabel = null;
+  let savingsPlanDuration = null;
+  let savingsPlanProvider = null;
+  let savingsPlanPrice = null;
+  let savingsTarget = null;
+  let savingsBalance = 0;
   // Single Premium tier: ₦1,300/week, hard 7-day expiry — no grace, no
   // extension. Two discounted purchases allowed per cycle, any order, any
   // time within the 7 days: the FIRST purchase used is ₦500 off, the
@@ -1791,8 +1925,8 @@
   // server-authoritative — computed in edge functions, never trusted from
   // the client. This object is just pricing/display config.
   const PREMIUM_PLANS = {
-    premium: { price: 1300, billing: 'week', cycleDays: 7, discountSlots: [300, 300, 300] }, // unlimited scan: 5 scans, 1hr cooldown, repeat
-    premium_lite: { price: 970, billing: 'week', cycleDays: 7, discountSlots: [166, 166, 166] } // 5 scans/day on Community Bonus, then locked out till next day
+    premium: { price: 1800, billing: 'week', cycleDays: 7, discountSlots: [300] }, // Community Bonus: 3 scans/day, guaranteed ₦100/day, 24hr lockout after 3rd scan
+    premium_lite: { price: 970, billing: '4 days', cycleDays: 4, discountSlots: [180] } // shorter/cheaper tier, same Community Bonus mechanic (3 scans/day, guaranteed ₦100/day)
   };
   let premDemoActive = false;    // is the demo blur/animation running
   let scanContext = 'reactivate'; // 'reactivate' (Boss/CEO cooldown scan) or 'activate' (one-time Boss trial scan)
@@ -1817,14 +1951,6 @@
   // waiting — even though that day is really just the day after Premium
   // expires, meaning the only way to actually get another discount is to
   // pay again. Nothing is ever unlocked for free on that day.
-  function nextDiscountDayLabel() {
-    if (!premiumExpiresAt) return 'soon';
-    const dayAfterExpiry = new Date(new Date(premiumExpiresAt).getTime() + 24 * 60 * 60 * 1000);
-    const weekday = dayAfterExpiry.toLocaleDateString('en-US', { weekday: 'long' });
-    const isTomorrow = dayAfterExpiry.toDateString() === new Date(Date.now() + 86400000).toDateString();
-    return isTomorrow ? 'tomorrow' : weekday;
-  }
-
   function rollDiscountAmount(planKey, isRealSubscriber) {
     const p = PREMIUM_PLANS[planKey] || PREMIUM_PLANS.premium;
     const slots = p.discountSlots; // [500, 300]
@@ -1997,6 +2123,8 @@
         if (typeof data.trialScansUsed !== 'undefined') { trialScansUsed = data.trialScansUsed; bossTrialAvailable = trialScansUsed < 5; }
         if (typeof data.cashbackScanCount !== 'undefined') cashbackScanCount = data.cashbackScanCount;
         if (typeof data.cashbackCooldownUntil !== 'undefined') cashbackCooldownUntil = data.cashbackCooldownUntil;
+        if (typeof data.lastPoolClaimAt !== 'undefined') lastPoolClaimAt = data.lastPoolClaimAt;
+        if (typeof data.poolFirstClaimUsed !== 'undefined') poolFirstClaimUsed = !!data.poolFirstClaimUsed;
         if (typeof data.poolBalance === 'number') {
           poolBalance = data.poolBalance;
           if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
@@ -2010,6 +2138,18 @@
           if (typeof renderMyCard === 'function') renderMyCard();
           premiumDiscountUsesLeft = typeof data.premiumDiscountUsesLeft === 'number' ? data.premiumDiscountUsesLeft : 0;
           premiumExpiresAt = data.premiumExpiresAt || null;
+          borrowCeiling = typeof data.borrowCeiling === 'number' ? data.borrowCeiling : 0;
+          borrowOwed = typeof data.borrowOwed === 'number' ? data.borrowOwed : 0;
+          borrowPrincipalOwed = typeof data.borrowPrincipalOwed === 'number' ? data.borrowPrincipalOwed : 0;
+          savingsNetwork = data.savingsNetwork ?? null;
+          savingsPlanId = data.savingsPlanId ?? null;
+          savingsPlanLabel = data.savingsPlanLabel ?? null;
+          savingsPlanDuration = data.savingsPlanDuration ?? null;
+          savingsPlanProvider = data.savingsPlanProvider ?? null;
+          savingsPlanPrice = data.savingsPlanPrice ?? null;
+          savingsTarget = data.savingsTarget ?? null;
+          savingsBalance = typeof data.savingsBalance === 'number' ? data.savingsBalance : 0;
+          if (typeof renderSavingsBubble === 'function') renderSavingsBubble();
           needsScanToActivate = premiumDiscountUsesLeft <= 0;
           renderPremiumProfileRow();
 
@@ -2148,6 +2288,8 @@
           if (typeof data.trialScansUsed !== 'undefined') { trialScansUsed = data.trialScansUsed; bossTrialAvailable = trialScansUsed < 5; }
           if (typeof data.cashbackScanCount !== 'undefined') cashbackScanCount = data.cashbackScanCount;
           if (typeof data.cashbackCooldownUntil !== 'undefined') cashbackCooldownUntil = data.cashbackCooldownUntil;
+          if (typeof data.lastPoolClaimAt !== 'undefined') lastPoolClaimAt = data.lastPoolClaimAt;
+          if (typeof data.poolFirstClaimUsed !== 'undefined') poolFirstClaimUsed = !!data.poolFirstClaimUsed;
 
           // Cashback pool balance — this was never being set on the
           // initial page-load path, so it silently stayed at its default
@@ -2167,6 +2309,18 @@
             if (typeof renderMyCard === 'function') renderMyCard();
             premiumDiscountUsesLeft = typeof data.premiumDiscountUsesLeft === 'number' ? data.premiumDiscountUsesLeft : 0;
             premiumExpiresAt = data.premiumExpiresAt || null;
+            borrowCeiling = typeof data.borrowCeiling === 'number' ? data.borrowCeiling : 0;
+            borrowOwed = typeof data.borrowOwed === 'number' ? data.borrowOwed : 0;
+            borrowPrincipalOwed = typeof data.borrowPrincipalOwed === 'number' ? data.borrowPrincipalOwed : 0;
+            savingsNetwork = data.savingsNetwork ?? null;
+            savingsPlanId = data.savingsPlanId ?? null;
+            savingsPlanLabel = data.savingsPlanLabel ?? null;
+            savingsPlanDuration = data.savingsPlanDuration ?? null;
+            savingsPlanProvider = data.savingsPlanProvider ?? null;
+            savingsPlanPrice = data.savingsPlanPrice ?? null;
+            savingsTarget = data.savingsTarget ?? null;
+            savingsBalance = typeof data.savingsBalance === 'number' ? data.savingsBalance : 0;
+            if (typeof renderSavingsBubble === 'function') renderSavingsBubble();
             premiumToggleOn = false;
             needsScanToActivate = premiumDiscountUsesLeft <= 0;
             setPremToggleUI(premiumToggleOn);
@@ -2179,16 +2333,29 @@
           renderBundles();
           fetchLeaderboardBadge();
           updateHistoryBadge();
-          fetchPendingGiftRequests();
-          // Defensive retry — on a true cold launch (vs. a refresh) this has
-          // shown up empty once before with no clear cause found yet; a
-          // second quiet check shortly after catches it either way.
-          setTimeout(fetchPendingGiftRequests, 2000);
           maybeShowFeedbackForRecentTxn();
         } else {
-          localStorage.removeItem('subsidi_userId');
-          localStorage.removeItem('subsidi_session_token');
-          show('reg-screen');
+          // get-user returned an error body (not a thrown fetch failure).
+          // This can be a transient DB/cold-start hiccup, not proof the
+          // account is gone — don't wipe the session over it. Treat like
+          // the catch-block path: stay logged in, retry shortly.
+          console.warn('[load] get-user returned error, retrying:', data && data.error);
+          userId = savedUserId;
+          isGuest = true;
+          show('dash');
+          updateSubsidyUI();
+          renderBundles();
+          fetchLeaderboardBadge();
+          setTimeout(async () => {
+            try {
+              const retryData = await callEdge('get-user', { userId: savedUserId });
+              if (retryData && !retryData.error) {
+                location.reload();
+              }
+            } catch (e2) {
+              console.error('[load] retry after get-user error failed:', e2);
+            }
+          }, 2000);
         }
       } catch(e) {
         console.error('[load] failed:', e);
@@ -2943,6 +3110,7 @@
   async function completePurchase(isPremiumPurchase) {
     const ph2 = document.getElementById('phinput').value || 'your number';
     document.getElementById('ov').classList.remove('open');
+    setTimeout(() => { const el = document.getElementById('ov'); if (el) el.style.display = 'none'; }, 300);
 
     if (!userId) return; // guests are gated before this point
 
@@ -3034,6 +3202,7 @@
     }
 
     document.getElementById('pin-buy-ov').classList.remove('open');
+    setTimeout(() => { const el = document.getElementById('pin-buy-ov'); if (el) el.style.display = 'none'; }, 300);
     // Reset subtitle back to default
     const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
     if (sub) sub.textContent = 'Confirm your identity to continue';
@@ -3094,6 +3263,7 @@
 
   function closePinBuy() {
     document.getElementById('pin-buy-ov').classList.remove('open');
+    setTimeout(() => { const el = document.getElementById('pin-buy-ov'); if (el) el.style.display = 'none'; }, 300);
     const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
     if (sub) sub.textContent = 'Confirm your identity to continue';
   }
@@ -3356,6 +3526,357 @@
     document.querySelectorAll('.net').forEach(b => b.classList.remove('sel'));
     el.classList.add('sel'); NET = n;
     renderBundles();
+  }
+
+  // ── Big-data savings: pick a random real plan on the given network,
+  // priced ₦5,000–₦9,000 (same base-price formula as renderBundles — 1%
+  // markup on wholesale cost, +₦500 pure profit if ≥ ₦7,000). Returns null
+  // if the network has nothing in range. ──
+  function pickRandomSavingsPlan(network) {
+    // PLANS keys aren't consistently cased (MTN, Airtel, Glo, '9mobile') while
+    // the picker passes upper-case codes (AIRTEL, GLO, 9MOBILE) — match
+    // case-insensitively so every network actually resolves, not just MTN.
+    const matchedKey = Object.keys(PLANS).find(
+      k => k.toUpperCase() === String(network).toUpperCase()
+    );
+    const netPlans = (matchedKey && PLANS[matchedKey]) || {};
+    const candidates = [];
+    ['daily', 'weekly', 'monthly'].forEach(cat => {
+      (netPlans[cat] || []).forEach(p => {
+        const basePrice = Math.round(p.ck * 1.01) + (Math.round(p.ck * 1.01) >= 7000 ? 500 : 0);
+        if (basePrice >= 5000 && basePrice <= 9000) {
+          candidates.push({
+            planId: p.planId,
+            planLabel: p.size,
+            planDuration: p.val,
+            provider: p.provider || 'ds',
+            origPrice: basePrice,
+            rawCk: p.ck,
+          });
+        }
+      });
+    });
+    if (candidates.length === 0) return null;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
+
+  // ── Big-data savings: bubble drag + tap ──
+  let savingsBubbleDragging = false;
+  let savingsBubbleMoved = false;
+  let savingsBubbleStartX = 0, savingsBubbleStartY = 0;
+  let savingsBubbleOffsetX = 0, savingsBubbleOffsetY = 0;
+
+  function savingsBubbleDown(e) {
+    if (isGuest) return; // logged-in feature only
+    const bubble = document.getElementById('savings-bubble');
+    if (!bubble) return;
+    savingsBubbleDragging = true;
+    savingsBubbleMoved = false;
+    const rect = bubble.getBoundingClientRect();
+    savingsBubbleOffsetX = e.clientX - rect.left;
+    savingsBubbleOffsetY = e.clientY - rect.top;
+    savingsBubbleStartX = e.clientX;
+    savingsBubbleStartY = e.clientY;
+    bubble.style.animation = 'none';
+    try { bubble.setPointerCapture(e.pointerId); } catch (err) {}
+    bubble.addEventListener('pointermove', savingsBubbleMove);
+    bubble.addEventListener('pointerup', savingsBubbleUp);
+    bubble.addEventListener('pointercancel', savingsBubbleUp);
+  }
+
+  function savingsBubbleMove(e) {
+    if (!savingsBubbleDragging) return;
+    const bubble = document.getElementById('savings-bubble');
+    if (!bubble) return;
+    const dx = e.clientX - savingsBubbleStartX;
+    const dy = e.clientY - savingsBubbleStartY;
+    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) savingsBubbleMoved = true;
+    if (!savingsBubbleMoved) return;
+    const size = bubble.offsetWidth;
+    let newLeft = e.clientX - savingsBubbleOffsetX;
+    let newTop = e.clientY - savingsBubbleOffsetY;
+    newLeft = Math.max(4, Math.min(window.innerWidth - size - 4, newLeft));
+    newTop = Math.max(4, Math.min(window.innerHeight - size - 4, newTop));
+    bubble.style.left = newLeft + 'px';
+    bubble.style.top = newTop + 'px';
+    bubble.style.right = 'auto';
+    bubble.style.bottom = 'auto';
+  }
+
+  function savingsBubbleUp(e) {
+    const bubble = document.getElementById('savings-bubble');
+    if (bubble) {
+      bubble.style.animation = 'savingsBubbleFloat 2.6s ease-in-out infinite';
+      bubble.removeEventListener('pointermove', savingsBubbleMove);
+      bubble.removeEventListener('pointerup', savingsBubbleUp);
+      bubble.removeEventListener('pointercancel', savingsBubbleUp);
+      try { bubble.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+    savingsBubbleDragging = false;
+    if (!savingsBubbleMoved) openSavingsOv();
+    savingsBubbleMoved = false;
+  }
+
+  // ── Big-data savings: sheet open/close + render ──
+  let savingsOvOpenedAt = 0;
+  function openSavingsOv() {
+    savingsOvOpenedAt = Date.now();
+    renderSavingsBubble();
+    const ov = document.getElementById('savings-ov');
+    if (ov) { ov.style.display = 'flex'; requestAnimationFrame(() => ov.classList.add('open')); }
+  }
+
+  function closeSavingsOv(e) {
+    // Ignore the browser's synthetic click that follows the same pointerup
+    // which just opened this overlay — otherwise it closes instantly.
+    if (Date.now() - savingsOvOpenedAt < 350) return;
+    if (e && e.target !== document.getElementById('savings-ov')) return;
+    const ov = document.getElementById('savings-ov');
+    if (ov) { ov.classList.remove('open'); setTimeout(() => { ov.style.display = 'none'; }, 300); }
+    const addForm = document.getElementById('savings-add-form');
+    const collectForm = document.getElementById('savings-collect-form');
+    if (addForm) addForm.style.display = 'none';
+    if (collectForm) collectForm.style.display = 'none';
+  }
+
+  function renderSavingsBubble() {
+    const picker = document.getElementById('savings-panel-picker');
+    const progress = document.getElementById('savings-panel-progress');
+    const confirmPanel = document.getElementById('savings-panel-confirm');
+    if (!picker || !progress) return;
+    if (confirmPanel) confirmPanel.style.display = 'none';
+    pendingSavingsNetwork = null;
+    pendingSavingsNetworkLabel = null;
+
+    if (!savingsPlanId) {
+      picker.style.display = 'block';
+      progress.style.display = 'none';
+      return;
+    }
+
+    picker.style.display = 'none';
+    progress.style.display = 'block';
+
+    const labelEl = document.getElementById('savings-plan-label');
+    if (labelEl) labelEl.textContent = savingsPlanLabel || '';
+
+    const target = savingsTarget || 0;
+    const current = savingsBalance || 0;
+    const pct = target > 0 ? Math.min(100, (current / target) * 100) : 0;
+
+    const bar = document.getElementById('savings-progress-bar');
+    if (bar) bar.style.width = pct + '%';
+
+    const currentLabel = document.getElementById('savings-current-label');
+    if (currentLabel) {
+      const whole = Math.floor(current).toLocaleString();
+      const dec = (current % 1).toFixed(2).slice(1);
+      currentLabel.textContent = '₦' + whole + dec;
+    }
+
+    const targetLabel = document.getElementById('savings-target-label');
+    if (targetLabel) targetLabel.textContent = '₦' + Math.round(target).toLocaleString();
+
+    const collectBtn = document.getElementById('savings-collect-btn');
+    if (collectBtn) {
+      const ready = target > 0 && current >= target;
+      collectBtn.style.opacity = ready ? '1' : '.4';
+      collectBtn.style.pointerEvents = ready ? 'auto' : 'none';
+    }
+  }
+
+  // ── Big-data savings: network selection → starts a new goal ──
+  let pendingSavingsNetwork = null;
+  let pendingSavingsNetworkLabel = null;
+
+  function confirmSavingsNetwork(network, label) {
+    pendingSavingsNetwork = network;
+    pendingSavingsNetworkLabel = label;
+    const lbl = document.getElementById('savings-confirm-network-label');
+    if (lbl) lbl.textContent = label;
+    const picker = document.getElementById('savings-panel-picker');
+    const confirmPanel = document.getElementById('savings-panel-confirm');
+    if (picker) picker.style.display = 'none';
+    if (confirmPanel) confirmPanel.style.display = 'block';
+  }
+
+  function cancelSavingsNetworkConfirm() {
+    pendingSavingsNetwork = null;
+    pendingSavingsNetworkLabel = null;
+    const picker = document.getElementById('savings-panel-picker');
+    const confirmPanel = document.getElementById('savings-panel-confirm');
+    if (confirmPanel) confirmPanel.style.display = 'none';
+    if (picker) picker.style.display = 'block';
+  }
+
+  async function finalizeSavingsNetwork() {
+    if (!pendingSavingsNetwork) return;
+    const network = pendingSavingsNetwork;
+    const confirmPanel = document.getElementById('savings-panel-confirm');
+    const picker = document.getElementById('savings-panel-picker');
+    await chooseSavingsNetwork(network);
+    // On success chooseSavingsNetwork swaps the sheet to the progress view via
+    // renderSavingsBubble(); on failure (e.g. no eligible plan), fall back to
+    // the picker so the error message is visible.
+    if (confirmPanel) confirmPanel.style.display = 'none';
+    if (!savingsPlanId && picker) picker.style.display = 'block';
+    pendingSavingsNetwork = null;
+    pendingSavingsNetworkLabel = null;
+  }
+
+  async function chooseSavingsNetwork(network) {
+    const errEl = document.getElementById('savings-picker-err');
+    if (errEl) errEl.textContent = '';
+    const picked = pickRandomSavingsPlan(network);
+    if (!picked) {
+      if (errEl) errEl.textContent = 'No eligible plans found for ' + network + ' right now — try another network.';
+      return;
+    }
+    let data;
+    try {
+      data = await callEdge('savings-start-goal', {
+        userId,
+        network,
+        planId: picked.planId,
+        planLabel: picked.planLabel,
+        planDuration: picked.planDuration,
+        provider: picked.provider,
+        origPrice: picked.origPrice,
+        rawCk: picked.rawCk,
+      });
+    } catch (e) {
+      data = { error: 'Something went wrong — try again.' };
+    }
+    if (!data || data.error) {
+      if (errEl) errEl.textContent = (data && data.error) || 'Could not start this goal — try again.';
+      return;
+    }
+    savingsNetwork = network;
+    savingsPlanId = picked.planId;
+    savingsPlanLabel = picked.planLabel;
+    savingsPlanDuration = picked.planDuration;
+    savingsPlanProvider = picked.provider;
+    savingsPlanPrice = picked.origPrice;
+    savingsTarget = data.target;
+    savingsBalance = data.balance;
+    renderSavingsBubble();
+  }
+
+  // ── Big-data savings: Add Money (wallet → savings) ──
+  function openSavingsAddMoney() {
+    const form = document.getElementById('savings-add-form');
+    if (form) form.style.display = 'block';
+    const input = document.getElementById('savings-add-input');
+    if (input) { input.value = ''; input.focus(); }
+    const err = document.getElementById('savings-add-err');
+    if (err) err.textContent = '';
+    onSavingsAddInput('');
+  }
+
+  function onSavingsAddInput(value) {
+    const btn = document.getElementById('savings-add-confirm-btn');
+    const amt = parseFloat(value);
+    const valid = amt > 0 && amt <= balance;
+    if (btn) {
+      btn.style.opacity = valid ? '1' : '.4';
+      btn.style.pointerEvents = valid ? 'auto' : 'none';
+    }
+  }
+
+  async function confirmSavingsAddMoney() {
+    const input = document.getElementById('savings-add-input');
+    const err = document.getElementById('savings-add-err');
+    const btn = document.getElementById('savings-add-confirm-btn');
+    const amt = parseFloat(input && input.value);
+    if (!amt || amt <= 0) return;
+    if (err) err.textContent = '';
+    const originalText = btn ? btn.textContent : '';
+    if (btn) { btn.textContent = 'Adding...'; btn.style.pointerEvents = 'none'; }
+
+    let data;
+    try {
+      data = await callEdge('savings-add-money', { userId, amount: amt });
+    } catch (e) {
+      data = { error: 'Something went wrong' };
+    }
+
+    if (!data || data.error) {
+      if (btn) { btn.textContent = originalText; btn.style.pointerEvents = 'auto'; }
+      if (err) err.textContent = (data && data.error) || 'Could not add money right now.';
+      return;
+    }
+
+    const balanceBefore = balance;
+    const savingsBefore = savingsBalance;
+    if (typeof animateBalanceNumber === 'function') {
+      await animateBalanceNumber(balanceBefore, data.newDashboardBalance, 700, (v) => {
+        balance = v;
+        if (typeof _paintMainBalance === 'function') _paintMainBalance(v);
+      });
+      await animateBalanceNumber(savingsBefore, data.newSavingsBalance, 700, (v) => {
+        savingsBalance = v;
+        renderSavingsBubble();
+      });
+    } else {
+      balance = data.newDashboardBalance;
+      savingsBalance = data.newSavingsBalance;
+      renderSavingsBubble();
+    }
+
+    const form = document.getElementById('savings-add-form');
+    if (form) form.style.display = 'none';
+    if (btn) { btn.textContent = originalText; btn.style.pointerEvents = 'auto'; }
+    fetchUserData();
+  }
+
+  // ── Big-data savings: Collect (deliver the plan, reset for next goal) ──
+  function openSavingsCollect() {
+    const form = document.getElementById('savings-collect-form');
+    if (form) form.style.display = 'block';
+    const err = document.getElementById('savings-collect-err');
+    if (err) err.textContent = '';
+  }
+
+  async function confirmSavingsCollect() {
+    const phoneInput = document.getElementById('savings-collect-phone');
+    const err = document.getElementById('savings-collect-err');
+    const btn = document.getElementById('savings-collect-confirm-btn');
+    const phone = phoneInput && phoneInput.value.trim();
+    if (!phone) {
+      if (err) err.textContent = 'Enter a phone number.';
+      return;
+    }
+    if (err) err.textContent = '';
+    const originalText = btn ? btn.textContent : '';
+    if (btn) { btn.textContent = 'Collecting...'; btn.style.pointerEvents = 'none'; }
+
+    let data;
+    try {
+      data = await callEdge('savings-collect', { userId, phoneNumber: phone });
+    } catch (e) {
+      data = { error: 'Something went wrong' };
+    }
+
+    if (!data || data.error) {
+      if (btn) { btn.textContent = originalText; btn.style.pointerEvents = 'auto'; }
+      if (err) err.textContent = (data && data.error) || 'Could not collect right now.';
+      return;
+    }
+
+    const deliveredLabel = savingsPlanLabel;
+    closeSavingsOv();
+    savingsPlanId = null;
+    savingsPlanLabel = null;
+    savingsPlanDuration = null;
+    savingsPlanProvider = null;
+    savingsPlanPrice = null;
+    savingsTarget = null;
+    savingsBalance = data.newSavingsBalance ?? 300;
+    if (btn) { btn.textContent = originalText; btn.style.pointerEvents = 'auto'; }
+    if (typeof showPremStatusPopup === 'function') {
+      showPremStatusPopup('Data Delivered! 🎉', 'Your ' + (deliveredLabel || '') + ' plan is on its way to ' + phone + '.');
+    }
+    fetchUserData();
   }
 
   // ── Tab switcher ──
@@ -3820,442 +4341,6 @@
   }
 
   // ══════════════════════════════════════════════════════════════════
-  // GET GIFT — wired to the real backend. Requires 4 edge functions:
-  // search-gift-user, create-gift-request, get-gift-requests,
-  // respond-gift-request.
-  // ══════════════════════════════════════════════════════════════════
-
-  const GIFT_MIN = 50;
-  const GIFT_MAX = 1000;
-
-  let pendingGiftRequests = []; // [{ id, name, amount, created_at }] — incoming, from get-gift-requests
-  let myGiftRequests = []; // [{ id, name, amount, created_at, status }] — outgoing (mine), from get-gift-requests
-  let giftResolvedRecipient = null; // { userId, username } — set only once search finds a real match
-
-  function openGetGiftSheet() {
-    if (gateCheck('Get Gift', 'Create a free account to request gifts from other users.')) return;
-    document.getElementById('gift-phone-input').value = '';
-    document.getElementById('gift-amount-input').value = '';
-    document.getElementById('gift-amount-err').textContent = '';
-    document.getElementById('gift-search-results').innerHTML = '';
-    giftResolvedRecipient = null;
-    setGiftOvPanel(0);
-    document.getElementById('gift-ov').classList.add('open');
-    fetchPendingGiftRequests(); // keeps the "My Requests" tab/count fresh
-  }
-
-  function closeGiftOv(e) {
-    if (e.target === document.getElementById('gift-ov')) document.getElementById('gift-ov').classList.remove('open');
-  }
-
-  // Live search — starts showing candidates from 3 digits in and keeps
-  // narrowing as more are typed, so you don't have to type the whole
-  // number before you can pick from the list. Debounced so it's not
-  // firing a network call on every single keystroke.
-  let giftSearchInFlight = 0;
-  let giftSearchDebounce = null;
-
-  function renderGiftSearchResults(query) {
-    const box = document.getElementById('gift-search-results');
-    const digits = (query || '').replace(/\D/g, '');
-    giftResolvedRecipient = null;
-
-    clearTimeout(giftSearchDebounce);
-
-    if (digits.length < 3) {
-      box.innerHTML = '';
-      return;
-    }
-
-    box.innerHTML = '<div style="text-align:center;color:var(--w40);font-size:13px;padding:10px 0;">Searching...</div>';
-    giftSearchDebounce = setTimeout(() => runGiftSearch(digits), 300);
-  }
-
-  async function runGiftSearch(digits) {
-    const box = document.getElementById('gift-search-results');
-    const thisSearch = ++giftSearchInFlight;
-
-    let result = null;
-    try {
-      result = await callEdge('search-gift-user', { phone: digits, requesterId: userId });
-    } catch (e) {
-      console.warn('[gift] search failed:', e);
-    }
-    if (thisSearch !== giftSearchInFlight) return; // a newer search superseded this one
-
-    const matches = (result && result.results) || [];
-    if (!matches.length) {
-      box.innerHTML = '<div style="text-align:center;color:var(--w40);font-size:13px;padding:10px 0;">No matching Subsidi users.</div>';
-      return;
-    }
-
-    window._giftSearchMatches = matches;
-    box.innerHTML = matches.map((u, i) =>
-      '<div onclick="selectGiftSearchResult(' + i + ')" style="display:flex;align-items:center;gap:10px;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:10px 14px;cursor:pointer;">' +
-        '<div style="width:32px;height:32px;border-radius:50%;background:var(--dark-4);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--w70);flex-shrink:0;font-size:13px;">' + u.username.charAt(0).toUpperCase() + '</div>' +
-        '<div style="flex:1;"><div style="font-weight:700;color:#fff;font-size:13px;">' + u.username + '</div><div style="color:var(--w40);font-size:12px;">' + u.phone + '</div></div>' +
-      '</div>'
-    ).join('');
-  }
-
-  function selectGiftSearchResult(i) {
-    const u = window._giftSearchMatches[i];
-    if (!u) return;
-    giftResolvedRecipient = { userId: u.userId, username: u.username };
-    document.getElementById('gift-phone-input').value = u.phone;
-    const box = document.getElementById('gift-search-results');
-    box.innerHTML =
-      '<div style="display:flex;align-items:center;gap:10px;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:10px 14px;">' +
-        '<div style="width:32px;height:32px;border-radius:50%;background:var(--dark-4);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--w70);flex-shrink:0;font-size:13px;">' + u.username.charAt(0).toUpperCase() + '</div>' +
-        '<div style="flex:1;"><div style="font-weight:700;color:#fff;font-size:13px;">' + u.username + '</div><div style="color:var(--w40);font-size:12px;">Selected</div></div>' +
-      '</div>';
-  }
-
-  // Opens the real premium subscription sheet (plan cards + benefits +
-  // "Unlock Premium" payment button) — the same one used everywhere else
-  // in the app.
-  function promptPremiumPlansForGift() {
-    showPremUnlockSheet();
-  }
-
-  // Replaces the ugly native alert() popup everywhere in this feature with
-  // something that actually matches the app's look.
-  function showGiftMessage(text, isError) {
-    const popId = 'gift-msg-pop';
-    const existing = document.getElementById(popId);
-    if (existing) existing.remove();
-    const pop = document.createElement('div');
-    pop.id = popId;
-    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:700;display:flex;align-items:center;justify-content:center;padding:24px;';
-    pop.innerHTML =
-      '<div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;">' +
-        '<div style="font-size:32px;margin-bottom:12px;">' + (isError ? '⚠️' : '🎉') + '</div>' +
-        '<div style="font-size:15px;font-weight:700;color:' + (isError ? '#ff6b6b' : '#fff') + ';margin-bottom:20px;line-height:1.5;">' + text + '</div>' +
-        '<button onclick="document.getElementById(\'' + popId + '\').remove();" style="width:100%;padding:14px;background:' + (isError ? 'var(--dark-4)' : '#F5A623') + ';border:' + (isError ? '1px solid var(--border)' : 'none') + ';border-radius:14px;color:' + (isError ? 'var(--w70)' : '#000') + ';font-size:14px;font-weight:800;cursor:pointer;">OK</button>' +
-      '</div>';
-    document.body.appendChild(pop);
-    pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
-  }
-
-  async function submitGiftRequest() {
-    const errEl = document.getElementById('gift-amount-err');
-    const amt = parseInt(document.getElementById('gift-amount-input').value, 10);
-
-    if (!giftResolvedRecipient) {
-      errEl.textContent = 'Search and confirm a Subsidi user first';
-      return;
-    }
-    if (!amt || amt < GIFT_MIN || amt > GIFT_MAX) {
-      errEl.textContent = 'Amount must be between ₦' + GIFT_MIN + ' and ₦' + GIFT_MAX;
-      return;
-    }
-
-    // No client-side premium gate here anymore — everyone gets 3 free
-    // lifetime requests before Premium is actually required, and only the
-    // server (create-gift-request) knows that count. If they've genuinely
-    // used up their free requests and aren't Premium, the server sends back
-    // "Premium required" below and we redirect then.
-    errEl.textContent = '';
-    showSpinner('Sending request...');
-    let result = null;
-    try {
-      result = await callEdge('create-gift-request', {
-        requesterId: userId,
-        recipientId: giftResolvedRecipient.userId,
-        amount: amt,
-      });
-    } catch (e) {
-      console.error('[gift] create-gift-request failed:', e);
-    }
-    hideSpinner();
-
-    if (result && result.success) {
-      document.getElementById('gift-ov').classList.remove('open');
-      showGiftMessage('Request sent to ' + giftResolvedRecipient.username + ' for ₦' + amt.toLocaleString() + '.');
-      fetchPendingGiftRequests(); // so "My Requests" reflects it right away
-    } else if (result && result.error === 'Premium required') {
-      // Cached premiumUnlocked was stale — server is the real authority.
-      document.getElementById('gift-ov').classList.remove('open');
-      promptPremiumPlansForGift();
-    } else {
-      errEl.textContent = (result && result.error) || 'Something went wrong, try again.';
-    }
-  }
-
-  function giftLastSeenKey() {
-    return 'subsidi_gift_last_seen_' + userId;
-  }
-
-  // Unseen incoming = requests that arrived since the bubble was last
-  // opened. This is what the bubble's badge NUMBER shows and clears on
-  // open — the bubble now only tracks incoming ("For You") requests.
-  // My Requests moved into the Get Gift sheet, so it no longer factors
-  // into the bubble at all.
-  function giftUnseenCount() {
-    const lastSeen = localStorage.getItem(giftLastSeenKey());
-    if (!lastSeen) return pendingGiftRequests.length;
-    return pendingGiftRequests.filter(r => new Date(r.created_at) > new Date(lastSeen)).length;
-  }
-
-  // Pulls both incoming and outgoing requests from the server — call on
-  // load, after opening the bubble or Get Gift sheet, and after
-  // responding to/collecting one.
-  async function fetchPendingGiftRequests() {
-    if (!userId || isGuest) return;
-    try {
-      const result = await callEdge('get-gift-requests', { userId });
-      if (result && result.success) {
-        pendingGiftRequests = result.incoming || [];
-        myGiftRequests = result.mine || [];
-        updateGiftBubble();
-        updateGiftMineCount();
-      }
-    } catch (e) {
-      console.warn('[gift] fetchPendingGiftRequests failed:', e);
-    }
-  }
-
-  function updateGiftBubble() {
-    const bubble = document.getElementById('gift-bubble');
-    const countEl = document.getElementById('gift-bubble-count');
-    const unseen = giftUnseenCount();
-
-    if (pendingGiftRequests.length > 0) {
-      if (bubble.style.display !== 'flex' && typeof window.resetGiftBubblePosition === 'function') {
-        window.resetGiftBubblePosition();
-      }
-      bubble.style.display = 'flex';
-      if (unseen > 0) {
-        countEl.style.display = 'flex';
-        countEl.textContent = unseen > 9 ? '9+' : String(unseen);
-      } else {
-        countEl.style.display = 'none';
-      }
-    } else {
-      bubble.style.display = 'none';
-    }
-  }
-
-  // The Get Gift button's own badge — shows how many outgoing requests are
-  // ready to Collect right now (status 'sent'). Always accurate the moment
-  // data refreshes, no separate seen/unseen tracking needed here since the
-  // number itself IS "how many need collecting."
-  function updateGiftMineCount() {
-    const collectable = myGiftRequests.filter(r => r.status === 'sent').length;
-
-    const giftBadge = document.getElementById('gift-badge');
-    if (giftBadge) {
-      giftBadge.textContent = collectable > 9 ? '9+' : String(collectable);
-      giftBadge.classList.toggle('show', collectable > 0);
-    }
-
-    const tabLabel = document.getElementById('gift-mine-count-label');
-    if (tabLabel) {
-      tabLabel.textContent = myGiftRequests.length > 0 ? ' (' + myGiftRequests.length + ')' : '';
-    }
-  }
-
-  function renderGiftRequestsList() {
-    const box = document.getElementById('gift-requests-list');
-    if (!pendingGiftRequests.length) {
-      box.innerHTML = '<div style="text-align:center;color:var(--w40);font-size:13px;padding:16px 0;">No pending requests.</div>';
-      return;
-    }
-    box.innerHTML = pendingGiftRequests.map(req =>
-      '<div style="background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:12px 14px;">' +
-        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">' +
-          '<div style="width:36px;height:36px;border-radius:50%;background:var(--dark-4);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--w70);flex-shrink:0;">' + req.name.charAt(0).toUpperCase() + '</div>' +
-          '<div style="flex:1;"><div style="font-weight:700;color:#fff;font-size:14px;">' + req.name + '</div><div style="color:var(--w40);font-size:12px;">wants ₦' + req.amount.toLocaleString() + '</div></div>' +
-        '</div>' +
-        '<div style="display:flex;gap:8px;">' +
-          '<button onclick="declineGiftRequest(\'' + req.id + '\')" style="flex:1;padding:10px;background:var(--dark-4);border:1px solid var(--border);border-radius:12px;color:var(--w70);font-size:13px;font-weight:700;cursor:pointer;">Decline</button>' +
-          '<button onclick="sendGiftRequest(\'' + req.id + '\')" style="flex:1;padding:10px;background:#F5A623;border:none;border-radius:12px;color:#000;font-size:13px;font-weight:800;cursor:pointer;">Send ₦' + req.amount.toLocaleString() + '</button>' +
-        '</div>' +
-      '</div>'
-    ).join('');
-  }
-
-  function renderMyGiftRequestsList() {
-    const box = document.getElementById('my-gift-requests-list');
-    if (!myGiftRequests.length) {
-      box.innerHTML = '<div style="text-align:center;color:var(--w40);font-size:13px;padding:16px 0;">No outgoing requests.</div>';
-      return;
-    }
-    box.innerHTML = myGiftRequests.map(req => {
-      const actionHtml = req.status === 'sent'
-        ? '<button onclick="collectGiftRequest(\'' + req.id + '\')" style="flex-shrink:0;padding:9px 14px;background:#F5A623;border:none;border-radius:12px;color:#000;font-size:13px;font-weight:800;cursor:pointer;">Collect ₦' + req.amount.toLocaleString() + '</button>'
-        : '<div style="flex-shrink:0;padding:9px 4px;color:var(--w40);font-size:12px;font-weight:700;">Waiting...</div>';
-      return '<div style="display:flex;align-items:center;gap:10px;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:10px 14px;">' +
-        '<div style="width:32px;height:32px;border-radius:50%;background:var(--dark-4);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--w70);flex-shrink:0;font-size:13px;">' + req.name.charAt(0).toUpperCase() + '</div>' +
-        '<div style="flex:1;"><div style="font-weight:700;color:#fff;font-size:13px;">' + req.name + '</div><div style="color:var(--w40);font-size:12px;">requested ₦' + req.amount.toLocaleString() + '</div></div>' +
-        actionHtml +
-      '</div>';
-    }).join('');
-  }
-
-  async function sendGiftRequest(id) {
-    const req = pendingGiftRequests.find(r => r.id === id);
-    if (!req) return;
-    if (balance < req.amount) {
-      showGiftMessage('Insufficient balance to send this gift.', true);
-      return;
-    }
-
-    let result = null;
-    try {
-      result = await callEdge('respond-gift-request', { requestId: id, responderId: userId, action: 'send' });
-    } catch (e) {
-      console.error('[gift] respond-gift-request (send) failed:', e);
-    }
-
-    if (!result || !result.success) {
-      showGiftMessage((result && result.error) || 'Something went wrong sending this gift, try again.', true);
-      return;
-    }
-
-    // This debits YOUR balance right away — the recipient still has to
-    // scan their card to actually collect it, at which point their
-    // balance goes up. That's why only your own balance updates here.
-    if (typeof result.newBalance === 'number') {
-      balance = result.newBalance;
-      const whole = Math.floor(balance).toLocaleString();
-      const dec = (balance % 1).toFixed(2).slice(1);
-      const balHtml = '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-      document.getElementById('bal-display').innerHTML = balHtml;
-      const balRepeatEl = document.getElementById('bal-display-repeat');
-      if (balRepeatEl) balRepeatEl.innerHTML = balHtml;
-    } else {
-      await fetchUserData(); // fallback: refetch balance from DB if it wasn't returned directly
-    }
-
-    pendingGiftRequests = pendingGiftRequests.filter(r => r.id !== id);
-    updateGiftBubble();
-    renderGiftRequestsList();
-    showGiftMessage('₦' + req.amount.toLocaleString() + ' sent to ' + req.name + '.');
-  }
-
-  // The requester's side of collecting a gift that's been sent — this is
-  // the actual moment their balance goes up, triggered by a REAL card scan
-  // (the same camera+QR flow used for Premium activation), not a fake delay.
-  let scanTargetGiftRequest = null;
-  function collectGiftRequest(id) {
-    const req = myGiftRequests.find(r => r.id === id);
-    if (!req) return;
-    scanTargetGiftRequest = req;
-    openFreeScan('collect-gift');
-  }
-
-  async function declineGiftRequest(id) {
-    try {
-      await callEdge('respond-gift-request', { requestId: id, responderId: userId, action: 'decline' });
-    } catch (e) {
-      console.warn('[gift] respond-gift-request (decline) failed:', e);
-    }
-    pendingGiftRequests = pendingGiftRequests.filter(r => r.id !== id);
-    updateGiftBubble();
-    renderGiftRequestsList();
-  }
-
-  async function openGiftRequestsList() {
-    document.getElementById('gift-requests-ov').classList.add('open');
-    await fetchPendingGiftRequests(); // refresh in case anything changed since the badge last updated
-    localStorage.setItem(giftLastSeenKey(), new Date().toISOString());
-    updateGiftBubble();
-    renderGiftRequestsList();
-  }
-
-  function closeGiftRequestsOv(e) {
-    if (e.target === document.getElementById('gift-requests-ov')) document.getElementById('gift-requests-ov').classList.remove('open');
-  }
-
-  // ── Tab toggle between "New Request" and "My Requests" inside the Get Gift sheet ──
-  function setGiftOvPanel(idx) {
-    const newPanel = document.getElementById('gift-ov-panel-new');
-    const minePanel = document.getElementById('gift-ov-panel-mine');
-    const newTab = document.getElementById('gift-ov-tab-new');
-    const mineTab = document.getElementById('gift-ov-tab-mine');
-    if (!newPanel || !minePanel || !newTab || !mineTab) return;
-
-    newPanel.style.display = idx === 0 ? '' : 'none';
-    minePanel.style.display = idx === 1 ? '' : 'none';
-    newTab.style.color = idx === 0 ? '#fff' : 'var(--w40)';
-    newTab.style.borderBottomColor = idx === 0 ? '#F5A623' : 'transparent';
-    mineTab.style.color = idx === 1 ? '#fff' : 'var(--w40)';
-    mineTab.style.borderBottomColor = idx === 1 ? '#F5A623' : 'transparent';
-
-    if (idx === 1) renderMyGiftRequestsList();
-  }
-
-  // ── Draggable bubble ──
-  // Distinguishes a tap (opens the list) from a drag (repositions the
-  // bubble) using a small movement threshold, same idea used for the
-  // balance-card swipe elsewhere in the app.
-  (function setupGiftBubbleDrag() {
-    const bubble = document.getElementById('gift-bubble');
-    let dragging = false, moved = false, startX = 0, startY = 0, origX = 0, origY = 0;
-
-    function pointerDown(x, y) {
-      dragging = true; moved = false;
-      startX = x; startY = y;
-      const rect = bubble.getBoundingClientRect();
-      origX = rect.left; origY = rect.top;
-      bubble.style.right = 'auto';
-      bubble.style.bottom = 'auto';
-      bubble.style.left = origX + 'px';
-      bubble.style.top = origY + 'px';
-    }
-    function pointerMove(x, y) {
-      if (!dragging) return;
-      const dx = x - startX, dy = y - startY;
-      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) moved = true;
-      let newLeft = origX + dx;
-      let newTop = origY + dy;
-      newLeft = Math.max(4, Math.min(window.innerWidth - 56, newLeft));
-      newTop = Math.max(4, Math.min(window.innerHeight - 56, newTop));
-      bubble.style.left = newLeft + 'px';
-      bubble.style.top = newTop + 'px';
-    }
-    function pointerUp(e) {
-      if (dragging && moved) {
-        // It was a drag, not a tap — swallow the click that would otherwise
-        // fire and open the requests list right after dragging.
-        e.stopPropagation();
-        e.preventDefault();
-      }
-      dragging = false;
-    }
-
-    bubble.addEventListener('touchstart', e => { const t = e.touches[0]; pointerDown(t.clientX, t.clientY); }, { passive: true });
-    bubble.addEventListener('touchmove', e => { const t = e.touches[0]; pointerMove(t.clientX, t.clientY); }, { passive: true });
-    bubble.addEventListener('touchend', pointerUp);
-
-    bubble.addEventListener('mousedown', e => pointerDown(e.clientX, e.clientY));
-    document.addEventListener('mousemove', e => pointerMove(e.clientX, e.clientY));
-    document.addEventListener('mouseup', pointerUp);
-
-    // Default starting position: right next to the "Network" section
-    // label, matching the requested screenshot — anchored to that actual
-    // element rather than a guessed pixel value, so it lands in the same
-    // visual spot regardless of balance digit length or other layout shifts
-    // above it. Falls back to a fixed position if that element isn't
-    // there for some reason.
-    function setGiftBubbleDefaultPosition() {
-      const anchor = document.getElementById('network-sec-title');
-      if (anchor) {
-        const rect = anchor.getBoundingClientRect();
-        bubble.style.right = '20px';
-        bubble.style.left = 'auto';
-        bubble.style.top = Math.max(8, rect.top - 12) + 'px';
-        bubble.style.bottom = 'auto';
-      } else {
-        bubble.style.right = '20px';
-        bubble.style.bottom = '90px';
-      }
-    }
-    setGiftBubbleDefaultPosition();
-    window.addEventListener('resize', setGiftBubbleDefaultPosition);
-    window.resetGiftBubblePosition = setGiftBubbleDefaultPosition;
-  })();
 
   // ── Standalone / Replacement Card Order ──
   // Anyone can buy the physical card on its own for ₦3,000, premium or not.
@@ -4622,6 +4707,13 @@
   // Kept as a thin function so existing call sites don't need updating.
   function updateSubsidyUI() {
     renderBundles();
+    updateSavingsBubbleVisibility();
+  }
+
+  // Savings bubble is a logged-in-only feature — hide it entirely for guests.
+  function updateSavingsBubbleVisibility() {
+    const bubble = document.getElementById('savings-bubble');
+    if (bubble) bubble.style.display = isGuest ? 'none' : 'flex';
   }
 
 
@@ -4891,15 +4983,6 @@
 
   applyBalanceVisibility();</script>
 
-<!-- GET GIFT (floating) -->
-<div class="wa-bell" id="get-gift-bell" onclick="if(gateCheck('Get Gift', 'Create a free account to request gifts from other users.'))return;openGetGiftSheet()">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--p)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/>
-    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
-  </svg>
-  <span class="wa-bell-label">Get Gift</span>
-  <span id="gift-badge" class="ni-badge" style="top:-6px;right:-6px;">0</span>
-</div>
 
 <!-- WHATSAPP SHEET -->
 <div class="wa-sheet-bg" id="wa-sheet-bg" onclick="if(event.target===this)closeWaSheet()">
@@ -4953,7 +5036,7 @@
   const FAQ_ITEMS = [
     {
       q: "What is Subsidi?",
-      a: "Subsidi is a membership that gets you mobile data cheaper than market price. New users get ₦100 free from the Community Bonus, no payment required. Premium starts at ₦970/week and gets you discounted purchases every week, plus scans to win from the Community Bonus — higher tiers unlock more scans."
+      a: "Subsidi is a membership that gets you mobile data cheaper than market price. New users get ₦100 free from the Community Bonus, no payment required. Premium starts at ₦970 and gets you discounted purchases plus 3 scans a day to win from the Community Bonus, guaranteeing ₦100 every day you're subscribed."
     },
     {
       q: "How do I keep my discount active?",
@@ -5058,7 +5141,9 @@
     PREM_PLAN_ORDER.forEach(p => {
       const cardBtn = document.getElementById('prem-btn-' + p);
       if (!cardBtn) return;
-      const priceDiv = cardBtn.children[1];
+      const priceDiv = document.getElementById('prem-price-' + p);
+      const planInfo = PREMIUM_PLANS[p] || PREMIUM_PLANS.premium;
+      if (priceDiv) priceDiv.innerHTML = '₦' + planInfo.price.toLocaleString() + '<span style="font-size:12px;font-weight:700;">/' + planInfo.billing + '</span>';
       if (p === plan) {
         const style = PREM_PLAN_STYLE[p].active;
         cardBtn.style.background = style.bg;
@@ -5089,7 +5174,7 @@
         btn.style.background = s.btnGradient;
         btn.style.color = s.btnText;
         btn.style.cursor = 'pointer';
-        btn.textContent = 'Unlock Premium — ' + PREM_PLAN_LABEL[plan];
+        btn.textContent = 'Unlock Premium';
         btn.setAttribute('onclick', "payPremiumUnlock('" + plan + "')");
         btn.classList.remove('trial-glow');
       }
@@ -5194,11 +5279,10 @@
         renderBundles();
         return;
       }
-      // Turning on — gated purely by how many of this cycle's 3 discount
-      // uses are left. No cooldown timer anymore: both uses are available
-      // any time within the 7-day Premium window, in any order.
+      // Turning on — gated purely by whether this cycle's 1 discount use is
+      // still left. Available any time within the Premium window.
       if (premiumDiscountUsesLeft <= 0) {
-        showPremStatusPopup('Come Back Soon', nextDiscountDayLabel() === 'tomorrow' ? 'Come back tomorrow.' : ('Come back on ' + nextDiscountDayLabel() + '.'));
+        showPremStatusPopup('Discount Used', "You've used up your discount — it renews on your next subscription.");
         return;
       }
       // Turning on — play the blur + scroll + price-drop reveal.
@@ -5410,8 +5494,8 @@
   }
 
   function turnOffPremiumAfterPurchase() {
-    // Every discounted purchase turns the toggle off and uses up one of
-    // this cycle's 3 discount slots (enforced server-side — this is just
+    // Every discounted purchase turns the toggle off and uses up this
+    // cycle's 1 discount slot (enforced server-side — this is just
     // an optimistic client-side decrement, confirmed on next fetchUserData).
     // The one-time signup bonus (claimSignupBonus) never sets premiumUnlocked,
     // so this only ever fires for real paid subscriptions.
@@ -5667,9 +5751,10 @@
         <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
         <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:16px;">Premium Policy</div>
         <div style="font-size:12px;color:var(--w50);line-height:1.8;">
-          <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Discounted Purchases Every Week</strong> — Premium plans start at ₦970/week. Every week you're subscribed, you get discounted purchases to use whenever you like — in any order, any time during the week.</p>
-          <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">7-Day Cycle</strong> — Premium runs for exactly 7 days from the day you pay, then expires — no grace period. Unused discounts don't carry over once it expires. To keep going, just subscribe again.</p>
-          <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Community Bonus</strong> — Premium subscribers get unlimited scan on the Community Bonus, added straight to your balance. After 5 scans in a row there's a 1-hour cooldown before you can scan again. The pool is funded by the ₦50 shared contribution added to every wallet top-up — never taken from any one user's balance. If it's empty, the claim button goes faded until it refills.</p>
+          <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Discounted Purchases Every Week</strong> — Premium plans start at ₦970. Every day you're subscribed, you get discounted purchases to use whenever you like — in any order, any time during your cycle.</p>
+          <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Fixed Cycle</strong> — Premium runs for a fixed number of days from the day you pay (7 days on Premium, 4 days on Premium Lite), then expires — no grace period. Unused discounts don't carry over once it expires. To keep going, just subscribe again.</p>
+          <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Community Bonus</strong> — Premium subscribers get 3 scans a day on the Community Bonus, added straight to your balance, guaranteeing ₦100 every day you're subscribed. After your 3rd scan of the day, it locks for 24 hours before resetting. This is separate from the free-tier pool and isn't affected by it running low.</p>
+          <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Data Savings Boost</strong> — If you have an active data savings goal, every premium renewal adds ₦300 (Premium) or ₦150 (Premium Lite) straight to it. This only applies while a goal is running — start one from the savings feature to benefit.</p>
           <p style="margin:0 0 10px;">🔐 <strong style="color:var(--w70);">PIN Required</strong> — Every premium purchase asks you to confirm your PIN at checkout to apply your discount. Nothing is auto-charged — you subscribe and pay whenever you're ready.</p>
           <p style="margin:0;">❓ Questions about your plan or billing? Reach out via <strong style="color:var(--w70);">Report Issue</strong> in Support.</p>
         </div>
@@ -5703,9 +5788,10 @@
           </div>
           <div id="prem-policy-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
-              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Discounted Purchases Every Week</strong> — Premium plans start at ₦970/week. You get discounted purchases every week — usable any time, any order.</p>
-              <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">7-Day Cycle</strong> — Runs 7 days from payment, then expires — no grace period, nothing carries over. Subscribe again for a fresh 7 days.</p>
-              <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Community Bonus</strong> — Premium subscribers get unlimited scan on the Community Bonus. After 5 scans in a row there's a 1-hour cooldown. Funded by the ₦50 shared contribution on every wallet top-up. If it's empty, the claim button goes faded until it refills.</p>
+              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Discounted Purchases Every Week</strong> — Premium plans start at ₦970. You get discounted purchases every day of your cycle — usable any time, any order.</p>
+              <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Fixed Cycle</strong> — Runs a fixed number of days from payment (7 days on Premium, 4 on Premium Lite), then expires — no grace period, nothing carries over. Subscribe again for a fresh cycle.</p>
+              <p style="margin:0 0 10px;">🏊 <strong style="color:var(--w70);">Community Bonus</strong> — Premium subscribers get 3 scans a day, guaranteeing ₦100 every day you're subscribed. After the 3rd scan it locks for 24 hours before resetting.</p>
+              <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Data Savings Boost</strong> — If you have an active data savings goal, every renewal adds ₦300 (Premium) or ₦150 (Premium Lite) straight to it.</p>
               <p style="margin:0 0 10px;">🔐 <strong style="color:var(--w70);">PIN Required</strong> — Every premium purchase asks you to confirm your PIN at checkout to apply the discount.</p>
             </div>
           </div>
@@ -6012,9 +6098,9 @@
       return;
     }
 
-    if (scanContext === 'collect-gift') {
+    if (scanContext === 'daily-free-scan') {
       document.getElementById('free-scan-status').textContent = 'Verifying card...';
-      processCollectGiftScan(cardCode);
+      processDailyFreeScan(cardCode);
       return;
     }
 
@@ -6186,55 +6272,46 @@
     if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
   }
 
-  function retryFreeScan() {
-    document.getElementById('free-error-view').style.display = 'none';
-    document.getElementById('free-scan-view').style.display = 'block';
-    document.getElementById('free-scan-status').textContent = 'Starting camera...';
-    startFreeScan();
-  }
+  // Daily free-tier pool scan — card scan required every time (unlike the
+  // one-time signup bonus above). Calls claim-free-scan, which wraps the
+  // claim_free_scan RPC: guaranteed ₦100 on this user's very first daily
+  // scan ever, randomized (capped at ₦100 and by the pool balance) after.
+  async function processDailyFreeScan(cardCode) {
+    document.getElementById('free-scan-status').textContent = 'Verifying card...';
 
-  async function processCollectGiftScan(cardCode) {
-    const req = scanTargetGiftRequest;
-    if (!req) {
-      document.getElementById('free-scan-view').style.display = 'none';
-      document.getElementById('free-error-msg').textContent = 'Something went wrong, try again.';
-      document.getElementById('free-error-view').style.display = 'block';
-      return;
-    }
-
-    let result = null;
+    let data;
     try {
-      result = await callEdge('collect-gift-request', { requestId: req.id, requesterId: userId });
+      data = await callEdge('claim-free-scan', { userId });
     } catch (e) {
-      console.error('[gift] collect-gift-request failed:', e);
+      data = null;
     }
 
-    if (!result || !result.success) {
+    if (!data || data.error) {
       document.getElementById('free-scan-view').style.display = 'none';
-      document.getElementById('free-error-msg').textContent = (result && result.error) || 'Could not collect this gift, try again.';
+      const msg = data && data.error === 'cooldown_active'
+        ? "You've already scanned today. Come back in 24 hours."
+        : (data && typeof data.message === 'string' && data.message) || 'Not available right now, please try again later.';
+      document.getElementById('free-error-msg').textContent = msg;
       document.getElementById('free-error-view').style.display = 'block';
       return;
     }
 
     closeFreeScan();
-    document.getElementById('gift-ov').classList.remove('open');
 
-    if (typeof result.newBalance === 'number') {
-      balance = result.newBalance;
-      const whole = Math.floor(balance).toLocaleString();
-      const dec = (balance % 1).toFixed(2).slice(1);
-      const balHtml = '<span class="bal-cur">₦</span>' + whole + '<span class="bal-dec">' + dec + '</span>';
-      document.getElementById('bal-display').innerHTML = balHtml;
-      const balRepeatEl = document.getElementById('bal-display-repeat');
-      if (balRepeatEl) balRepeatEl.innerHTML = balHtml;
-    } else {
-      await fetchUserData();
-    }
+    const amountWon = (data && typeof data.amountWon === 'number') ? data.amountWon : 0;
+    await collectCashbackIntoMain(amountWon, poolBalance);
+    poolFirstClaimUsed = true;
+    lastPoolClaimAt = new Date().toISOString();
+    await fetchUserData();
+    if (typeof data.newBalance === 'number') balance = data.newBalance;
+    if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
+  }
 
-    myGiftRequests = myGiftRequests.filter(r => r.id !== req.id);
-    updateGiftMineCount();
-    showGiftMessage('₦' + req.amount.toLocaleString() + ' was added to your balance!');
-    scanTargetGiftRequest = null;
+  function retryFreeScan() {
+    document.getElementById('free-error-view').style.display = 'none';
+    document.getElementById('free-scan-view').style.display = 'block';
+    document.getElementById('free-scan-status').textContent = 'Starting camera...';
+    startFreeScan();
   }
 </script>
 
@@ -6248,9 +6325,25 @@
   let cashbackScanCount = 0;
   let cashbackCooldownUntil = null; // ISO string or null
 
+  // Daily free-tier pool scan — separate from the premium cashback claim
+  // above and separate from the one-time Boss trial (bossTrialAvailable /
+  // trialScansUsed). Free (non-premium) users get exactly 1 scan every
+  // 24hrs from the same shared reward_pool, via claim_free_scan on the
+  // backend. lastPoolClaimAt drives the 24hr cooldown; poolFirstClaimUsed
+  // tells the backend whether this user's next scan is the guaranteed
+  // ₦100 or a randomized amount.
+  let lastPoolClaimAt = null; // ISO string or null
+  let poolFirstClaimUsed = false;
+
   function cashbackCooldownMsLeft() {
     if (!cashbackCooldownUntil) return 0;
     return Math.max(0, new Date(cashbackCooldownUntil).getTime() - Date.now());
+  }
+
+  function freeScanCooldownMsLeft() {
+    if (!lastPoolClaimAt) return 0;
+    const msSinceClaim = Date.now() - new Date(lastPoolClaimAt).getTime();
+    return Math.max(0, (24 * 60 * 60 * 1000) - msSinceClaim);
   }
 
   // Shows WHEN scanning opens back up — a clock time if it's later today,
@@ -6280,18 +6373,27 @@
     // label so non-premium users know what tapping it will do.
     const collectBtn = document.getElementById('actions-card-1');
     const collectLabel = document.getElementById('cashback-collect-btn-label');
-    if (collectBtn) {
-      collectBtn.style.filter = 'none';
-      collectBtn.style.opacity = collectBtn.style.opacity; // leave swipe-controlled opacity alone
-    }
     if (collectLabel) {
-      const msLeft = cashbackCooldownMsLeft();
-      if (bossTrialAvailable && !premiumUnlocked) {
-        collectLabel.textContent = 'Collect Free Bonus (' + (5 - trialScansUsed) + '/5)';
-      } else if (msLeft > 0) {
-        collectLabel.textContent = 'Back ' + formatCashbackCooldownLabel(msLeft);
+      if (!premiumUnlocked) {
+        // Free tier: 1 scan every 24hrs from the public pool. Greyed out
+        // (not just "on cooldown") when the pool has nothing in it, so a
+        // free user never burns their daily attempt on a guaranteed ₦0.
+        const freeMsLeft = freeScanCooldownMsLeft();
+        if (freeMsLeft > 0) {
+          if (collectBtn) collectBtn.style.filter = 'none';
+          collectLabel.textContent = 'Back ' + formatCashbackCooldownLabel(freeMsLeft);
+        } else if (poolBalance <= 0) {
+          if (collectBtn) collectBtn.style.filter = 'grayscale(1) opacity(0.5)';
+          collectLabel.textContent = 'Pool Empty';
+        } else {
+          if (collectBtn) collectBtn.style.filter = 'none';
+          collectLabel.textContent = 'Collect';
+        }
       } else {
-        collectLabel.textContent = 'Collect';
+        // Premium: unaffected by the free-tier pool logic above.
+        if (collectBtn) collectBtn.style.filter = 'none';
+        const msLeft = cashbackCooldownMsLeft();
+        collectLabel.textContent = msLeft > 0 ? 'Back ' + formatCashbackCooldownLabel(msLeft) : 'Collect';
       }
     }
   }
@@ -6301,20 +6403,294 @@
   // instead of via a hidden button inside the premium plan picker — this is
   // the visible, obvious home for "free money from the cashback pool."
   function handleCashbackCollectTap() {
-    if (bossTrialAvailable && !premiumUnlocked) {
-      claimSignupBonus();
-      return;
-    }
     if (!premiumUnlocked) {
-      showPremUnlockSheet();
+      if (poolBalance <= 0) return; // greyed out — no attempt burned
+      const freeMsLeft = freeScanCooldownMsLeft();
+      if (freeMsLeft > 0) {
+        showPremStatusPopup('Come Back Soon', 'Your next free scan unlocks ' + formatCashbackCooldownLabel(freeMsLeft) + '.');
+        return;
+      }
+      openFreeScan('daily-free-scan');
       return;
     }
     const msLeft = cashbackCooldownMsLeft();
     if (msLeft > 0) {
-      alert('Too many scans — try again ' + formatCashbackCooldownLabel(msLeft) + '.');
+      showPremStatusPopup('Too Many Scans', 'Try again ' + formatCashbackCooldownLabel(msLeft) + '.');
       return;
     }
     openCashbackScan();
+  }
+
+  // ── BORROW — wired to the real backend (borrow-draw / borrow-repay). ──
+  let selectedBorrowAmt = 0;
+  let selectedRepayAmt = 0;
+
+  function handleBorrowTap() {
+    if (!premiumUnlocked) {
+      document.getElementById('borrow-lock-ov').classList.add('open');
+      return;
+    }
+    openBorrowSheet();
+  }
+
+  function borrowAvailable() {
+    return Math.max(0, borrowCeiling - borrowPrincipalOwed);
+  }
+
+  function openBorrowSheet() {
+    selectedBorrowAmt = 0;
+    selectedRepayAmt = 0;
+    const available = borrowAvailable();
+
+    const input = document.getElementById('borrow-amt-input');
+    if (input) { input.value = ''; input.max = available; }
+    document.getElementById('borrow-max-label').textContent = '₦' + available.toLocaleString();
+    document.getElementById('borrow-amt-err').textContent = '';
+    const btn = document.getElementById('borrow-confirm-btn');
+    btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
+    btn.textContent = 'Borrow';
+
+    const repayInput = document.getElementById('repay-amt-input');
+    if (repayInput) repayInput.value = '';
+    document.getElementById('repay-amt-err').textContent = '';
+    document.getElementById('borrow-owed-label').textContent = '₦' + borrowOwed.toLocaleString();
+    document.getElementById('borrow-owed-tab-label').textContent = borrowOwed > 0 ? ' (₦' + borrowOwed.toLocaleString() + ')' : '';
+    const repayBtn = document.getElementById('repay-confirm-btn');
+    repayBtn.style.opacity = '.4'; repayBtn.style.pointerEvents = 'none';
+    repayBtn.textContent = 'Repay';
+    const fullBtn = document.getElementById('repay-full-btn');
+    fullBtn.style.display = borrowOwed > 0 ? 'block' : 'none';
+    fullBtn.textContent = 'Pay In Full (₦' + borrowOwed.toLocaleString() + ')';
+
+    setBorrowOvPanel(0);
+    const ov = document.getElementById('borrow-ov');
+    ov.style.display = 'flex';
+    setTimeout(() => ov.classList.add('open'), 10);
+  }
+
+  function setBorrowOvPanel(idx) {
+    const borrowPanel = document.getElementById('borrow-ov-panel-borrow');
+    const repayPanel = document.getElementById('borrow-ov-panel-repay');
+    const tabBorrow = document.getElementById('borrow-ov-tab-borrow');
+    const tabRepay = document.getElementById('borrow-ov-tab-repay');
+    if (idx === 0) {
+      borrowPanel.style.display = 'block';
+      repayPanel.style.display = 'none';
+      tabBorrow.style.color = '#fff';
+      tabBorrow.style.borderBottomColor = '#8B4FE8';
+      tabRepay.style.color = 'var(--w40)';
+      tabRepay.style.borderBottomColor = 'transparent';
+    } else {
+      borrowPanel.style.display = 'none';
+      repayPanel.style.display = 'block';
+      tabRepay.style.color = '#fff';
+      tabRepay.style.borderBottomColor = '#8B4FE8';
+      tabBorrow.style.color = 'var(--w40)';
+      tabBorrow.style.borderBottomColor = 'transparent';
+    }
+  }
+
+  function closeBorrowOv(e) {
+    if (e && e.target !== document.getElementById('borrow-ov')) return;
+    const ov = document.getElementById('borrow-ov');
+    ov.classList.remove('open');
+    setTimeout(() => { ov.style.display = 'none'; }, 300);
+  }
+
+  function closeBorrowLockOv() {
+    document.getElementById('borrow-lock-ov').classList.remove('open');
+  }
+
+  function onBorrowAmtInput(value) {
+    const amt = parseInt(value, 10);
+    const btn = document.getElementById('borrow-confirm-btn');
+    const err = document.getElementById('borrow-amt-err');
+    const available = borrowAvailable();
+
+    if (!value) {
+      err.textContent = '';
+      selectedBorrowAmt = 0;
+      btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
+      btn.textContent = 'Borrow';
+      return;
+    }
+    if (!amt || amt < 240) {
+      err.textContent = 'Minimum you can borrow is ₦240.';
+      selectedBorrowAmt = 0;
+      btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
+      btn.textContent = 'Borrow';
+      return;
+    }
+    if (amt > available) {
+      err.textContent = 'That\'s more than you can currently borrow (₦' + available.toLocaleString() + ').';
+      selectedBorrowAmt = 0;
+      btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
+      btn.textContent = 'Borrow';
+      return;
+    }
+    err.textContent = '';
+    selectedBorrowAmt = amt;
+    btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+    btn.textContent = 'Borrow ₦' + amt.toLocaleString();
+  }
+
+  async function confirmBorrow() {
+    if (!selectedBorrowAmt) return;
+    const btn = document.getElementById('borrow-confirm-btn');
+    const err = document.getElementById('borrow-amt-err');
+    const originalText = btn.textContent;
+    btn.style.pointerEvents = 'none';
+    btn.textContent = 'Borrowing...';
+
+    let data;
+    try {
+      data = await callEdge('borrow-draw', { userId, amount: selectedBorrowAmt });
+    } catch (e) {
+      data = null;
+    }
+
+    if (!data || data.error) {
+      btn.style.pointerEvents = 'auto';
+      btn.textContent = originalText;
+      err.textContent = (data && data.message) || 'Could not process this right now, try again.';
+      return;
+    }
+
+    if (typeof data.newOwed === 'number') borrowOwed = data.newOwed;
+    if (typeof data.newCeiling === 'number') borrowCeiling = data.newCeiling;
+    if (typeof data.newPrincipalOwed === 'number') borrowPrincipalOwed = data.newPrincipalOwed;
+
+    closeBorrowOv();
+    if (typeof data.newBalance === 'number') {
+      await borrowIntoMain(selectedBorrowAmt, data.newBalance);
+    } else if (typeof showGiftPopup === 'function') {
+      showGiftPopup(selectedBorrowAmt);
+    }
+    fetchUserData();
+  }
+
+  // Same visual beats as collectCashbackIntoMain (drain the Community Bonus
+  // card, swipe to Main, balance overshoots, pause, settles, reveal) but
+  // never touches the real poolBalance variable — only paints the DOM
+  // element directly and restores the true value at the end via
+  // renderCashbackBalance(). A borrow amount is unrelated to the real pool
+  // and can exceed it, which broke collectCashbackIntoMain's refill math
+  // (drove poolBalance negative / stuck at a wrong number) — this avoids
+  // that class of bug entirely, since nothing borrowed ever actually comes
+  // out of the real Community Bonus pool.
+  async function borrowIntoMain(amount, actualNewBalance) {
+    const balanceBefore = balance;
+    const cbEl = document.getElementById('cashback-bal-display');
+    const truePool = poolBalance; // real, untouched — used only as the cosmetic starting point
+
+    function paintCB(v) {
+      if (!cbEl) return;
+      const whole = Math.floor(Math.max(0, v)).toLocaleString();
+      const dec = (Math.max(0, v) % 1).toFixed(2).slice(1);
+      cbEl.innerHTML = '<span class="bal-cur" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">₦</span>' +
+        whole + '<span class="bal-dec" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">' + dec + '</span>';
+    }
+
+    // 1. Community Bonus card cosmetically drains to 0
+    await animateBalanceNumber(truePool, 0, 1400, paintCB);
+
+    // 2. Swipe to Main (no-op if already there)
+    if (window._walletSwipeToMain) window._walletSwipeToMain();
+    await new Promise(r => setTimeout(r, 400));
+
+    // 3. Main balance overshoots up by the borrowed amount
+    await animateBalanceNumber(balanceBefore, balanceBefore + amount, 1100, (v) => {
+      balance = v;
+      _paintMainBalance(v);
+    });
+
+    // 4. Pause
+    await new Promise(r => setTimeout(r, 950));
+
+    // 5. Settle to the real confirmed balance (should already match, but
+    // this snaps to the DB's number in case of any rounding drift)
+    await animateBalanceNumber(balanceBefore + amount, actualNewBalance, 500, (v) => {
+      balance = v;
+      _paintMainBalance(v);
+    });
+
+    // Restore the Community Bonus card to its true, untouched value —
+    // nothing about it was ever really changed.
+    if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
+
+    // 6. "You got ₦x" popup
+    if (typeof showGiftPopup === 'function') showGiftPopup(amount);
+    else alert('You got ₦' + Math.round(amount).toLocaleString());
+  }
+
+  function onRepayAmtInput(value) {
+    const amt = parseInt(value, 10);
+    const btn = document.getElementById('repay-confirm-btn');
+    const err = document.getElementById('repay-amt-err');
+
+    if (!value || !amt || amt < 1) {
+      err.textContent = '';
+      selectedRepayAmt = 0;
+      btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
+      btn.textContent = 'Repay';
+      return;
+    }
+    if (amt > balance) {
+      err.textContent = 'Not enough balance to repay that amount.';
+      selectedRepayAmt = 0;
+      btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
+      btn.textContent = 'Repay';
+      return;
+    }
+    err.textContent = '';
+    selectedRepayAmt = amt;
+    btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+    btn.textContent = 'Repay ₦' + amt.toLocaleString();
+  }
+
+  async function confirmRepay() {
+    if (!selectedRepayAmt) return;
+    await doRepay(selectedRepayAmt, 'repay-confirm-btn', 'repay-amt-err');
+  }
+
+  async function confirmRepayFull() {
+    if (!borrowOwed) return;
+    await doRepay(borrowOwed, 'repay-full-btn', 'repay-amt-err');
+  }
+
+  async function doRepay(amount, btnId, errId) {
+    const btn = document.getElementById(btnId);
+    const err = document.getElementById(errId);
+    const originalText = btn.textContent;
+    btn.style.pointerEvents = 'none';
+    btn.textContent = 'Repaying...';
+
+    let data;
+    try {
+      data = await callEdge('borrow-repay', { userId, amount });
+    } catch (e) {
+      data = null;
+    }
+
+    if (!data || data.error) {
+      btn.style.pointerEvents = 'auto';
+      btn.textContent = originalText;
+      err.textContent = (data && data.message) || 'Could not process this right now, try again.';
+      return;
+    }
+
+    if (typeof data.newOwed === 'number') borrowOwed = data.newOwed;
+    if (typeof data.newPrincipalOwed === 'number') borrowPrincipalOwed = data.newPrincipalOwed;
+
+    closeBorrowOv();
+    if (typeof data.newBalance === 'number') {
+      const balanceBefore = balance;
+      await animateBalanceNumber(balanceBefore, data.newBalance, 900, (v) => {
+        balance = v;
+        _paintMainBalance(v);
+      });
+    }
+    fetchUserData();
   }
 
   // ── COLLECT CASHBACK: card scan ──
@@ -6409,10 +6785,22 @@
         return;
       }
       closeCashbackScan();
-      await collectCashbackIntoMain(data.collectedAmount, data.poolBalanceBefore); // animates using the DB-confirmed amount
+      // claim-cashback (Premium's Community Bonus) no longer touches the
+      // shared reward_pool at all — it's a guaranteed payout independent of
+      // it — so data.poolBalance/poolBalanceBefore won't be present here.
+      // Guard both instead of assuming they exist, or poolBalance gets
+      // clobbered to undefined and renders as "NaNaN".
+      if (typeof data.poolBalanceBefore === 'number') {
+        await collectCashbackIntoMain(data.collectedAmount, data.poolBalanceBefore);
+      } else {
+        balance = data.newBalance;
+        if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
+        if (typeof showGiftPopup === 'function') showGiftPopup(data.collectedAmount);
+        else alert('You got ₦' + Math.round(data.collectedAmount).toLocaleString());
+      }
       // Snap to the DB's final numbers in case of any rounding drift.
       balance = data.newBalance;
-      poolBalance = data.poolBalance;
+      if (typeof data.poolBalance === 'number') poolBalance = data.poolBalance;
       cashbackScanCount = data.scanCount ?? 0;
       cashbackCooldownUntil = data.cooldownUntil ?? null;
       if (typeof renderCashbackBalance === 'function') renderCashbackBalance();

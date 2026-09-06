@@ -179,6 +179,12 @@
   .tabs::-webkit-scrollbar{display:none}
   .tab{flex-shrink:0;padding:9px 16px;border-radius:20px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;color:var(--w40);transition:all .18s;background:var(--dark-3);border:1px solid var(--border)}
   .tab.on{background:var(--p);border-color:var(--p);color:var(--w)}
+  .tab.lasts-tab{color:#F5A623;border-color:rgba(245,166,35,.4);animation:lastsTabGlow 2.5s ease-in-out infinite;}
+  .tab.lasts-tab.on{animation:none;background:#F5A623;border-color:#F5A623;color:#000;}
+  @keyframes lastsTabGlow{
+    0%,100%{box-shadow:0 0 3px rgba(245,166,35,.25);}
+    50%{box-shadow:0 0 10px rgba(245,166,35,.7);}
+  }
 
   .bundles{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
   .bundle{background:var(--dark-3);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:all .15s;overflow:hidden}
@@ -897,7 +903,7 @@
     <div class="tabs" style="margin-bottom:12px;">
       <div class="tab cat-tab on" onclick="selCategory(this,'daily')">Daily</div>
       <div class="tab cat-tab" onclick="selCategory(this,'weekly')">Weekly</div>
-      <div class="tab cat-tab" onclick="selCategory(this,'monthly')">Monthly</div>
+      <div class="tab cat-tab lasts-tab" onclick="selCategory(this,'lasts')">Data That Lasts</div>
     </div>
     <div id="prem-plans-spotlight">
       <div class="bundles" id="bundles-all"></div>
@@ -3458,6 +3464,25 @@
 
   let CATEGORY = 'daily';
 
+  // Small monthly plans (<₦4k wholesale) get folded into Weekly instead of
+  // having their own thin tab. Plans ≥₦4k are ALL genuinely 30-day across
+  // every network (verified against the real catalog), so "Data That Lasts"
+  // is an honest label, not just marketing — it never mixes in a short-
+  // validity plan. Threshold is on raw ck (wholesale), not the marked-up
+  // display price — close enough (1% markup) that it never crosses the line.
+  const LASTS_THRESHOLD = 4000;
+
+  function getPlansForCategory(netPlans, cat) {
+    const monthly = netPlans.monthly || [];
+    if (cat === 'weekly') {
+      return (netPlans.weekly || []).concat(monthly.filter(p => p.ck < LASTS_THRESHOLD));
+    }
+    if (cat === 'lasts') {
+      return monthly.filter(p => p.ck >= LASTS_THRESHOLD);
+    }
+    return netPlans[cat] || [];
+  }
+
   function selCategory(el, cat) {
     document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('on'));
     el.classList.add('on');
@@ -3467,7 +3492,7 @@
 
   function renderBundles() {
     const netPlans = PLANS[NET] || { daily: [], weekly: [], monthly: [] };
-    const plans = netPlans[CATEGORY] || [];
+    const plans = getPlansForCategory(netPlans, CATEGORY);
     const container = document.getElementById('bundles-all');
     if (!container) return;
     const count = document.getElementById('market-count');

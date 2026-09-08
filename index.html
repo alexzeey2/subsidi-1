@@ -6500,7 +6500,7 @@
     const input = document.getElementById('borrow-amt-input');
     if (input) input.value = BORROW_BASE;
     document.getElementById('borrow-amt-err').textContent = '';
-    const available = premiumUnlocked ? Math.max(BORROW_BASE, borrowCeiling) : BORROW_BASE;
+    const available = Math.max(BORROW_BASE, borrowCeiling);
     document.getElementById('borrow-available-display').textContent = '₦' + available.toLocaleString();
     const sub = document.getElementById('borrow-max-sub');
     if (sub) sub.textContent = premiumUnlocked ? 'Spendable on data only' : 'Get Premium to borrow more';

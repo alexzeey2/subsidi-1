@@ -6520,13 +6520,15 @@
     showPremUnlockSheet(false);
   }
 
+  let currentBorrowAvailable = 0;
+
   function openBorrowAmtSheet() {
     selectedBorrowAmt = BORROW_BASE;
     const input = document.getElementById('borrow-amt-input');
     if (input) input.value = BORROW_BASE;
     document.getElementById('borrow-amt-err').textContent = '';
-    const available = Math.max(BORROW_BASE, borrowCeiling);
-    document.getElementById('borrow-available-display').textContent = '₦' + available.toLocaleString();
+    currentBorrowAvailable = BORROW_BASE + borrowCeiling;
+    document.getElementById('borrow-available-display').textContent = '₦' + currentBorrowAvailable.toLocaleString();
     const sub = document.getElementById('borrow-max-sub');
     if (sub) sub.textContent = premiumUnlocked ? 'Spendable on data only' : 'Get Premium to borrow more';
     const btn = document.getElementById('borrow-confirm-btn');
@@ -6569,8 +6571,8 @@
       showBorrowLockPopup('Get Premium', 'to borrow more than ₦100.', 'See Premium Plans');
       return;
     }
-    if (amt > BORROW_BASE && amt > borrowCeiling) {
-      err.textContent = 'That\'s more than you can currently borrow (₦' + borrowCeiling.toLocaleString() + ').';
+    if (amt > currentBorrowAvailable) {
+      err.textContent = 'That\'s more than you can currently borrow (₦' + currentBorrowAvailable.toLocaleString() + ').';
       selectedBorrowAmt = 0;
       btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
       btn.textContent = 'Continue';

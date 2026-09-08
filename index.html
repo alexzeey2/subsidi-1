@@ -1986,13 +1986,27 @@
     return slots[slots.length - premiumDiscountUsesLeft] ?? 0;
   }
 
-  async function callEdge(fnName, body) {
-    const res = await fetch(SUPA_URL + '/functions/v1/' + fnName, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY },
-      body: JSON.stringify(body)
-    });
-    return res.json();
+  async function callEdge(fnName, body, timeoutMs = 12000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(SUPA_URL + '/functions/v1/' + fnName, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        console.error('[callEdge]', fnName, 'HTTP', res.status, data);
+      }
+      return data;
+    } catch (e) {
+      console.error('[callEdge]', fnName, 'failed:', e.message);
+      throw e;
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   let NET = 'MTN', cur = {};
@@ -4441,17 +4455,26 @@
         (async () => {
           showSpinner('Confirming payment...');
           try {
-            let result = await callEdge('deposit', { reference: response.reference, userId, amount });
             // Bank transfers routinely take longer than a card payment to
             // clear on Paystack's side. Keep quietly re-checking for up to
             // ~30s total before giving up on this session — the vast
             // majority of deposits confirm well within that window, so
             // most people never see anything beyond the loading spinner.
+            // Each attempt has its own timeout (via callEdge), so one hung
+            // request just counts as a failed attempt instead of freezing
+            // the whole flow indefinitely.
+            let result = null;
             let attempts = 0;
-            while (!(result && result.success) && attempts < 5) {
-              await new Promise(r => setTimeout(r, 6000));
-              result = await callEdge('deposit', { reference: response.reference, userId, amount });
+            while (attempts < 6) {
+              try {
+                result = await callEdge('deposit', { reference: response.reference, userId, amount });
+              } catch (e) {
+                result = null;
+                console.error('[deposit] attempt', attempts + 1, 'failed:', e.message);
+              }
+              if (result && result.success) break;
               attempts++;
+              if (attempts < 6) await new Promise(r => setTimeout(r, 6000));
             }
             hideSpinner();
             if (result && result.success) {
@@ -4462,13 +4485,15 @@
               showDepStatusPopup('success', amount);
               setTimeout(maybeShowFeedbackForRecentTxn, 800);
             } else {
-              // Genuinely still unresolved after ~30s of retrying — rather
-              // than alarm the user with a popup over something that
-              // usually isn't a problem, close quietly. subsidi_last_deposit
-              // stays in place, so the background reconciliation on next
-              // app load will keep checking and credit it the moment it
-              // clears, with the success popup firing then.
+              // Genuinely still unresolved after ~30s of retrying. Rather
+              // than close silently (which is what made the last failure
+              // invisible), tell the user it's still confirming and give
+              // them the reference — subsidi_last_deposit stays in place,
+              // so the on-load recovery check will keep trying and credit
+              // it (with the success popup) the moment it clears.
+              console.error('[deposit] gave up after', attempts, 'attempts, result:', result);
               closeDepOv();
+              showDepStatusPopup('pending', amount, response.reference);
             }
           } catch (e) {
             hideSpinner();

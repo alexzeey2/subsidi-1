@@ -111,7 +111,8 @@
   /* ── PREMIUM TOGGLE ── */
   .prem-toggle-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
   .prem-toggle-label{font-size:11px;font-weight:700;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;transition:color .2s;}
-  .prem-toggle-label.active{color:#F5A623;}
+  .prem-toggle-label.active{color:#F5A623;animation:premLabelGlow 2s ease-in-out infinite;}
+  @keyframes premLabelGlow{0%,100%{text-shadow:0 0 4px rgba(245,166,35,.3)}50%{text-shadow:0 0 10px rgba(245,166,35,.9),0 0 18px rgba(255,201,71,.5)}}
   .prem-toggle-track{width:44px;height:24px;border-radius:12px;background:var(--dark-4);border:1px solid var(--border);position:relative;transition:background .25s,border-color .25s;flex-shrink:0;animation:premPulse 2.5s ease-in-out infinite;}
   .prem-toggle-track.on{background:linear-gradient(90deg,#b87010,#F5A623);border-color:#F5A623;animation:none;}
   .prem-toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 4px rgba(0,0,0,.3);}
@@ -122,21 +123,6 @@
   .set-toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.4,0,.2,1),background .25s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
   .set-toggle-track.on .set-toggle-thumb{transform:translateX(20px);background:#000;}
   @keyframes premPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,166,35,0);border-color:var(--border);}50%{box-shadow:0 0 0 4px rgba(245,166,35,.25);border-color:#F5A623;}}
-
-  /* ── PREMIUM DEMO BLUR ── */
-  .prem-blur-target{transition:filter .4s,opacity .4s;}
-  .prem-demo-active .prem-blur-target{filter:blur(4px);opacity:.25;pointer-events:none;}
-  /* Plans section: blur the market header title but NOT the category tabs */
-  .prem-demo-active .prem-market-header{filter:blur(4px);opacity:.25;pointer-events:none;}
-  /* Always keep category tabs visible and tappable during demo */
-  .prem-demo-active .cat-tabs-wrap{filter:none!important;opacity:1!important;pointer-events:auto!important;}
-  .prem-demo-active .cat-tab{filter:none!important;opacity:1!important;pointer-events:auto!important;}
-  #prem-plans-spotlight{transition:filter .4s,opacity .4s;}
-
-  /* ── PREMIUM PRICE ANIMATION ── */
-  .b-price.prem-counting{color:#F5A623!important;}
-  @keyframes premGlow{0%,100%{text-shadow:0 0 8px rgba(245,166,35,.4)}50%{text-shadow:0 0 20px rgba(245,166,35,.9)}}
-  .b-price.prem-final{animation:premGlow 1.2s ease-in-out infinite;color:#F5A623!important;}
 
   /* ── PREMIUM UNLOCK SHEET ── */
   .prem-sheet-price{font-size:36px;font-weight:900;color:#F5A623;text-align:center;margin:8px 0 4px;}
@@ -802,7 +788,7 @@
       <div class="brand">Subsidi<span class="bpip"></span></div>
       <div class="topbar-icons">
         <div class="prem-toggle-wrap" id="prem-toggle-wrap" onclick="onPremToggleClick()">
-          <span class="prem-toggle-label" id="prem-toggle-label">Premium</span>
+          <span class="prem-toggle-label active" id="prem-toggle-label">Emergency</span>
           <div class="prem-toggle-track" id="prem-toggle-track">
             <div class="prem-toggle-thumb"></div>
           </div>
@@ -1104,83 +1090,6 @@
   </div>
 </div>
 
-<!-- ── CHEAPER-THAN-OPAY confirmation popup — shown right after the toggle is turned ON ── -->
-<div class="gate-ov" id="cheaper-mode-ov">
-  <div class="gate-sheet">
-    <div class="sh-bar"></div>
-    <div class="gate-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3.24L4 3a1 1 0 0 0-1 1l.24 5.59a2 2 0 0 0 .59 1.41l9.58 9.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83Z"/><circle cx="7.5" cy="7.5" r="1.5" fill="#F5A623" stroke="none"/>
-      </svg>
-    </div>
-    <div class="gate-title" style="font-size:20px;">Price is cheaper than Opay, PalmPay &amp; Moniepoint now.</div>
-    <div class="gate-sub" style="font-size:15px;font-weight:600;color:#F5A623;">You can check.</div>
-    <button class="gate-btn" onclick="closeCheaperModeOv()">Nice</button>
-  </div>
-</div>
-
-<!-- ── EMERGENCY PURCHASE GIFT BOX (draggable, auto-drifting, permanent) ── -->
-<div id="savings-bubble" onpointerdown="savingsBubbleDown(event)" style="position:fixed;left:0;top:0;width:64px;height:64px;display:none;z-index:95;cursor:grab;touch-action:none;user-select:none;transition:transform 1.8s cubic-bezier(.45,.05,.55,.95);">
-  <div id="giftbox-float" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;animation:savingsBubbleFloat 2.6s ease-in-out infinite;">
-    <svg id="savings-bubble-hand" width="52" height="52" viewBox="0 0 48 48" fill="none" stroke="none">
-      <!-- box body -->
-      <rect x="7" y="20" width="34" height="22" rx="2.5" fill="#F5A623"/>
-      <!-- box lid -->
-      <rect x="4" y="14" width="40" height="9" rx="2.5" fill="#FFC947"/>
-      <!-- vertical ribbon -->
-      <rect x="21" y="14" width="6" height="28" fill="#E0791A"/>
-      <!-- bow left loop -->
-      <path d="M24 14c-3-7-13-8-13-1 0 4 6 3 13 1z" fill="#FFD873"/>
-      <!-- bow right loop -->
-      <path d="M24 14c3-7 13-8 13-1 0 4-6 3-13 1z" fill="#FFD873"/>
-      <!-- bow knot -->
-      <circle cx="24" cy="14" r="3" fill="#E0791A"/>
-    </svg>
-    <div id="giftbox-sparkle" style="position:absolute;inset:-10px;pointer-events:none;"></div>
-    <div id="giftbox-label" style="position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:5px;background:rgba(0,0,0,0.75);border:1px solid rgba(245,166,35,0.5);border-radius:8px;padding:3px 8px;font-size:10.5px;font-weight:800;color:#FFC947;letter-spacing:.3px;white-space:nowrap;pointer-events:none;animation:giftboxLabelGlow 2s ease-in-out infinite;">Emergency Box</div>
-  </div>
-</div>
-<style>
-  @keyframes savingsBubbleFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-  #savings-bubble-hand{
-    transform-origin:50% 60%;
-    animation:giftboxWiggle 2.4s ease-in-out infinite, giftboxGlow 2s ease-in-out infinite;
-  }
-  @keyframes giftboxWiggle{
-    0%,100%{transform:rotate(0deg) scale(1)}
-    8%{transform:rotate(-8deg) scale(1.04)}
-    16%{transform:rotate(8deg) scale(1.04)}
-    24%{transform:rotate(-4deg) scale(1.02)}
-    32%,100%{transform:rotate(0deg) scale(1)}
-  }
-  @keyframes giftboxGlow{
-    0%,100%{filter:drop-shadow(0 2px 6px rgba(0,0,0,.45)) drop-shadow(0 0 4px rgba(245,166,35,.4))}
-    50%{filter:drop-shadow(0 0 18px rgba(245,166,35,1)) drop-shadow(0 0 32px rgba(255,201,71,.7))}
-  }
-  @keyframes giftboxLabelGlow{
-    0%,100%{box-shadow:0 0 4px rgba(245,166,35,.35);border-color:rgba(245,166,35,0.5);}
-    50%{box-shadow:0 0 14px rgba(245,166,35,.9),0 0 22px rgba(255,201,71,.5);border-color:rgba(255,201,71,0.9);}
-  }
-  #giftbox-sparkle::before, #giftbox-sparkle::after{
-    content:'';
-    position:absolute;
-    width:6px;height:6px;
-    border-radius:50%;
-    background:#FFD873;
-    box-shadow:0 0 8px 2px rgba(255,216,115,.9);
-    animation:giftboxSparkle 2.4s ease-in-out infinite;
-  }
-  #giftbox-sparkle::before{ top:2px; left:4px; animation-delay:0s; }
-  #giftbox-sparkle::after{ bottom:6px; right:0px; animation-delay:1.2s; }
-  @keyframes giftboxSparkle{
-    0%,100%{opacity:0; transform:scale(.4);}
-    50%{opacity:1; transform:scale(1.1);}
-  }
-</style>
-
 <!-- ── BIG-DATA SAVINGS SHEET ── -->
 <div class="overlay" id="savings-ov" onclick="closeSavingsOv(event)">
   <div class="sheet" onclick="event.stopPropagation()">
@@ -1207,13 +1116,14 @@
           <div id="savings-plan-label" style="font-size:30px;font-weight:900;color:#F5A623;">0GB</div>
           <div style="font-size:13px;color:var(--w40);font-weight:700;">Will be yours soon</div>
         </div>
-        <div style="margin:22px 0 8px;background:var(--dark-3);border-radius:999px;height:14px;overflow:hidden;border:1px solid var(--border);">
+        <div style="margin:22px 0 8px;background:var(--dark-3);border-radius:999px;height:14px;overflow:hidden;border:1px solid var(--border);display:none;">
           <div id="savings-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#b87010,#F5A623);border-radius:999px;transition:width .6s cubic-bezier(.22,1,.36,1);"></div>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800;margin-bottom:20px;">
-          <span id="savings-current-label" style="color:#F5A623;">₦0.00</span>
-          <span id="savings-target-label" style="color:var(--w40);">₦0</span>
+        <div style="text-align:center;margin-bottom:20px;">
+          <span id="savings-current-label" style="display:none;">₦0.00</span>
+          <span id="savings-target-label" style="font-size:26px;font-weight:900;color:#F5A623;">₦0</span>
         </div>
+
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <button class="cbtn" id="savings-add-btn" onclick="openSavingsAddMoney()" style="background:transparent;border:1.5px solid var(--border);color:var(--w70);">Add Money</button>
@@ -1559,7 +1469,7 @@
       <button class="reg-btn" onclick="retryFreeScan()" style="width:100%;margin-bottom:10px;">Try Again</button>
       <button class="refer-close" onclick="closeFreeScan()" style="margin-bottom:10px;">Close</button>
       <div style="font-size:12px;color:var(--w40);">
-        Want cheaper data without the wait? <a href="javascript:void(0)" onclick="closeFreeScan();openPremDiscountPick();" style="color:var(--p-light);font-weight:600;">See paid plans</a>
+        Want cheaper data without the wait? <a href="javascript:void(0)" onclick="closeFreeScan();showPremUnlockSheet(false);" style="color:var(--p-light);font-weight:600;">See paid plans</a>
       </div>
     </div>
   </div>
@@ -1763,26 +1673,6 @@
   </div>
 </div>
 
-<!-- ── PREMIUM DISCOUNT PICKER (preview only — no prices, no payment) ── -->
-<div class="overlay" id="prem-pick-ov" onclick="closePremDiscountPick(event)" style="display:none;align-items:flex-end;">
-  <div class="sheet" style="padding-bottom:32px;" onclick="event.stopPropagation()">
-    <div class="sh-bar"></div>
-    <div style="text-align:center;padding:4px 20px 0;">
-      <div style="font-size:22px;margin-bottom:6px;">⚡</div>
-      <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px;">Pick your discount</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:20px;">See how much cheaper your data gets on each tier.</div>
-    </div>
-    <div style="display:flex;gap:6px;padding:0 16px;">
-      <div id="pick-card-premium" onclick="pickPremDiscount('premium')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark-3);border:1.5px solid var(--border);opacity:0.55;">
-        <div style="font-size:9.5px;font-weight:800;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px;">Premium</div>
-        <div id="pick-card-premium-amt" style="font-size:19px;font-weight:900;color:var(--w40);">Special Pricing</div>
-        <div style="font-size:9px;font-weight:600;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;margin-top:2px;">off, from your pot</div>
-      </div>
-    </div>
-    <div style="text-align:center;font-size:10px;color:var(--w40);padding:10px 20px 0;">Everyone can borrow ₦100 free, no payment required. Premium unlocks discounted purchases, more borrowing, and your Emergency Box — just confirm your PIN at checkout.</div>
-  </div>
-</div>
-
 <!-- ── PREMIUM UNLOCK SHEET ── -->
 <div class="overlay" id="prem-unlock-ov" onclick="closePremUnlockOv(event)" style="display:none;align-items:flex-end;">
   <div class="sheet" style="padding-bottom:32px;" onclick="event.stopPropagation()">
@@ -1957,10 +1847,7 @@
   const PREMIUM_PLANS = {
     premium: { price: 870, billing: 'week', cycleDays: 7, discountSlots: [80, 80, 80, 80] } // Community Bonus: 3 scans/day, guaranteed ₦100/day, 24hr lockout after 3rd scan
   };
-  let premDemoActive = false;    // is the demo blur/animation running
   let scanContext = 'reactivate'; // 'reactivate' (Boss/CEO cooldown scan) or 'activate' (one-time Boss trial scan)
-  let premDemoSeen = false;      // demo has been shown to logged-in non-premium user
-  let demoSelectedPlan = 'premium'; // single tier now, kept for the discount-picker demo code path
 
   // One-time Boss trial: a brand-new user can activate Boss for free with just
   // a card scan. It's good for exactly one purchase-use — once that use is
@@ -3487,18 +3374,39 @@
   // Small monthly plans (<₦4k wholesale) get folded into Weekly instead of
   // having their own thin tab. Plans ≥₦4k are ALL genuinely 30-day across
   // every network (verified against the real catalog), so "Data That Lasts"
-  // is an honest label, not just marketing — it never mixes in a short-
-  // validity plan. Threshold is on raw ck (wholesale), not the marked-up
-  // display price — close enough (1% markup) that it never crosses the line.
+  // is an honest label, not just marketing.
+  // A plan also qualifies as "Data That Lasts" if it's 10GB+ regardless of
+  // validity — a big 7-day (or bigger) plan still "lasts" in the sense that
+  // matters, even if it's not the 30-day kind.
   const LASTS_THRESHOLD = 4000;
+  const LASTS_MIN_GB = 10;
+
+  function planSizeGB(size) {
+    const m = String(size).match(/([\d.]+)\s*(GB|MB)/i);
+    if (!m) return 0;
+    const num = parseFloat(m[1]);
+    return m[2].toUpperCase() === 'GB' ? num : num / 1024;
+  }
+
+  function qualifiesForLasts(p) {
+    return p.ck >= LASTS_THRESHOLD || planSizeGB(p.size) >= LASTS_MIN_GB;
+  }
 
   function getPlansForCategory(netPlans, cat) {
+    const daily = netPlans.daily || [];
+    const weekly = netPlans.weekly || [];
     const monthly = netPlans.monthly || [];
+
+    if (cat === 'daily') {
+      return daily.filter(p => !qualifiesForLasts(p));
+    }
     if (cat === 'weekly') {
-      return (netPlans.weekly || []).concat(monthly.filter(p => p.ck < LASTS_THRESHOLD));
+      return weekly.filter(p => !qualifiesForLasts(p))
+        .concat(monthly.filter(p => !qualifiesForLasts(p)));
     }
     if (cat === 'lasts') {
-      return monthly.filter(p => p.ck >= LASTS_THRESHOLD);
+      return daily.filter(qualifiesForLasts)
+        .concat(weekly.filter(qualifiesForLasts), monthly.filter(qualifiesForLasts));
     }
     return netPlans[cat] || [];
   }
@@ -3525,27 +3433,28 @@
       const isExpensive = p.ck >= 1100; // Golden-plan styling/category only — unrelated to discount band below
       const isCheapDiscountBand = p.ck <= 500; // legacy flag, discount is now flat ₦300 regardless of band
 
-      // Pricing — 1% markup on wholesale cost. This margin is never credited
-      // to any one user; it's public money split 50/50 into the two shared
-      // pools (reward_pool for cashback claims, toggle_pool for premium
-      // discounts) — see the buy-data success handler on the backend.
+      // Pricing — 1% markup on wholesale cost for regular plans. This margin is
+      // never credited to any one user; it's public money split 50/50 into the
+      // two shared pools (reward_pool for cashback claims, toggle_pool for
+      // premium discounts) — see the buy-data success handler on the backend.
+      // "Data That Lasts" plans get 3% instead of 1% — same qualifying rule
+      // used for the tab itself (ck >= LASTS_THRESHOLD or size >= LASTS_MIN_GB).
       // Rounded once, cleanly, to whole naira — no compounding float error
       // from ClubKonnect's raw decimal costs.
       const rawCost = p.ck;
-      const basePrice = Math.round(rawCost * 1.01);
+      const markupRate = qualifiesForLasts(p) ? 0.03 : 0.01;
+      const basePrice = Math.round(rawCost * (1 + markupRate));
       let displayPriceFinal = basePrice;
 
-      // Add ₦500 pure profit markup for plans ≥ ₦7k (doesn't split, pure profit)
-      if (basePrice >= 7000) {
-        displayPriceFinal += 500;
-      }
-
-      // Premium toggle logic — only active right after a fresh card scan (not needing re-scan),
-      // or during the picker demo preview.
+      // Premium toggle logic — only active right after a fresh card scan (not needing re-scan).
+      // Note: premiumToggleOn is never set true anymore (toggle now opens Emergency Box
+      // instead), so this branch is currently unreachable — left in place since the
+      // underlying discount system (rollDiscountAmount/premiumDiscountUsesLeft) is still
+      // wired into checkout and hasn't been removed.
       let isPremiumActive = false;
       const toggleReallyOn = premiumToggleOn && (!premiumUnlocked || !needsScanToActivate);
-      if (toggleReallyOn || premDemoActive) {
-        const activePlan = premiumUnlocked ? premiumPlan : demoSelectedPlan;
+      if (toggleReallyOn) {
+        const activePlan = premiumUnlocked ? premiumPlan : 'premium';
         isPremiumActive = true;
         const flatDiscount = rollDiscountAmount(activePlan, premiumUnlocked);
         // Discount is funded from the subscription fee already collected — never from this
@@ -3574,10 +3483,6 @@
       </div>`;
     }).join('');
 
-    // Re-apply glow animation on premium prices if demo is still active
-    if (premDemoActive) {
-      container.querySelectorAll('.b-price-gold').forEach(el => el.classList.add('prem-final'));
-    }
   }
 
   function selNet(el, n) {
@@ -3617,87 +3522,13 @@
     return candidates[Math.floor(Math.random() * candidates.length)];
   }
 
-  // ── Big-data savings: bubble drag + tap ──
-  let savingsBubbleDragging = false;
-  let savingsBubbleMoved = false;
-  let savingsBubbleStartX = 0, savingsBubbleStartY = 0;
-  let savingsBubbleOffsetX = 0, savingsBubbleOffsetY = 0;
-  let giftboxDriftTimer = null;
-
-  // Gift box drifts to a new random spot on screen every 6 seconds.
-  // Skips a move while the user is actively dragging it, and only
-  // runs while the bubble is actually visible (logged-in users).
-  function startGiftboxDrift() {
-    if (giftboxDriftTimer) return;
-    giftboxDriftTimer = setInterval(() => {
-      const bubble = document.getElementById('savings-bubble');
-      if (!bubble || savingsBubbleDragging) return;
-      if (getComputedStyle(bubble).display === 'none') return;
-      const size = bubble.offsetWidth || 64;
-      const maxLeft = Math.max(4, window.innerWidth - size - 4);
-      const maxTop = Math.max(4, window.innerHeight - size - 4);
-      const newLeft = 4 + Math.random() * (maxLeft - 4);
-      const newTop = 4 + Math.random() * (maxTop - 4);
-      bubble.style.transform = `translate3d(${newLeft}px,${newTop}px,0)`;
-    }, 6000);
-  }
-
-  function savingsBubbleDown(e) {
-    if (isGuest) return; // logged-in feature only
-    const bubble = document.getElementById('savings-bubble');
-    const floatEl = document.getElementById('giftbox-float');
-    if (!bubble) return;
-    savingsBubbleDragging = true;
-    savingsBubbleMoved = false;
-    const rect = bubble.getBoundingClientRect();
-    savingsBubbleOffsetX = e.clientX - rect.left;
-    savingsBubbleOffsetY = e.clientY - rect.top;
-    savingsBubbleStartX = e.clientX;
-    savingsBubbleStartY = e.clientY;
-    if (floatEl) floatEl.style.animation = 'none';
-    bubble.style.transition = 'none';
-    try { bubble.setPointerCapture(e.pointerId); } catch (err) {}
-    bubble.addEventListener('pointermove', savingsBubbleMove);
-    bubble.addEventListener('pointerup', savingsBubbleUp);
-    bubble.addEventListener('pointercancel', savingsBubbleUp);
-  }
-
-  function savingsBubbleMove(e) {
-    if (!savingsBubbleDragging) return;
-    const bubble = document.getElementById('savings-bubble');
-    if (!bubble) return;
-    const dx = e.clientX - savingsBubbleStartX;
-    const dy = e.clientY - savingsBubbleStartY;
-    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) savingsBubbleMoved = true;
-    if (!savingsBubbleMoved) return;
-    const size = bubble.offsetWidth;
-    let newLeft = e.clientX - savingsBubbleOffsetX;
-    let newTop = e.clientY - savingsBubbleOffsetY;
-    newLeft = Math.max(4, Math.min(window.innerWidth - size - 4, newLeft));
-    newTop = Math.max(4, Math.min(window.innerHeight - size - 4, newTop));
-    bubble.style.transform = `translate3d(${newLeft}px,${newTop}px,0)`;
-  }
-
-  function savingsBubbleUp(e) {
-    const bubble = document.getElementById('savings-bubble');
-    const floatEl = document.getElementById('giftbox-float');
-    if (bubble) {
-      bubble.style.transition = 'transform 1.8s cubic-bezier(.45,.05,.55,.95)';
-      bubble.removeEventListener('pointermove', savingsBubbleMove);
-      bubble.removeEventListener('pointerup', savingsBubbleUp);
-      bubble.removeEventListener('pointercancel', savingsBubbleUp);
-      try { bubble.releasePointerCapture(e.pointerId); } catch (err) {}
-    }
-    if (floatEl) floatEl.style.animation = 'savingsBubbleFloat 2.6s ease-in-out infinite';
-    savingsBubbleDragging = false;
-    if (!savingsBubbleMoved) openSavingsOv();
-    savingsBubbleMoved = false;
-  }
-
   // ── Big-data savings: sheet open/close + render ──
   let savingsOvOpenedAt = 0;
+  let emergencyToggleOn = false;
   function openSavingsOv() {
     savingsOvOpenedAt = Date.now();
+    emergencyToggleOn = true;
+    setPremToggleUI(true);
     renderSavingsBubble();
     const ov = document.getElementById('savings-ov');
     if (ov) { ov.style.display = 'flex'; requestAnimationFrame(() => ov.classList.add('open')); }
@@ -3708,6 +3539,8 @@
     // which just opened this overlay — otherwise it closes instantly.
     if (Date.now() - savingsOvOpenedAt < 350) return;
     if (e && e.target !== document.getElementById('savings-ov')) return;
+    emergencyToggleOn = false;
+    setPremToggleUI(false);
     const ov = document.getElementById('savings-ov');
     if (ov) { ov.classList.remove('open'); setTimeout(() => { ov.style.display = 'none'; }, 300); }
     const addForm = document.getElementById('savings-add-form');
@@ -3766,7 +3599,7 @@
     const targetLabel = document.getElementById('savings-target-label');
     if (targetLabel) {
       const remaining = Math.max(0, target - current);
-      targetLabel.textContent = 'Remaining ₦' + Math.round(remaining).toLocaleString();
+      targetLabel.textContent = '₦' + Math.round(remaining).toLocaleString();
     }
 
     const collectBtn = document.getElementById('savings-collect-btn');
@@ -4920,23 +4753,6 @@
   // Kept as a thin function so existing call sites don't need updating.
   function updateSubsidyUI() {
     renderBundles();
-    updateSavingsBubbleVisibility();
-  }
-
-  // Savings bubble is a logged-in-only feature — hide it entirely for guests.
-  function updateSavingsBubbleVisibility() {
-    const bubble = document.getElementById('savings-bubble');
-    if (bubble) {
-      bubble.style.display = isGuest ? 'none' : 'flex';
-      if (!isGuest && !bubble.dataset.positioned) {
-        const size = bubble.offsetWidth || 64;
-        const initLeft = window.innerWidth - size - 16;
-        const initTop = window.innerHeight - size - 170;
-        bubble.style.transform = `translate3d(${initLeft}px,${initTop}px,0)`;
-        bubble.dataset.positioned = '1';
-      }
-    }
-    if (!isGuest) startGiftboxDrift();
   }
 
 
@@ -5490,56 +5306,13 @@
   // Load persisted premium state from localStorage
   // Premium state is loaded from the database via fetchUserData — not localStorage
 
-  async function onPremToggleClick() {
-    if (premiumUnlocked) {
-      if (premiumToggleOn) {
-        premiumToggleOn = false;
-        const dash = document.getElementById('dash');
-        if (dash) dash.classList.remove('prem-demo-active');
-        setPremToggleUI(false);
-        renderBundles();
-        return;
-      }
-      // Turning on — gated purely by whether this cycle's 1 discount use is
-      // still left. Available any time within the Premium window.
-      if (premiumDiscountUsesLeft <= 0) {
-        showPremStatusPopup('Discount Used', "You've used up your discount — it renews on your next subscription.");
-        return;
-      }
-      // Turning on — play the blur + scroll + price-drop reveal.
-      pickPremDiscount(premiumPlan);
-      return;
+  function onPremToggleClick() {
+    if (gateCheck('Emergency Box', 'Create a free account to use your Emergency Box.')) return;
+    if (emergencyToggleOn) {
+      closeSavingsOv();
+    } else {
+      openSavingsOv();
     }
-
-    if (bossTrialAvailable) {
-      // Never subscribed, trial still available — flip on now. The trial
-      // itself only actually activates on the PIN confirmation at checkout.
-      if (premiumToggleOn) {
-        premiumToggleOn = false;
-        const dash = document.getElementById('dash');
-        if (dash) dash.classList.remove('prem-demo-active');
-        setPremToggleUI(false);
-        renderBundles();
-        return;
-      }
-      // Trial users aren't gated by the discount-fund availability check —
-      // that message is only relevant to actual premium subscribers.
-      pickPremDiscount('premium');
-      return;
-    }
-
-    // No active subscription and no trial left — nothing to toggle on for
-    // free. Show the picker so they can subscribe to a paid plan.
-    if (premiumToggleOn) {
-      premiumToggleOn = false;
-      premDemoSeen = false;
-      const dash = document.getElementById('dash');
-      if (dash) dash.classList.remove('prem-demo-active');
-      setPremToggleUI(false);
-      renderBundles();
-      return;
-    }
-    pickPremDiscount('premium');
   }
 
   
@@ -5704,13 +5477,16 @@
     });
   }
 
+  // Track physically flips on/off (mirrors whether the Emergency sheet is
+  // open) — but the "Emergency" label itself always stays gold/glowing,
+  // regardless of which state the switch is in.
   function setPremToggleUI(on) {
     const track = document.getElementById('prem-toggle-track');
     const label = document.getElementById('prem-toggle-label');
     if (track) on ? track.classList.add('on') : track.classList.remove('on');
     if (label) {
-      label.textContent = on ? 'Premium ON' : 'Premium';
-      on ? label.classList.add('active') : label.classList.remove('active');
+      label.textContent = 'Emergency';
+      label.classList.add('active');
     }
   }
 
@@ -5726,143 +5502,6 @@
     setPremToggleUI(false);
     renderBundles();
     updateSubsidyUI();
-  }
-
-  // ── DISCOUNT PICKER (preview only) ──
-  const PICK_CARD_STYLE = {
-    premium: { active: { bg: 'rgba(245,166,35,0.1)', border: '#F5A623', text: '#F5A623' } }
-  };
-
-  function highlightPickCard(plan) {
-    PREM_PLAN_ORDER.forEach(p => {
-      const card = document.getElementById('pick-card-' + p);
-      if (!card) return;
-      const pctDiv = card.children[1];
-      // Never expose the actual discount amount or how many uses are left —
-      // just show that discounted pricing is active/available at all.
-      if (pctDiv) {
-        const next = (premiumUnlocked && p === premiumPlan) ? rollDiscountAmount(p, true) : 0;
-        pctDiv.textContent = next > 0 ? 'Discount Active' : 'Special Pricing';
-      }
-      if (p === plan) {
-        const s = PICK_CARD_STYLE[p].active;
-        card.style.background = s.bg;
-        card.style.borderColor = s.border;
-        card.style.opacity = '1';
-        if (pctDiv) pctDiv.style.color = s.text;
-      } else {
-        card.style.background = 'var(--dark-3)';
-        card.style.borderColor = 'var(--border)';
-        card.style.opacity = '0.55';
-        if (pctDiv) pctDiv.style.color = 'var(--w40)';
-      }
-    });
-  }
-
-  function openPremDiscountPick() {
-    const ov = document.getElementById('prem-pick-ov');
-    if (ov) { ov.style.display = 'flex'; setTimeout(() => ov.classList.add('open'), 10); }
-    highlightPickCard(demoSelectedPlan || 'premium');
-  }
-
-  function closePremDiscountPick(e) {
-    if (e && e.target !== document.getElementById('prem-pick-ov')) return;
-    const ov = document.getElementById('prem-pick-ov');
-    if (ov) { ov.classList.remove('open'); setTimeout(() => { ov.style.display = 'none'; }, 300); }
-  }
-
-  function pickPremDiscount(plan) {
-    demoSelectedPlan = plan;
-    premiumToggleOn = true;
-    premDemoSeen = true;
-    setPremToggleUI(true);
-    const dash = document.getElementById('dash');
-    if (dash) dash.classList.add('prem-demo-active');
-
-    // Close the picker first — the price drop plays AFTER it's out of the way,
-    // so you actually get to watch it happen instead of it being hidden behind the sheet.
-    closePremDiscountPick();
-
-    setTimeout(() => {
-      // Snapshot what's currently on screen so we can animate FROM it — the real,
-      // correct values come from renderBundles() below, not from this snapshot.
-      const beforeVals = [];
-      document.querySelectorAll('#bundles-all .bundle .b-price').forEach(el => {
-        beforeVals.push(parseFloat(el.textContent.replace(/[₦,]/g, '').trim()));
-      });
-
-      // Real re-render — this is what actually fixes prices/onclick handlers for
-      // whichever tab (daily/weekly/monthly) is currently visible, no tab switch needed.
-      renderBundles();
-
-      const priceEls = document.querySelectorAll('#bundles-all .bundle .b-price');
-      const targets = [];
-      priceEls.forEach((el, i) => {
-        const toVal = parseFloat(el.textContent.replace(/[₦,]/g, '').trim());
-        if (isNaN(toVal)) return;
-        const fromVal = beforeVals[i];
-        targets.push({ el, from: isNaN(fromVal) ? toVal : fromVal, to: toVal });
-      });
-
-      // Snap back to the "from" value immediately, before any paint, so there's
-      // no flash of the final number before the count-down plays.
-      targets.forEach(({ el, from }) => { el.textContent = '₦' + Math.round(from).toLocaleString(); });
-
-      runPriceCountAnimation(targets, () => setTimeout(showCheaperThanOpayPopup, 2500));
-
-      const spotlight = document.getElementById('prem-plans-spotlight');
-      if (spotlight) spotlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 320);
-  }
-
-  function showCheaperThanOpayPopup() {
-    const ov = document.getElementById('cheaper-mode-ov');
-    if (ov) ov.classList.add('open');
-  }
-
-  function closeCheaperModeOv() {
-    const ov = document.getElementById('cheaper-mode-ov');
-    if (ov) ov.classList.remove('open');
-  }
-
-  function runPriceCountAnimation(targets, onDone) {
-    if (!targets || targets.length === 0) { if (onDone) onDone(); return; }
-    const duration = 900;
-    const start = performance.now();
-    function step(now) {
-      const t = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - t, 3);
-      targets.forEach(({ el, from, to }) => {
-        const current = Math.round(from + (to - from) * ease);
-        el.textContent = '₦' + current.toLocaleString();
-        el.classList.add('prem-counting');
-      });
-      if (t < 1) {
-        requestAnimationFrame(step);
-      } else {
-        targets.forEach(({ el, to }) => {
-          el.textContent = '₦' + to.toLocaleString();
-          el.classList.remove('prem-counting');
-          el.classList.add('prem-final');
-        });
-        if (onDone) onDone();
-      }
-    }
-    requestAnimationFrame(step);
-  }
-
-  function cancelPremDemo() {
-    premDemoActive = false;
-    premDemoSeen = false;
-    premiumToggleOn = false;
-    // Lift blur
-    const dash = document.getElementById('dash');
-    if (dash) dash.classList.remove('prem-demo-active');
-    setPremToggleUI(false);
-    renderBundles();
-    document.querySelectorAll('.b-price').forEach(el => {
-      el.classList.remove('prem-counting', 'prem-final');
-    });
   }
 
   // Stamps a persistent "Current" badge on the plan the user is actually
@@ -5935,9 +5574,6 @@
     if (ov) { ov.classList.remove('open'); setTimeout(() => { ov.style.display = 'none'; }, 300); }
     if (!premiumUnlocked) {
       premiumToggleOn = false;
-      premDemoSeen = false;
-      const dash = document.getElementById('dash');
-      if (dash) dash.classList.remove('prem-demo-active');
       setPremToggleUI(false);
       renderBundles();
       // The buy sheet underneath may still be open with a stale `cur.price`

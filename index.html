@@ -971,7 +971,7 @@
       </div>
       <img src="${CARD_IMG}" alt="Subsidi Card" style="width:100%;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,0.5);margin-bottom:20px;">
       <div style="font-size:13px;color:var(--w40);line-height:1.7;text-align:center;padding:0 8px;">
-        This is the card you scan to activate discounts and collect cashback. ${premiumUnlocked ? 'Your ' + planLabel + ' plan is active on this card.' : 'Subscribe to a premium plan to start earning discounts on every purchase.'}
+        This is the card you scan to activate Premium and collect cashback. ${premiumUnlocked ? 'Your ' + planLabel + ' plan is active on this card.' : 'Subscribe to a premium plan for a higher borrow limit and your Emergency Box.'}
       </div>
       ${!premiumUnlocked ? `<button onclick="showPremUnlockSheet()" style="margin-top:20px;width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));color:#fff;font-size:14px;font-weight:800;cursor:pointer;">Unlock Premium</button>` : ''}`;
   }
@@ -1281,7 +1281,7 @@
         </div>
         <div class="prof-row-body">
           <div class="prof-row-title">Premium</div>
-          <div class="prof-row-sub" id="prof-row-premium-sub">Discounted purchases every week</div>
+          <div class="prof-row-sub" id="prof-row-premium-sub">Higher borrow limit + Emergency Box</div>
         </div>
         <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
@@ -1293,7 +1293,7 @@
         </div>
         <div class="prof-row-body">
           <div class="prof-row-title">Premium Policy</div>
-          <div class="prof-row-sub">How Premium's weekly discounts work</div>
+          <div class="prof-row-sub">How Premium's weekly perks work</div>
         </div>
         <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
@@ -1456,7 +1456,7 @@
         <span style="font-size:28px;">✓</span>
       </div>
       <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:var(--green);margin-bottom:6px;">Premium activated!</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">Your discount is live for this cycle — scan again after your next cooldown.</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">Your higher borrow limit and Emergency Box are active for this cycle.</div>
       <button class="reg-btn" onclick="closeFreeScan()" style="width:100%;">Done</button>
     </div>
 
@@ -1590,7 +1590,7 @@
   <div style="padding:20px 16px 24px;max-width:480px;margin:0 auto;">
     <div style="font-size:22px;font-weight:900;margin-bottom:6px;">Order a New Card</div>
     <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:20px;">
-      Lost, damaged, or never had one? Get the same plastic Subsidi card used to reactivate discounts — no premium plan required.
+      Lost, damaged, or never had one? Get the same plastic Subsidi card used to reactivate Premium and claim free scans — no active plan required.
     </div>
 
     <img id="newcard-photo" src="https://i.postimg.cc/QMbVvFSz/1780768681291-removebg-preview.png" alt="Subsidi Card" style="width:100%;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,0.5);margin-bottom:20px;">
@@ -1704,7 +1704,6 @@
           <div style="background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
             <div style="font-size:20px;font-weight:900;color:#F5A623;margin-bottom:12px;">What you get</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> 4 discount purchases</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Borrow more than ₦100</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Unlock Emergency Box</div>
             </div>
@@ -2330,7 +2329,7 @@
             premiumToggleOn = true;
             setPremToggleUI(true);
             renderBundles();
-            alert('Premium activated! Enter your PIN at checkout to get the discount.');
+            alert('Premium activated! Your higher borrow limit and Emergency Box are ready.');
           } else {
             alert('Payment verification failed. Contact support with ref: ' + paystackRef);
           }
@@ -3893,7 +3892,7 @@
     buyPinEntry = '';
     updateBuyPinDots('');
     const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
-    if (sub) sub.textContent = premiumToggleOn ? 'Confirm your identity to apply your discount' : 'Confirm your identity to continue';
+    if (sub) sub.textContent = 'Confirm your identity to continue';
     openPinBuyOv();
     return;
   }
@@ -3975,7 +3974,7 @@
     // Card row sub / right
     const cardSubEl = document.getElementById('prof-card-sub');
     const cardRightEl = document.getElementById('prof-card-right');
-    if (cardSubEl) cardSubEl.textContent = 'Subsidy discounts active';
+    if (cardSubEl) cardSubEl.textContent = 'Card active';
     if (cardRightEl) {
       cardRightEl.textContent = 'Active';
       cardRightEl.style.color = 'var(--green)';
@@ -5075,11 +5074,11 @@
   const FAQ_ITEMS = [
     {
       q: "What is Subsidi?",
-      a: "Subsidi is a membership that gets you mobile data cheaper than market price. Everyone can borrow ₦100 free, no payment required. Premium is ₦870 and gets you discounted purchases, more borrowing, and your Emergency Box."
+      a: "Subsidi is a membership that gets you mobile data cheaper than market price. Everyone can borrow ₦100 free, no payment required. Premium is ₦870 and gets you a higher borrow limit and your Emergency Box."
     },
     {
-      q: "How do I keep my discount active?",
-      a: "Every premium purchase asks you to confirm your PIN at checkout to apply your discount. Nothing is auto-charged — you subscribe and pay whenever you're ready."
+      q: "How do I keep Premium active?",
+      a: "Just renew every 7 days — your higher borrow limit and Emergency Box top-up apply automatically as soon as you pay. Nothing is auto-charged; you subscribe and pay whenever you're ready."
     },
     {
       q: "Is my money safe?",
@@ -5339,7 +5338,7 @@
         <div style="width:64px;height:64px;border-radius:50%;background:rgba(245,166,35,.08);border:1.5px solid rgba(245,166,35,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
           <span style="font-size:30px;">😊</span>
         </div>
-        <div style="font-size:14px;background:linear-gradient(90deg,#fff,#F5A623,#fff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:24px;line-height:1.6;font-weight:600;">Discount Fund is being refilled.<br>Please come Back later</div>
+        <div style="font-size:14px;background:linear-gradient(90deg,#fff,#F5A623,#fff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:24px;line-height:1.6;font-weight:600;">This isn't available right now.<br>Please come back later</div>
         <button onclick="document.getElementById('${popId}').remove();" style="width:100%;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">OK</button>
       </div>`;
     document.body.appendChild(pop);
@@ -5373,7 +5372,7 @@
       <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;">
         <div style="font-size:32px;margin-bottom:12px;">⏳</div>
         <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:8px;">Cooldown Active</div>
-        <div style="font-size:13px;color:var(--w40);margin-bottom:12px;line-height:1.6;">Your next discounted purchase unlocks on</div>
+        <div style="font-size:13px;color:var(--w40);margin-bottom:12px;line-height:1.6;">Your next reactivation unlocks on</div>
         <div id="prem-countdown" style="font-size:28px;font-weight:900;color:#F5A623;letter-spacing:.5px;margin-bottom:24px;">${formatCooldownReset(msLeft)}</div>
         <div style="display:flex;gap:10px;">
           <button onclick="document.getElementById('${popId}').remove();" style="flex:1;padding:14px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:13px;font-weight:700;cursor:pointer;">Close</button>
@@ -5523,9 +5522,9 @@
     const el = document.getElementById('prof-row-premium-sub');
     if (!el) return;
     if (premiumUnlocked && PREMIUM_PLANS[premiumPlan]) {
-      el.textContent = '₦' + PREMIUM_PLANS[premiumPlan].price.toLocaleString() + '/week — discounted purchases';
+      el.textContent = '₦' + PREMIUM_PLANS[premiumPlan].price.toLocaleString() + '/week — active';
     } else {
-      el.textContent = 'Discounted purchases every week';
+      el.textContent = 'Higher borrow limit + Emergency Box';
     }
   }
 
@@ -5534,10 +5533,10 @@
     const label = document.getElementById('prem-sheet-context-label');
     if (label) {
       if (fromPlanTap === 'reactivate') {
-        label.textContent = 'Scan your card to reactivate your discount';
+        label.textContent = 'Scan your card to reactivate Premium';
         label.style.display = '';
       } else {
-        label.textContent = fromPlanTap ? 'This is a Premium price' : 'Unlock cheaper prices';
+        label.textContent = fromPlanTap ? 'This is a Premium price' : 'Unlock more with Premium';
         label.style.display = fromPlanTap ? '' : 'none';
       }
     }
@@ -5618,11 +5617,10 @@
         <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
         <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:16px;">Premium Policy</div>
         <div style="font-size:12px;color:var(--w50);line-height:1.8;">
-          <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Discounted Purchases</strong> — Premium is ₦870/week. You get 4 discount purchases to use whenever you like — in any order, any time during your cycle.</p>
-          <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Fixed Cycle</strong> — Premium runs for 7 days from the day you pay, then expires — no grace period. Unused discounts don't carry over once it expires. To keep going, just subscribe again.</p>
-          <p style="margin:0 0 10px;">📦 <strong style="color:var(--w70);">Emergency Box</strong> — Premium unlocks it, and boosts your progress every renewal.</p>
-          <p style="margin:0 0 10px;">🔓 <strong style="color:var(--w70);">Borrow</strong> — Everyone can borrow ₦100 free. Premium lets you borrow more than that.</p>
-          <p style="margin:0 0 10px;">🔐 <strong style="color:var(--w70);">PIN Required</strong> — Every premium purchase asks you to confirm your PIN at checkout to apply your discount. Nothing is auto-charged — you subscribe and pay whenever you're ready.</p>
+          <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Weekly Subscription</strong> — Premium is ₦870/week, billed each time you renew.</p>
+          <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Fixed Cycle</strong> — Premium runs for 7 days from the day you pay, then expires — no grace period. Subscribe again for a fresh cycle.</p>
+          <p style="margin:0 0 10px;">📦 <strong style="color:var(--w70);">Emergency Box</strong> — Premium unlocks it, and boosts your balance every renewal.</p>
+          <p style="margin:0 0 10px;">🔓 <strong style="color:var(--w70);">Borrow</strong> — Everyone can borrow ₦100 free. Premium lets you borrow more, and your limit grows with each renewal.</p>
           <p style="margin:0;">❓ Questions about your plan or billing? Reach out via <strong style="color:var(--w70);">Report Issue</strong> in Support.</p>
         </div>
         <button onclick="document.getElementById('${popId}').remove();" style="width:100%;margin-top:24px;padding:15px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">Close</button>
@@ -5655,11 +5653,10 @@
           </div>
           <div id="prem-policy-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
-              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Discounted Purchases</strong> — Premium is ₦870/week. You get 4 discount purchases to use any time, any order during your cycle.</p>
+              <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Weekly Subscription</strong> — Premium is ₦870/week, billed each time you renew.</p>
               <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Fixed Cycle</strong> — Runs 7 days from payment, then expires — no grace period, nothing carries over. Subscribe again for a fresh cycle.</p>
-              <p style="margin:0 0 10px;">📦 <strong style="color:var(--w70);">Emergency Box</strong> — Premium unlocks it, and boosts your progress every renewal.</p>
-              <p style="margin:0 0 10px;">🔓 <strong style="color:var(--w70);">Borrow</strong> — Everyone can borrow ₦100 free. Premium lets you borrow more.</p>
-              <p style="margin:0 0 10px;">🔐 <strong style="color:var(--w70);">PIN Required</strong> — Every premium purchase asks you to confirm your PIN at checkout to apply the discount.</p>
+              <p style="margin:0 0 10px;">📦 <strong style="color:var(--w70);">Emergency Box</strong> — Premium unlocks it, and boosts your balance every renewal.</p>
+              <p style="margin:0 0 10px;">🔓 <strong style="color:var(--w70);">Borrow</strong> — Everyone can borrow ₦100 free. Premium lets you borrow more, and your limit grows with each renewal.</p>
             </div>
           </div>
         </div>
@@ -5720,7 +5717,7 @@
               setPremToggleUI(true);
               renderBundles();
               updateCurrentPlanBadge();
-              alert('Premium activated! Enter your PIN at checkout to get the discount.');
+              alert('Premium activated! Your higher borrow limit and Emergency Box are ready.');
             } else {
               alert('Payment verification failed. Contact support with ref: ' + response.reference);
             }

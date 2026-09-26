@@ -108,21 +108,11 @@
   .refresh-btn:active{background:var(--dark-5);transform:scale(.96)}
   .refresh-btn.spinning svg{animation:spin .6s linear infinite}
 
-  /* ── PREMIUM TOGGLE ── */
-  .prem-toggle-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
-  .prem-toggle-label{font-size:11px;font-weight:700;color:var(--w40);letter-spacing:.4px;text-transform:uppercase;transition:color .2s;}
-  .prem-toggle-label.active{color:#F5A623;animation:premLabelGlow 2s ease-in-out infinite;}
-  @keyframes premLabelGlow{0%,100%{text-shadow:0 0 4px rgba(245,166,35,.3)}50%{text-shadow:0 0 10px rgba(245,166,35,.9),0 0 18px rgba(255,201,71,.5)}}
-  .prem-toggle-track{width:44px;height:24px;border-radius:12px;background:var(--dark-4);border:1px solid var(--border);position:relative;transition:background .25s,border-color .25s;flex-shrink:0;animation:premPulse 2.5s ease-in-out infinite;}
-  .prem-toggle-track.on{background:linear-gradient(90deg,#b87010,#F5A623);border-color:#F5A623;animation:none;}
-  .prem-toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 4px rgba(0,0,0,.3);}
-  .prem-toggle-track.on .prem-toggle-thumb{transform:translateX(20px);}
   .bal-blurred{filter:blur(9px);-webkit-filter:blur(9px);user-select:none;transition:filter .25s;}
   .set-toggle-track{width:44px;height:24px;border-radius:12px;background:var(--dark-4);border:1px solid var(--border);position:relative;transition:background .25s,border-color .25s;flex-shrink:0;}
   .set-toggle-track.on{background:#fff;border-color:#fff;}
   .set-toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .25s cubic-bezier(.4,0,.2,1),background .25s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
   .set-toggle-track.on .set-toggle-thumb{transform:translateX(20px);background:#000;}
-  @keyframes premPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,166,35,0);border-color:var(--border);}50%{box-shadow:0 0 0 4px rgba(245,166,35,.25);border-color:#F5A623;}}
 
   /* ── PREMIUM UNLOCK SHEET ── */
   .prem-sheet-price{font-size:36px;font-weight:900;color:#F5A623;text-align:center;margin:8px 0 4px;}
@@ -249,6 +239,24 @@
   .gift-win-amount .cur{color:#F5A623;margin-right:2px}
   .gift-win-sub{font-size:12.5px;color:var(--w40);margin-bottom:24px;line-height:1.5}
   .gift-win-btn{width:100%;padding:14px;background:linear-gradient(135deg,#F5A623,#E8A500);border:none;border-radius:14px;color:#241800;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.2px}
+  .rw-strip{position:relative;overflow:hidden;margin:22px -24px -28px;background:rgba(255,255,255,.035);border-top:1px solid var(--border);cursor:pointer}
+  .rw-track{display:flex}
+  .rw-slide{flex:0 0 100%;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 24px}
+  .rw-strip:active{background:rgba(255,255,255,.06)}
+  .rw-strip-l{display:flex;align-items:center;gap:10px;min-width:0;font-size:13px;font-weight:600;color:var(--w70)}
+  .rw-strip-l svg{flex-shrink:0}
+  .rw-strip-r{display:flex;align-items:center;gap:2px;flex-shrink:0;font-size:12px;font-weight:700;color:var(--p-light)}
+  .rw-row{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-top:1px solid var(--border)}
+  .rw-ico{width:26px;height:26px;border-radius:50%;background:var(--p-subtle);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .rw-t{font-size:15px;font-weight:700;line-height:1.35}
+  .rw-s{font-size:12.5px;color:var(--w40);margin-top:3px;line-height:1.5}
+  .rw-foot{font-size:12.5px;font-weight:600;color:#F5A623;line-height:1.55;padding:14px 0 16px;border-top:1px solid var(--border)}
+  .rw-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+  .rw-stat{background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:14px 16px}
+  .rw-stat-l{font-size:12px;font-weight:600;color:var(--w40)}
+  .rw-stat-v{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-top:6px}
+  .rw-stat-v.purple{color:var(--p-light)}
+  .rw-stat-v.gold{color:#F5A623}
   .sheet{background:var(--dark-2);border:1px solid var(--border);border-radius:28px 28px 0 0;padding:10px 24px 44px;width:100%;animation:up .32s cubic-bezier(.22,1,.36,1)}
   @keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
   @keyframes giftWave{0%,100%{transform:rotate(0deg)}10%{transform:rotate(16deg)}20%{transform:rotate(-10deg)}30%{transform:rotate(16deg)}40%{transform:rotate(-6deg)}50%{transform:rotate(12deg)}60%,100%{transform:rotate(0deg)}}
@@ -288,6 +296,27 @@
   .dep-opt{background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:18px;text-align:center;font-size:18px;font-weight:700;cursor:pointer;transition:all .15s;color:var(--w)}
   .dep-opt:active{transform:scale(.96)}
   .dep-opt.sel{background:var(--p-subtle);border-color:var(--p);color:var(--p-light)}
+
+  /* ── Borrowed from subsidi-stock.html's Invest sheet — UI only, no GB/margin math ── */
+  .inv-hero{text-align:center;padding:18px 0 20px;}
+  .inv-hero-amt{font-size:32px;font-weight:700;color:#F5A623;}
+  .inv-hero-lbl{font-size:12px;font-weight:700;color:#F5A623;letter-spacing:.3px;margin-top:4px;}
+  .invest-input-row{display:flex;align-items:baseline;gap:6px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:18px 0 14px;margin-bottom:14px;}
+  .invest-cur{font-size:26px;font-weight:700;color:var(--w40);}
+  .invest-input{background:transparent;border:none;outline:none;color:var(--w);font-family:inherit;font-size:26px;font-weight:700;width:100%;}
+  .invest-min-hint{font-size:11.5px;color:var(--w40);margin-bottom:16px;}
+  .invest-error{display:inline-flex;align-items:center;gap:7px;background:rgba(224,65,90,0.1);border:1px solid rgba(224,65,90,0.25);border-radius:8px;padding:8px 12px;font-size:12px;color:#FF6B81;font-weight:600;margin-bottom:16px;}
+  .quick-amts{display:flex;gap:8px;margin-bottom:22px;}
+  .earn-amt-swipe-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;display:flex;gap:12px;padding:4px 0;scrollbar-width:none;}
+  .earn-amt-swipe-wrap::-webkit-scrollbar{display:none;}
+  .earn-amt-swipe-track{display:flex;gap:12px;padding:0 calc(50% - 62px);}
+  .earn-amt-card{flex-shrink:0;width:124px;height:64px;border-radius:16px;background:var(--dark-3);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:var(--w70);scroll-snap-align:center;transition:border-color .2s,color .2s,opacity .2s;}
+  .earn-amt-card.sel{border-color:#F5A623;color:#F5A623;}
+  .earn-amt-card.disabled{opacity:.35;}
+  .qa{flex:1;background:var(--dark-4);border:1px solid var(--border);border-radius:10px;padding:9px 4px;text-align:center;font-size:12px;font-weight:600;color:var(--w70);cursor:pointer;}
+  .qa.sel{background:var(--p-subtle);border-color:var(--p);color:var(--p-light);}
+  .sheet-actions{display:flex;flex-direction:column;gap:10px;}
+  .btn-primary{background:var(--p);color:var(--w);border:none;padding:16px;border-radius:16px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;width:100%;}
 
   .spc{height:28px}
 
@@ -787,18 +816,23 @@
     <div class="topbar">
       <div class="brand">Subsidi<span class="bpip"></span></div>
       <div class="topbar-icons">
-        <div class="prem-toggle-wrap" id="prem-toggle-wrap" onclick="onPremToggleClick()">
-          <span class="prem-toggle-label active" id="prem-toggle-label">Emergency</span>
-          <div class="prem-toggle-track" id="prem-toggle-track">
-            <div class="prem-toggle-thumb"></div>
-          </div>
+        <div id="hist-icon-wrap" onclick="if(gateCheck('Transaction History','Create a free account to view your transaction history.'))return;showHistoryOv()" style="position:relative;width:36px;height:36px;flex-shrink:0;border-radius:50%;background:var(--dark-4);border:1px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span id="hist-badge" class="ni-badge">0</span>
+        </div>
+        <div onclick="navTo('profile',this)" style="width:36px;height:36px;border-radius:50%;background:var(--dark-4);border:1px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="var(--w70)" stroke="none">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+          </svg>
         </div>
       </div>
     </div>
 
     <!-- Wallet card (static frame; only the balance strip swipes) -->
     <div class="wallet-card-frame prem-blur-target">
-      <div class="bal-lbl" id="wallet-label">Wallet Balance</div>
+      <div class="bal-lbl" id="wallet-label">Spending Wallet</div>
 
       <!-- Swipeable balance strip -->
       <div id="card-swipe-wrap" style="overflow:hidden;position:relative;padding-right:54px;box-sizing:border-box;cursor:pointer;">
@@ -814,7 +848,7 @@
             </div>
           </div>
 
-          <!-- Balance 1: Cashback Pool -->
+          <!-- Balance 1: Savings Balance (was Cashback Pool) -->
           <div data-card="1" style="min-width:100%;flex-shrink:0;box-sizing:border-box;">
             <div class="bal-amt" id="cashback-bal-display" style="background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0;">
               <span class="bal-cur" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">₦</span>0<span class="bal-dec" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">.00</span>
@@ -837,33 +871,64 @@
           </svg>
           <span>Add Money</span>
         </div>
-        <div class="act-rect" onclick="showPremUnlockSheet(false)" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 15 8.5 22 9.3 17 14.1 18.2 21 12 17.6 5.8 21 7 14.1 2 9.3 9 8.5 12 2"/>
+        <div class="act-rect" onclick="event.stopPropagation();if(gateCheck('Save & Earn','Create a free account to start saving.'))return;openEarnOv()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
           </svg>
-          <span>Premium</span>
-        </div>
-        <div id="hist-icon-wrap" onclick="if(gateCheck('Transaction History','Create a free account to view your transaction history.'))return;showHistoryOv()" style="position:relative;width:26px;height:26px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-          <span id="hist-badge" class="ni-badge">0</span>
+          <span>Save & Earn</span>
         </div>
       </div>
 
-      <!-- Actions for Cashback Pool -->
+      <!-- Actions for Save & Earn slide -->
       <div class="wallet-card-actions" id="actions-card-1" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0 4px;opacity:0;pointer-events:none;transition:opacity .25s ease;">
-        <!-- Old Community Bonus "Collect" button retired — replaced in-place by Borrow. -->
-        <div class="act-rect" id="cashback-collect-btn" onclick="event.stopPropagation();if(gateCheck('Borrow','Create a free account to borrow.'))return;handleBorrowTap()" style="flex:1;background:rgba(139,79,232,0.08);border:1px solid rgba(139,79,232,0.35);color:#8B4FE8;">
-          <span id="cashback-collect-btn-label">Borrow</span>
+        <div class="act-rect" onclick="event.stopPropagation();if(gateCheck('Save & Earn','Create a free account to start saving.'))return;openEarnOv()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+          </svg>
+          <span>Save & Earn</span>
         </div>
-        <div class="act-rect" id="cashback-borrow-btn" onclick="event.stopPropagation();if(gateCheck('Repay','Create a free account to manage borrowing.'))return;handleRepayTap()" style="flex:1;background:rgba(139,79,232,0.08);border:1px solid rgba(139,79,232,0.35);color:#8B4FE8;">
-          <span id="cashback-borrow-btn-label">Repay</span>
+        <div class="act-rect" onclick="event.stopPropagation();if(gateCheck('Withdraw','Create a free account to withdraw your savings.'))return;openWithdrawOv()" style="flex:1;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+          </svg>
+          <span>Withdraw</span>
         </div>
       </div>
 
     </div>
 
+
+    <div class="rw-strip" onclick="openRewardsHow()" role="button" tabindex="0">
+      <div class="rw-track" id="rw-track">
+        <div class="rw-slide">
+          <div class="rw-strip-l">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>
+            <span>Only Active Users Are Rewarded</span>
+          </div>
+          <div class="rw-strip-r"><span>See how</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </div>
+        </div>
+        <div class="rw-slide">
+          <div class="rw-strip-l">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>
+            <span id="rw-slide-spent">₦0 of ₦2,000 spent this week</span>
+          </div>
+          <div class="rw-strip-r"><span>See how</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </div>
+        </div>
+        <div class="rw-slide">
+          <div class="rw-strip-l">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>
+            <span>Only Active Users Are Rewarded</span>
+          </div>
+          <div class="rw-strip-r"><span>See how</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 
@@ -929,15 +994,6 @@
       </div>
       <span class="ni-lbl">New Card</span>
     </div>
-    <div class="ni" onclick="navTo('profile',this)">
-      <div class="ni-ico">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-      </div>
-      <span class="ni-lbl">Account</span>
-    </div>
   </div>
 </div>
 
@@ -971,7 +1027,7 @@
       </div>
       <img src="${CARD_IMG}" alt="Subsidi Card" style="width:100%;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,0.5);margin-bottom:20px;">
       <div style="font-size:13px;color:var(--w40);line-height:1.7;text-align:center;padding:0 8px;">
-        This is the card you scan to activate Premium and collect cashback. ${premiumUnlocked ? 'Your ' + planLabel + ' plan is active on this card.' : 'Subscribe to a premium plan for a higher borrow limit and your Emergency Box.'}
+        This is the card you scan to activate Premium and collect cashback. ${premiumUnlocked ? 'Your ' + planLabel + ' plan is active on this card.' : 'Subscribe to a premium plan for discounted data purchases and your Community Bonus.'}
       </div>
       ${!premiumUnlocked ? `<button onclick="showPremUnlockSheet()" style="margin-top:20px;width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));color:#fff;font-size:14px;font-weight:800;cursor:pointer;">Unlock Premium</button>` : ''}`;
   }
@@ -988,168 +1044,6 @@
 </div>
 
 <!-- ── CARD ACTIVE SHEET ── -->
-
-<!-- ── BORROW: AMOUNT SHEET (step 1 — everyone can borrow ₦100 free; more needs Premium) ── -->
-<div class="overlay" id="borrow-amt-ov" onclick="closeBorrowAmtOv(event)">
-  <div class="sheet" onclick="event.stopPropagation()">
-    <div class="sh-bar"></div>
-    <div class="sh-title">Borrow</div>
-    <div style="text-align:center;margin:4px 0 16px;">
-      <div style="font-size:12px;color:var(--w40);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">You can borrow</div>
-      <div id="borrow-available-display" style="font-size:36px;font-weight:800;color:#8B4FE8;">₦100</div>
-    </div>
-    <div class="sh-sub" id="borrow-max-sub" style="text-align:center;">Premium unlocks more</div>
-    <div style="position:relative;margin:20px 0 20px;">
-      <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--w40);font-size:16px;font-weight:700;pointer-events:none;">₦</span>
-      <input id="borrow-amt-input" type="number" inputmode="numeric" min="100" placeholder="How much do you want to borrow" oninput="onBorrowAmtInput(this.value)" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px 16px 16px 34px;font-size:16px;font-weight:700;color:var(--w);">
-    </div>
-    <div id="borrow-amt-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:4px;"></div>
-    <button class="cbtn" id="borrow-confirm-btn" onclick="proceedToBorrowScan()" style="opacity:.4;pointer-events:none;">Continue</button>
-  </div>
-</div>
-
-<!-- ── BORROW: CARD SCAN SHEET (step 2 — confirms the draw) ── -->
-<!-- Same card-scan mechanism as the old Community Bonus collect (jsQR + valid-card
-     check) — same physical card, this time confirming a borrow. -->
-<div class="refer-ov" id="borrow-scan-ov">
-  <div class="refer-sheet">
-    <div class="sh-bar"></div>
-    <div style="display:flex;justify-content:flex-end;margin:-6px -6px 4px;">
-      <div onclick="closeBorrowScan()" style="width:32px;height:32px;border-radius:50%;background:var(--w15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--w40)">×</div>
-    </div>
-
-    <div id="borrow-scan-view">
-      <div style="text-align:center;margin-bottom:16px;">
-        <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:#8B4FE8;margin-bottom:4px;">Scan your card</div>
-        <div id="borrow-scan-sub" style="font-size:13px;color:var(--w40);line-height:1.6;">Hold your Subsidi card up to the camera to borrow</div>
-      </div>
-
-      <div style="position:relative;width:100%;aspect-ratio:1/1;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
-        <video id="borrow-scan-video" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:20px;" autoplay playsinline muted></video>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
-          <div style="width:160px;height:160px;position:relative;">
-            <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-top:3px solid #8B4FE8;border-left:3px solid #8B4FE8;border-radius:4px 0 0 0;"></div>
-            <div style="position:absolute;top:0;right:0;width:32px;height:32px;border-top:3px solid #8B4FE8;border-right:3px solid #8B4FE8;border-radius:0 4px 0 0;"></div>
-            <div style="position:absolute;bottom:0;left:0;width:32px;height:32px;border-bottom:3px solid #8B4FE8;border-left:3px solid #8B4FE8;border-radius:0 0 0 4px;"></div>
-            <div style="position:absolute;bottom:0;right:0;width:32px;height:32px;border-bottom:3px solid #8B4FE8;border-right:3px solid #8B4FE8;border-radius:0 0 4px 0;"></div>
-          </div>
-        </div>
-      </div>
-
-      <div style="display:flex;justify-content:center;margin-bottom:14px;">
-        <button id="borrow-torch-btn" onclick="toggleBorrowTorch()" style="display:flex;align-items:center;gap:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:12px;padding:10px 20px;color:var(--w70);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6l-2 4h10l-2-4V2"/><line x1="12" y1="12" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
-          <span id="borrow-torch-label">Flash Off</span>
-        </button>
-      </div>
-      <div id="borrow-scan-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:14px;">Starting camera...</div>
-    </div>
-
-    <!-- Error -->
-    <div id="borrow-error-view" style="display:none;text-align:center;">
-      <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,80,80,.08);border:1.5px solid rgba(255,80,80,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-        <span style="font-size:28px;">⚠️</span>
-      </div>
-      <div id="borrow-error-msg" style="font-size:14px;color:#ff6b6b;margin-bottom:20px;line-height:1.6;"></div>
-      <button class="reg-btn" onclick="retryBorrowScan()" style="width:100%;margin-bottom:10px;">Try Again</button>
-      <button class="refer-close" onclick="closeBorrowScan()">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- ── REPAY SHEET (standalone — was the "Repay" tab of the old combined sheet) ── -->
-<div class="overlay" id="repay-ov" onclick="closeRepayOv(event)">
-  <div class="sheet" onclick="event.stopPropagation()">
-    <div class="sh-bar"></div>
-    <div class="sh-title">Repay</div>
-    <div class="sh-sub">You owe <span id="repay-owed-label" style="color:var(--w);font-weight:800;">₦0</span>. You can't borrow again until this is fully repaid.</div>
-    <div id="repay-due-label" style="font-size:12px;font-weight:700;margin:-6px 0 14px;"></div>
-    <div style="position:relative;margin:20px 0 20px;">
-      <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--w40);font-size:16px;font-weight:700;pointer-events:none;">₦</span>
-      <input id="repay-amt-input" type="number" inputmode="numeric" min="1" placeholder="How much do you want to repay" oninput="onRepayAmtInput(this.value)" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px 16px 16px 34px;font-size:16px;font-weight:700;color:var(--w);">
-    </div>
-    <div id="repay-amt-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:4px;"></div>
-    <button class="cbtn" id="repay-confirm-btn" onclick="confirmRepay()" style="opacity:.4;pointer-events:none;">Repay</button>
-    <button class="cbtn" id="repay-full-btn" onclick="confirmRepayFull()" style="margin-top:8px;background:transparent;border:1.5px solid var(--border);color:var(--w70);">Pay In Full</button>
-  </div>
-</div>
-
-<!-- ── BORROW LOCK POPUP (generic — used both for ">₦100 needs Premium" and "repay first") ── -->
-<div class="gate-ov" id="borrow-lock-ov">
-  <div class="gate-sheet">
-    <div class="sh-bar"></div>
-    <div class="gate-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B4FE8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-    </div>
-    <div class="gate-title" style="font-size:22px;">Get Premium</div>
-    <div class="gate-sub" style="font-size:15px;font-weight:600;">to borrow more than ₦100.</div>
-    <button class="gate-btn" id="borrow-lock-cta" onclick="borrowLockCtaTap()">See Premium Plans</button>
-    <button class="gate-skip" onclick="closeBorrowLockOv()">Maybe later</button>
-  </div>
-</div>
-
-<!-- ── BIG-DATA SAVINGS SHEET ── -->
-<div class="overlay" id="savings-ov" onclick="closeSavingsOv(event)">
-  <div class="sheet" onclick="event.stopPropagation()">
-    <div class="sh-bar"></div>
-
-    <!-- Auto-pick loading/error state — shown briefly while a plan is being chosen, or on failure -->
-    <div id="savings-panel-picker" style="text-align:center;padding:20px 0;">
-      <div style="font-size:15px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;color:#F5A623;margin-bottom:10px;">Emergency Purchase</div>
-      <div id="savings-picker-loading" class="sh-title" style="font-size:17px;">Picking a plan for you...</div>
-      <div id="savings-picker-err" style="font-size:12px;color:#ff6b6b;min-height:16px;text-align:center;margin-top:10px;"></div>
-      <button class="cbtn" id="savings-picker-retry-btn" onclick="startAutoSavingsGoal()" style="display:none;margin-top:14px;">Try Again</button>
-    </div>
-
-    <!-- Progress view — shown once a goal is active -->
-    <div id="savings-panel-progress" style="display:none;">
-      <div id="savings-tabs-row" style="display:flex;justify-content:center;gap:20px;margin-bottom:16px;touch-action:pan-y;">
-        <div id="savings-tab-mtn" class="savings-net-tab" onclick="switchSavingsTab('MTN')" style="font-size:12px;font-weight:800;color:var(--w40);padding-bottom:6px;border-bottom:2px solid transparent;cursor:pointer;">MTN</div>
-        <div id="savings-tab-airtel" class="savings-net-tab" onclick="switchSavingsTab('Airtel')" style="font-size:12px;font-weight:800;color:var(--w40);padding-bottom:6px;border-bottom:2px solid transparent;cursor:pointer;">Airtel</div>
-        <div id="savings-tab-glo" class="savings-net-tab" onclick="switchSavingsTab('Glo')" style="font-size:12px;font-weight:800;color:var(--w40);padding-bottom:6px;border-bottom:2px solid transparent;cursor:pointer;">Glo</div>
-        <div id="savings-tab-9mobile" class="savings-net-tab" onclick="switchSavingsTab('9mobile')" style="font-size:12px;font-weight:800;color:var(--w40);padding-bottom:6px;border-bottom:2px solid transparent;cursor:pointer;">9mobile</div>
-      </div>
-      <div id="savings-swipe-area" onpointerdown="savingsSwipeDown(event)" style="touch-action:pan-y;">
-        <div style="text-align:center;margin-bottom:4px;">
-          <div id="savings-plan-label" style="font-size:30px;font-weight:900;color:#F5A623;">0GB</div>
-          <div style="font-size:13px;color:var(--w40);font-weight:700;">Will be yours soon</div>
-        </div>
-        <div style="margin:22px 0 8px;background:var(--dark-3);border-radius:999px;height:14px;overflow:hidden;border:1px solid var(--border);display:none;">
-          <div id="savings-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#b87010,#F5A623);border-radius:999px;transition:width .6s cubic-bezier(.22,1,.36,1);"></div>
-        </div>
-        <div style="text-align:center;margin-bottom:20px;">
-          <span id="savings-current-label" style="display:none;">₦0.00</span>
-          <span id="savings-target-label" style="font-size:26px;font-weight:900;color:#F5A623;">₦0</span>
-        </div>
-
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <button class="cbtn" id="savings-add-btn" onclick="openSavingsAddMoney()" style="background:transparent;border:1.5px solid var(--border);color:var(--w70);">Add Money</button>
-        <button class="cbtn" id="savings-collect-btn" onclick="handleSavingsCollectTap()" style="opacity:.4;pointer-events:none;">Collect</button>
-      </div>
-      <div id="savings-collect-premium-note" style="display:none;font-size:11px;color:var(--w40);text-align:center;margin-top:10px;">Premium is needed to collect — your balance still grows either way.</div>
-
-      <!-- Add money mini-form, hidden until "Add Money" tapped -->
-      <div id="savings-add-form" style="display:none;margin-top:16px;">
-        <div style="position:relative;margin-bottom:10px;">
-          <span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--w40);font-size:16px;font-weight:700;pointer-events:none;">₦</span>
-          <input id="savings-add-input" type="number" inputmode="numeric" min="1" placeholder="How much to add" oninput="onSavingsAddInput(this.value)" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px 16px 16px 34px;font-size:16px;font-weight:700;color:var(--w);">
-        </div>
-        <div id="savings-add-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:4px;"></div>
-        <button class="cbtn" id="savings-add-confirm-btn" onclick="confirmSavingsAddMoney()" style="opacity:.4;pointer-events:none;">Add to Savings</button>
-      </div>
-
-      <!-- Collect mini-form, hidden until "Collect" tapped -->
-      <div id="savings-collect-form" style="display:none;margin-top:16px;">
-        <input id="savings-collect-phone" type="tel" inputmode="numeric" placeholder="Phone number to receive data" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-size:16px;font-weight:700;color:var(--w);margin-bottom:10px;">
-        <div id="savings-collect-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:4px;"></div>
-        <button class="cbtn" id="savings-collect-confirm-btn" onclick="confirmSavingsCollect()">Collect My Data</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ── DEPOSIT SHEET ── -->
 <div class="overlay" id="dep-ov" onclick="closeDepOv(event)">
@@ -1205,7 +1099,173 @@
   </div>
 </div>
 
+<!-- ── EARN SHEET (deposit into Savings) ── -->
+<div class="overlay" id="earn-ov" onclick="closeEarnOv(event)">
+  <div class="sheet">
+    <div class="sh-bar"></div>
+
+    <div class="inv-hero">
+      <div class="inv-hero-amt"><span style="font-size:20px;color:var(--w40);">₦</span><span id="earn-hero-amt">0</span></div>
+      <div class="inv-hero-lbl">Estimated Reward</div>
+    </div>
+
+
+    <div class="invest-error" id="earn-amt-error" style="display:none;">Minimum deposit is ₦1,000.</div>
+
+    <div class="earn-amt-swipe-wrap" id="earn-amt-swipe-wrap">
+      <div class="earn-amt-swipe-track" id="earn-amt-swipe-track"></div>
+    </div>
+    <div style="font-size:11px;color:var(--w40);text-align:center;margin:8px 0 22px;">Tap to choose an amount</div>
+
+    <div class="sheet-actions">
+      <button class="btn-primary" id="earn-confirm-btn" onclick="confirmEarnDeposit()" style="opacity:.4;pointer-events:none;">Save to Earn</button>
+    </div>
+    <div style="font-size:11px;color:var(--w40);line-height:1.6;margin-top:14px;text-align:center;">You can withdraw your capital anytime, free. If you withdraw before a deposit reaches its expected reward, you'll forfeit that reward unless you move it to your main wallet first.</div>
+  </div>
+</div>
+
+<!-- ── WITHDRAW SHEET (Savings → Main Wallet or Bank Account) ── -->
+<div class="overlay" id="withdraw-ov" onclick="closeWithdrawOv(event)">
+  <div class="sheet">
+    <div class="sh-bar"></div>
+    <div class="sh-title">Withdraw</div>
+    <div class="sh-sub">Available: <strong id="withdraw-avail" style="color:#F5A623;">₦0</strong></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div id="withdraw-dest-main" onclick="selectWithdrawDest('main')" class="dep-opt" style="font-size:14px;">To Main Wallet<div style="font-size:11px;color:var(--w40);font-weight:600;margin-top:4px;">Free · Anytime</div></div>
+      <div id="withdraw-dest-bank" onclick="selectWithdrawDest('bank')" class="dep-opt" style="font-size:14px;">To Bank Account<div id="withdraw-bank-sub" style="font-size:11px;color:var(--w40);font-weight:600;margin-top:4px;">Free · Only on the 30th</div></div>
+    </div>
+
+    <input id="withdraw-amt-input" type="number" inputmode="numeric" placeholder="Amount to withdraw" oninput="updateWithdrawBtnText()" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-size:16px;font-weight:700;color:var(--w);margin-bottom:6px;">
+    <div id="withdraw-card-limit-hint" style="display:none;font-size:12px;color:#F5A623;line-height:1.6;margin-bottom:12px;">Max ₦10,000 per withdrawal without verifying your card. <a href="javascript:void(0)" onclick="openCardLimitOv('Verify your Subsidi card to withdraw more than ₦10,000 at once.')" style="color:#F5A623;font-weight:700;text-decoration:underline;">Verify your card</a></div>
+
+    <div id="withdraw-bank-form" style="display:none;">
+      <input id="withdraw-bank-name" type="text" placeholder="Bank name" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-size:15px;font-weight:600;color:var(--w);margin-bottom:10px;">
+      <input id="withdraw-acct-number" type="text" inputmode="numeric" placeholder="Account number" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-size:15px;font-weight:600;color:var(--w);margin-bottom:10px;">
+      <input id="withdraw-acct-name" type="text" placeholder="Account holder name" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-size:15px;font-weight:600;color:var(--w);margin-bottom:12px;">
+    </div>
+
+    <div id="withdraw-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:4px;"></div>
+    <button class="cbtn" id="withdraw-confirm-btn" onclick="confirmWithdraw()" style="opacity:.4;pointer-events:none;">Withdraw</button>
+    <div style="font-size:11px;color:var(--w40);line-height:1.6;margin-top:12px;text-align:center;">No withdrawal fee. Bank withdrawals only go out on the 30th of each month.</div>
+  </div>
+</div>
+
+<!-- ── WITHDRAW REWARD-FORFEIT WARNING (shown before a bank withdrawal that would forfeit unsecured reward) ── -->
+<div class="refer-ov" id="forfeit-warn-ov">
+  <div class="refer-sheet">
+    <div class="sh-bar"></div>
+    <div style="width:64px;height:64px;border-radius:50%;background:rgba(245,166,35,.1);border:1.5px solid rgba(245,166,35,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+    </div>
+    <div style="font-size:17px;font-weight:800;color:var(--w);text-align:center;margin-bottom:8px;">You'll forfeit your reward</div>
+    <div id="forfeit-warn-text" style="font-size:13px;color:var(--w70);line-height:1.6;text-align:center;margin-bottom:20px;">You have unsecured reward on deposits that haven't reached their expected reward yet. Withdrawing your capital to your bank now forfeits all of it. Move it to your main wallet first to keep it.</div>
+    <button class="cbtn" onclick="moveRewardToWalletThenClose()" style="margin-bottom:10px;">Move Reward to Wallet First</button>
+    <button class="cbtn" onclick="acceptForfeitAndWithdraw()" style="background:transparent;border:1.5px solid rgba(255,80,80,.35);color:#ff6b6b;margin-bottom:10px;">Continue Anyway (Forfeit Reward)</button>
+    <button class="cbtn" onclick="closeForfeitWarnOv()" style="background:transparent;border:1.5px solid var(--border);color:var(--w70);">Cancel</button>
+  </div>
+</div>
+
+<!-- ── WITHDRAW CONSISTENCY-RESET WARNING (shown before any withdrawal — capital or reward) ── -->
+<div class="refer-ov" id="consistency-warn-ov">
+  <div class="refer-sheet">
+    <div class="sh-bar"></div>
+    <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,80,80,.1);border:1.5px solid rgba(255,80,80,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+    </div>
+    <div style="text-align:center;margin-bottom:16px;margin-top:4px;">
+      <div style="display:inline-block;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:10px 22px;">
+        <div style="font-size:11px;color:#fff;font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;">Current Consistency</div>
+        <div id="consistency-warn-current-score" style="font-size:22px;font-weight:800;color:var(--green);line-height:1.2;">0%</div>
+      </div>
+    </div>
+    <div id="consistency-warn-text" style="font-size:13px;color:#fff;line-height:1.6;text-align:center;margin-bottom:20px;">Withdrawing resets it. Deposit that amount back to start it climbing again.</div>
+    <button class="cbtn" onclick="proceedPastConsistencyWarn()" style="background:transparent;border:1.5px solid rgba(255,80,80,.35);color:#ff6b6b;margin-bottom:10px;">Continue Anyway</button>
+    <button class="cbtn" onclick="closeConsistencyWarnOv()" style="background:transparent;border:1.5px solid var(--border);color:var(--w70);">Cancel</button>
+  </div>
+</div>
+
+<!-- ── SAVE & EARN CARD-LIMIT SHEET (blocks large deposits/withdrawals without a linked card) ── -->
+<div class="refer-ov" id="card-limit-ov">
+  <div class="refer-sheet">
+    <div class="sh-bar"></div>
+    <div style="display:flex;justify-content:flex-end;margin:-6px -6px 4px;">
+      <div onclick="closeCardLimitOv()" style="width:32px;height:32px;border-radius:50%;background:var(--w15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--w40)">×</div>
+    </div>
+
+    <!-- Blocked message -->
+    <div id="card-limit-blocked-view">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+        <div id="card-limit-reason" style="font-size:16px;font-weight:700;color:#fff;line-height:1.5;"></div>
+      </div>
+      <button class="reg-btn" onclick="startCardLimitScan()" style="width:100%;margin-bottom:10px;">Scan Your Card</button>
+      <button class="refer-close" onclick="showCardLimitManualEntry()" style="margin-bottom:10px;">Enter Card Number</button>
+      <div class="refer-close" onclick="closeCardLimitOv()" style="background:transparent;border:none;text-align:center;">Maybe later</div>
+    </div>
+
+    <!-- Manual card number entry -->
+    <div id="card-limit-manual-view" style="display:none;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-family:'Georgia',serif;font-size:19px;font-style:italic;color:#fff;margin-bottom:6px;">Enter your card number</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.6;">The code printed on your Subsidi card</div>
+      </div>
+      <input id="card-limit-manual-input" type="text" placeholder="e.g. SUB-1234" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-size:16px;font-weight:700;color:var(--w);margin-bottom:8px;">
+      <div id="card-limit-manual-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:8px;"></div>
+      <button class="reg-btn" onclick="submitCardLimitManual()" style="width:100%;margin-bottom:10px;">Verify</button>
+      <div class="refer-close" onclick="showCardLimitBlocked()">Back</div>
+    </div>
+
+    <!-- Camera scan -->
+    <div id="card-limit-scan-view" style="display:none;">
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:#fff;margin-bottom:4px;">Scan your card</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.6;">Hold your Subsidi card up to the camera</div>
+      </div>
+      <div style="position:relative;width:100%;aspect-ratio:1/1;border-radius:20px;overflow:hidden;margin-bottom:20px;background:var(--dark-3);border:1px solid var(--border);">
+        <video id="card-limit-video" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:20px;" autoplay playsinline muted></video>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+          <div style="width:160px;height:160px;position:relative;">
+            <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-top:3px solid #fff;border-left:3px solid #fff;border-radius:4px 0 0 0;"></div>
+            <div style="position:absolute;top:0;right:0;width:32px;height:32px;border-top:3px solid #fff;border-right:3px solid #fff;border-radius:0 4px 0 0;"></div>
+            <div style="position:absolute;bottom:0;left:0;width:32px;height:32px;border-bottom:3px solid #fff;border-left:3px solid #fff;border-radius:0 0 0 4px;"></div>
+            <div style="position:absolute;bottom:0;right:0;width:32px;height:32px;border-bottom:3px solid #fff;border-right:3px solid #fff;border-radius:0 0 4px 0;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;margin-bottom:14px;">
+        <button id="card-limit-torch-btn" onclick="toggleCardLimitTorch()" style="display:flex;align-items:center;gap:8px;background:var(--dark-3);border:1px solid var(--border);border-radius:12px;padding:10px 20px;color:var(--w70);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6l-2 4h10l-2-4V2"/><line x1="12" y1="12" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/></svg>
+          <span id="card-limit-torch-label">Flash Off</span>
+        </button>
+      </div>
+      <div id="card-limit-status" style="text-align:center;font-size:13px;color:var(--w40);margin-bottom:14px;">Starting camera...</div>
+    </div>
+
+    <!-- Success -->
+    <div id="card-limit-success-view" style="display:none;text-align:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(0,200,150,.1);border:1.5px solid rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <span style="font-size:28px;">✓</span>
+      </div>
+      <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:var(--green);margin-bottom:6px;">Card verified!</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">Continuing your transaction...</div>
+    </div>
+
+    <!-- Error -->
+    <div id="card-limit-error-view" style="display:none;text-align:center;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,80,80,.08);border:1.5px solid rgba(255,80,80,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <span style="font-size:28px;">⚠️</span>
+      </div>
+      <div id="card-limit-error-msg" style="font-size:14px;color:#ff6b6b;margin-bottom:20px;line-height:1.6;"></div>
+      <button class="reg-btn" onclick="startCardLimitScan()" style="width:100%;margin-bottom:10px;">Try Again</button>
+      <div class="refer-close" onclick="closeCardLimitOv()">Close</div>
+    </div>
+  </div>
+</div>
+
 <!-- ── BUY SHEET ── -->
+
 <div class="overlay" id="ov" onclick="closeOv(event)">
   <div class="sheet">
     <div class="sh-bar"></div>
@@ -1269,22 +1329,10 @@
     <div class="prof-id" id="prof-id">ID · subsidi.app/ref/swiftwave</div>
   </div>
 
-  <!-- Premium -->
+  <!-- Rewards -->
   <div class="prof-sec">
-    <div class="prof-sec-title">Premium</div>
+    <div class="prof-sec-title">Rewards</div>
     <div class="prof-card">
-      <div class="prof-row" onclick="showPremUnlockSheet(false)">
-        <div class="prof-row-ico">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 15 8.5 22 9.3 17 14.1 18.2 21 12 17.6 5.8 21 7 14.1 2 9.3 9 8.5 12 2"/>
-          </svg>
-        </div>
-        <div class="prof-row-body">
-          <div class="prof-row-title">Premium</div>
-          <div class="prof-row-sub" id="prof-row-premium-sub">Higher borrow limit + Emergency Box</div>
-        </div>
-        <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
       <div class="prof-row" onclick="showPremiumPolicySheet()">
         <div class="prof-row-ico">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1292,8 +1340,8 @@
           </svg>
         </div>
         <div class="prof-row-body">
-          <div class="prof-row-title">Premium Policy</div>
-          <div class="prof-row-sub">How Premium's weekly perks work</div>
+          <div class="prof-row-title">Reward Policy</div>
+          <div class="prof-row-sub">How your savings rewards work</div>
         </div>
         <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
@@ -1401,15 +1449,6 @@
       </div>
       <span class="ni-lbl">New Card</span>
     </div>
-    <div class="ni on" onclick="navTo('profile',this)">
-      <div class="ni-ico">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B4FE8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-      </div>
-      <span class="ni-lbl" style="color:var(--p-light)">Account</span>
-    </div>
   </div>
 </div>
 
@@ -1456,7 +1495,7 @@
         <span style="font-size:28px;">✓</span>
       </div>
       <div style="font-family:'Georgia',serif;font-size:20px;font-style:italic;color:var(--green);margin-bottom:6px;">Premium activated!</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">Your higher borrow limit and Emergency Box are active for this cycle.</div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:24px;">Your discounted purchases and Community Bonus are active for this cycle.</div>
       <button class="reg-btn" onclick="closeFreeScan()" style="width:100%;">Done</button>
     </div>
 
@@ -1531,14 +1570,17 @@
   <!-- Header -->
   <div style="padding:48px 24px 40px;position:relative;overflow:hidden">
     <div style="position:absolute;top:-80px;right:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(108,43,217,.12) 0%,transparent 65%);pointer-events:none"></div>
-    <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;">Top Spenders</div>
+    <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;">Most Consistent Savers</div>
   </div>
 
   <!-- Your position -->
   <div style="margin:0 20px 20px" id="leaderboard-you"></div>
 
   <!-- List subtitle -->
-  <div style="margin:0 20px 16px;font-size:13px;color:var(--w40);line-height:1.5">The top 20 biggest spenders this month. Resets on the 1st.</div>
+  <div style="margin:0 20px 16px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.3);border-radius:14px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start;">
+    <div style="font-size:16px;line-height:1.3;flex-shrink:0;">💡</div>
+    <div style="font-size:13px;color:#fff;font-weight:600;line-height:1.55;">₦1,000 saved = 1% consistency. It climbs every 24hrs, and any withdrawal resets it to 0. Stay top 3 for 365 days straight to earn a reward on top of your savings.</div>
+  </div>
 
   <!-- List -->
   <div style="margin:0 20px 16px" id="leaderboard-list">
@@ -1572,15 +1614,6 @@
         </svg>
       </div>
       <span class="ni-lbl">New Card</span>
-    </div>
-    <div class="ni" onclick="navTo('profile',this)">
-      <div class="ni-ico">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-      </div>
-      <span class="ni-lbl">Account</span>
     </div>
   </div>
 </div>
@@ -1638,15 +1671,6 @@
       </div>
       <span class="ni-lbl" style="color:var(--p-light)">New Card</span>
     </div>
-    <div class="ni" onclick="navTo('profile',this)">
-      <div class="ni-ico">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-      </div>
-      <span class="ni-lbl">Account</span>
-    </div>
   </div>
 </div>
 
@@ -1669,59 +1693,6 @@
       <button class="reg-btn" style="background:#25D366;font-size:15px;font-weight:800;" onclick="sendWaPremiumMessage()">
         Send on WhatsApp
       </button>
-    </div>
-  </div>
-</div>
-
-<!-- ── PREMIUM UNLOCK SHEET ── -->
-<div class="overlay" id="prem-unlock-ov" onclick="closePremUnlockOv(event)" style="display:none;align-items:flex-end;">
-  <div class="sheet" style="padding-bottom:32px;" onclick="event.stopPropagation()">
-    <div class="sh-bar"></div>
-
-    <!-- Header -->
-    <div style="text-align:center;padding:4px 20px 0;">
-      <div style="font-size:22px;margin-bottom:6px;">⚡</div>
-      <div style="font-size:13px;font-weight:700;color:#F5A623;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;" id="prem-sheet-context-label">This is a Premium price</div>
-      <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px;">Unlock Premium</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">Get the cheapest data prices in Nigeria.</div>
-    </div>
-
-    <!-- Plan card (single tier now) -->
-    <div style="display:flex;gap:6px;padding:0 16px;margin-bottom:20px;">
-      <div id="prem-btn-premium" onclick="selectPremPlan('premium')" style="flex:1;border-radius:14px;padding:16px 4px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(245,166,35,0.1);border:1.5px solid #F5A623;opacity:1;position:relative;">
-        <div id="prem-current-badge-premium" style="display:none;position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#F5A623;color:#000;font-size:7.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:8px;white-space:nowrap;">Current</div>
-        <div style="font-size:9.5px;font-weight:800;color:#F5A623;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px;">Premium</div>
-        <div id="prem-price-premium" style="font-size:26px;font-weight:900;color:#F5A623;">₦870<span style="font-size:12px;font-weight:700;">/week</span></div>
-      </div>
-    </div>
-
-    <!-- Benefits box -->
-    <div id="prem-benefits-wrap" style="overflow:hidden;position:relative;padding:0 20px;margin-bottom:20px;">
-      <div id="prem-benefits-inner" style="display:flex;width:100%;transform:translateX(0%);transition:transform .35s cubic-bezier(.4,0,.2,1);will-change:transform;">
-
-        <!-- Premium benefits — only things Premium actually gates -->
-        <div style="flex-shrink:0;width:100%;box-sizing:border-box;">
-          <div style="background:var(--dark-3);border:1px solid rgba(245,166,35,.3);border-radius:16px;padding:16px 20px;">
-            <div style="font-size:20px;font-weight:900;color:#F5A623;margin-bottom:12px;">What you get</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Borrow more than ₦100</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--w70);"><span style="color:#F5A623;font-weight:800;">✓</span> Unlock Emergency Box</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Unlock button -->
-    <div style="padding:0 20px;">
-      <button id="prem-unlock-btn" class="reg-btn" style="background:linear-gradient(90deg,#b87010,#F5A623);color:#000;font-weight:900;font-size:15px;" onclick="payPremiumUnlock('premium')">
-        Unlock Premium
-      </button>
-    </div>
-
-    <div style="margin:0 20px;">
-      <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--w40);cursor:pointer;" onclick="closePremUnlockOv()">Maybe later</div>
     </div>
   </div>
 </div>
@@ -1821,20 +1792,18 @@
   let needsScanToActivate = false; // true once this cycle's 1 discount use is spent — nothing left to toggle on until renewal
   let premiumDiscountUsesLeft = 0; // 0-4 — server-authoritative, loaded from data.premiumDiscountUsesLeft. Resets to 4 only on a fresh Premium payment.
   let premiumExpiresAt = null; // ISO string from the server — used to compute the "come back on [day]" illusion date
-  let borrowCeiling = 0; // ₦ — server-authoritative, loaded from data.borrowCeiling. Grows passively for every user (₦20 of each ₦70 deposit fee), uncapped. Everyone can always borrow up to ₦100 with no Premium; borrowing more than ₦100 requires active Premium.
-  let borrowOwed = 0; // ₦ — server-authoritative, loaded from data.borrowOwed. Total owed from the last draw (principal + 10% fee). Must hit 0 before a new draw is allowed.
-  let borrowDueAt = null; // ISO string or null — server-authoritative, loaded from data.borrowDueAt. Set to 14 days after each draw; passive borrow_ceiling growth pauses once this passes with borrowOwed still > 0.
 
-  // Big-data savings goal — server-authoritative, loaded from get-user.
-  // savingsPlans null means no active goals (bubble tap should show the
-  // network picker); non-null means a goal is in progress (bubble tap
-  // shows the progress sheet instead).
-  // Emergency Purchase: all 4 networks have a plan+target picked at once,
-  // sharing ONE balance. savingsCurrentTab controls which network is
-  // currently being viewed/collected — it does not affect the balance.
-  let savingsPlans = null; // { MTN: {planId,planLabel,planDuration,provider,origPrice,rawCk,target}, Airtel: {...}, Glo: {...}, '9mobile': {...} }
-  let savingsCurrentTab = 'MTN';
+  // ── Save & Earn (Savings) — server-authoritative, loaded from get-user.
+  // savingsBalance is the live total across all deposits. savingsDeposits is
+  // the per-deposit breakdown. `matured` is
+  // decided server-side per deposit (whether it has reached its expected
+  // reward) — no longer date-based, so the client doesn't compute it.
+  // Backend not built yet — defaults keep the UI safe/empty until
+  // data.savings exists.
   let savingsBalance = 0;
+  let myConsistencyScore = null; // last-known % from the leaderboard fetch, used to show "current: X%" in the withdraw warning
+  let savingsDeposits = []; // [{id, amount, depositedAt, matured, rewardEarned}, ...]
+
   // Single Premium tier: ₦1,300/week, hard 7-day expiry — no grace, no
   // extension. Two discounted purchases allowed per cycle, any order, any
   // time within the 7 days: the FIRST purchase used is ₦500 off, the
@@ -2067,12 +2036,6 @@
           if (typeof renderMyCard === 'function') renderMyCard();
           premiumDiscountUsesLeft = typeof data.premiumDiscountUsesLeft === 'number' ? data.premiumDiscountUsesLeft : 0;
           premiumExpiresAt = data.premiumExpiresAt || null;
-          borrowCeiling = typeof data.borrowCeiling === 'number' ? data.borrowCeiling : 0;
-          borrowOwed = typeof data.borrowOwed === 'number' ? data.borrowOwed : 0;
-          borrowDueAt = data.borrowDueAt || null;
-          savingsPlans = data.savingsPlans ?? null;
-          savingsBalance = typeof data.savingsBalance === 'number' ? data.savingsBalance : 0;
-          if (typeof renderSavingsBubble === 'function') renderSavingsBubble();
           needsScanToActivate = premiumDiscountUsesLeft <= 0;
           renderPremiumProfileRow();
 
@@ -2082,6 +2045,15 @@
           // it must never stomp on a toggle the user has live right now.
           if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
         }
+
+        if (typeof data.savings !== 'undefined') {
+          savingsBalance = typeof data.savings?.balance === 'number' ? data.savings.balance : 0;
+          savingsDeposits = Array.isArray(data.savings?.deposits) ? data.savings.deposits : [];
+          if (typeof renderSavingsUI === 'function') renderSavingsUI();
+          if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
+        }
+
+        if (data.rewards) applyRewards(data.rewards);
 
         renderBundles();
       }
@@ -2231,18 +2203,21 @@
             if (typeof renderMyCard === 'function') renderMyCard();
             premiumDiscountUsesLeft = typeof data.premiumDiscountUsesLeft === 'number' ? data.premiumDiscountUsesLeft : 0;
             premiumExpiresAt = data.premiumExpiresAt || null;
-            borrowCeiling = typeof data.borrowCeiling === 'number' ? data.borrowCeiling : 0;
-            borrowOwed = typeof data.borrowOwed === 'number' ? data.borrowOwed : 0;
-            borrowDueAt = data.borrowDueAt || null;
-            savingsPlans = data.savingsPlans ?? null;
-            savingsBalance = typeof data.savingsBalance === 'number' ? data.savingsBalance : 0;
-            if (typeof renderSavingsBubble === 'function') renderSavingsBubble();
             premiumToggleOn = false;
             needsScanToActivate = premiumDiscountUsesLeft <= 0;
             setPremToggleUI(premiumToggleOn);
             renderPremiumProfileRow();
             if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
           }
+
+          if (typeof data.savings !== 'undefined') {
+            savingsBalance = typeof data.savings?.balance === 'number' ? data.savings.balance : 0;
+            savingsDeposits = Array.isArray(data.savings?.deposits) ? data.savings.deposits : [];
+            if (typeof renderSavingsUI === 'function') renderSavingsUI();
+            if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
+          }
+
+          if (data.rewards) applyRewards(data.rewards);
 
           checkWaJoined();
           show('dash');
@@ -2329,7 +2304,7 @@
             premiumToggleOn = true;
             setPremToggleUI(true);
             renderBundles();
-            alert('Premium activated! Your higher borrow limit and Emergency Box are ready.');
+            alert('Premium activated! Your discounted purchases and Community Bonus are ready.');
           } else {
             alert('Payment verification failed. Contact support with ref: ' + paystackRef);
           }
@@ -2360,6 +2335,20 @@
             }
             // Not successful yet — leave it in place, we'll check again
             // next time the app loads rather than polling right now.
+          }
+        }
+
+        // Same one-shot recovery, for the Save & Earn Paystack charge.
+        const lastSav = localStorage.getItem('subsidi_last_savings_deposit');
+        if (lastSav) {
+          const sav = JSON.parse(lastSav);
+          if (sav && sav.ref && sav.userId && sav.amount) {
+            const result = await callEdge('savings-verify', { reference: sav.ref, userId: sav.userId, amount: sav.amount });
+            if (result && result.success) {
+              localStorage.removeItem('subsidi_last_savings_deposit');
+              saveLocalTxn({ type: 'deposit', data_plan: 'savings', amount: sav.amount, status: 'success' });
+              await fetchUserData();
+            }
           }
         }
       } catch (e) {
@@ -2554,6 +2543,7 @@
   }
   function toggleFreeTorch() { toggleTorchFor('free', freeStream); }
   function toggleCashbackTorch() { toggleTorchFor('cashback', cashbackStream); }
+  function toggleCardLimitTorch() { toggleTorchFor('card-limit', cardLimitStream); }
 
   // ── Registration Step 3: Set PIN ──
   // Check if card already exists in Supabase
@@ -2914,7 +2904,9 @@
       priceEl.classList.remove('price-gold');
     }
     document.getElementById('phinput').value = '';
-    document.getElementById('ov').classList.add('open');
+    const ov = document.getElementById('ov');
+    ov.style.display = 'flex';
+    ov.classList.add('open');
   }
 
   // ── Login PIN (returning card owner) ──
@@ -3122,14 +3114,6 @@
     const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
     if (sub) sub.textContent = 'Confirm your identity to continue';
 
-    if (pinFlowMode === 'savings-collect') {
-      const phone = pendingSavingsCollectPhone;
-      pendingSavingsCollectPhone = null;
-      pinFlowMode = 'buy';
-      await performSavingsCollect(phone);
-      return;
-    }
-
     if (premiumToggleOn) {
       await completePremiumPinPurchase();
       return;
@@ -3184,13 +3168,29 @@
     await completePurchase(true);
   }
 
+  // Was missing entirely — confirmBuy() called this to show the PIN sheet,
+  // but with no definition the click silently threw (ReferenceError),
+  // which is why the button looked "unclickable" after entering a phone
+  // number. Mirrors the reset-then-show pattern used elsewhere (e.g.
+  // hideScanBad's counterpart) — explicitly re-set display since
+  // closePinBuy leaves an inline display:none behind after its close
+  // animation, which a bare classList.add('open') can't override.
+  function openPinBuyOv() {
+    buyPinEntry = '';
+    updateBuyPinDots('');
+    const err = document.getElementById('buy-pin-err');
+    if (err) err.classList.remove('show');
+    const ov = document.getElementById('pin-buy-ov');
+    ov.style.display = 'flex';
+    ov.classList.add('open');
+  }
+
   function closePinBuy() {
     document.getElementById('pin-buy-ov').classList.remove('open');
     setTimeout(() => { const el = document.getElementById('pin-buy-ov'); if (el) el.style.display = 'none'; }, 300);
     const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
     if (sub) sub.textContent = 'Confirm your identity to continue';
     pinFlowMode = 'buy';
-    pendingSavingsCollectPhone = null;
   }
 
   // ── Screen navigation ──
@@ -3446,10 +3446,10 @@
       let displayPriceFinal = basePrice;
 
       // Premium toggle logic — only active right after a fresh card scan (not needing re-scan).
-      // Note: premiumToggleOn is never set true anymore (toggle now opens Emergency Box
-      // instead), so this branch is currently unreachable — left in place since the
-      // underlying discount system (rollDiscountAmount/premiumDiscountUsesLeft) is still
-      // wired into checkout and hasn't been removed.
+      // Note: premiumToggleOn is never set true anymore, so this branch is
+      // currently unreachable — left in place since the underlying discount
+      // system (rollDiscountAmount/premiumDiscountUsesLeft) is still wired
+      // into checkout and hasn't been removed.
       let isPremiumActive = false;
       const toggleReallyOn = premiumToggleOn && (!premiumUnlocked || !needsScanToActivate);
       if (toggleReallyOn) {
@@ -3490,389 +3490,16 @@
     renderBundles();
   }
 
-  // ── Emergency Purchase: pick a random real plan on the given network,
-  // priced ₦400–₦2,000, with a flat ₦50 profit margin added on top.
-  // Returns null if the network has nothing in range. ──
-  function pickRandomSavingsPlan(network) {
-    // PLANS keys aren't consistently cased (MTN, Airtel, Glo, '9mobile') while
-    // the picker passes upper-case codes (AIRTEL, GLO, 9MOBILE) — match
-    // case-insensitively so every network actually resolves, not just MTN.
-    const matchedKey = Object.keys(PLANS).find(
-      k => k.toUpperCase() === String(network).toUpperCase()
-    );
-    const netPlans = (matchedKey && PLANS[matchedKey]) || {};
-    const candidates = [];
-    ['daily', 'weekly', 'monthly'].forEach(cat => {
-      (netPlans[cat] || []).forEach(p => {
-        const basePrice = Math.round(p.ck * 1.01);
-        if (basePrice >= 400 && basePrice <= 1000) {
-          candidates.push({
-            planId: p.planId,
-            planLabel: p.size,
-            planDuration: p.val,
-            provider: p.provider || 'ck',
-            origPrice: basePrice,
-            rawCk: p.ck,
-          });
-        }
-      });
-    });
-    if (candidates.length === 0) return null;
-    return candidates[Math.floor(Math.random() * candidates.length)];
-  }
-
-  // ── Big-data savings: sheet open/close + render ──
-  let savingsOvOpenedAt = 0;
-  let emergencyToggleOn = false;
-  function openSavingsOv() {
-    savingsOvOpenedAt = Date.now();
-    emergencyToggleOn = true;
-    setPremToggleUI(true);
-    renderSavingsBubble();
-    const ov = document.getElementById('savings-ov');
-    if (ov) { ov.style.display = 'flex'; requestAnimationFrame(() => ov.classList.add('open')); }
-  }
-
-  function closeSavingsOv(e) {
-    // Ignore the browser's synthetic click that follows the same pointerup
-    // which just opened this overlay — otherwise it closes instantly.
-    if (Date.now() - savingsOvOpenedAt < 350) return;
-    if (e && e.target !== document.getElementById('savings-ov')) return;
-    emergencyToggleOn = false;
-    setPremToggleUI(false);
-    const ov = document.getElementById('savings-ov');
-    if (ov) { ov.classList.remove('open'); setTimeout(() => { ov.style.display = 'none'; }, 300); }
-    const addForm = document.getElementById('savings-add-form');
-    const collectForm = document.getElementById('savings-collect-form');
-    if (addForm) addForm.style.display = 'none';
-    if (collectForm) collectForm.style.display = 'none';
-  }
-
-  function renderSavingsBubble() {
-    const picker = document.getElementById('savings-panel-picker');
-    const progress = document.getElementById('savings-panel-progress');
-    if (!picker || !progress) return;
-
-    if (!savingsPlans) {
-      startAutoSavingsGoal();
-      return;
-    }
-
-    picker.style.display = 'none';
-    progress.style.display = 'block';
-
-    const tabIds = { MTN: 'savings-tab-mtn', Airtel: 'savings-tab-airtel', Glo: 'savings-tab-glo', '9mobile': 'savings-tab-9mobile' };
-    Object.entries(tabIds).forEach(([net, id]) => {
-      const tab = document.getElementById(id);
-      if (!tab) return;
-      const active = savingsCurrentTab === net;
-      tab.style.color = active ? '#fff' : 'var(--w40)';
-      tab.style.borderBottom = active ? '2px solid #F5A623' : '2px solid transparent';
-    });
-
-    const plan = savingsPlans[savingsCurrentTab];
-    if (!plan) return;
-
-    const labelEl = document.getElementById('savings-plan-label');
-    if (labelEl) labelEl.textContent = plan.planLabel || '';
-
-    const target = plan.target || 0;
-    // Cosmetic ₦80 head-start for non-premium users — makes the bar look
-    // like it's already started. Only becomes REAL (added to the actual
-    // savings_balance row) once they pay for premium, via
-    // credit_savings_on_premium. Once premium, savingsBalance already
-    // includes that real ₦80 from the trigger, so don't add it twice.
-    const current = (savingsBalance || 0) + (premiumUnlocked ? 0 : 80);
-    const pct = target > 0 ? Math.min(100, (current / target) * 100) : 0;
-
-    const bar = document.getElementById('savings-progress-bar');
-    if (bar) bar.style.width = pct + '%';
-
-    const currentLabel = document.getElementById('savings-current-label');
-    if (currentLabel) {
-      const whole = Math.floor(current).toLocaleString();
-      const dec = (current % 1).toFixed(2).slice(1);
-      currentLabel.textContent = '₦' + whole + dec;
-    }
-
-    const targetLabel = document.getElementById('savings-target-label');
-    if (targetLabel) {
-      const remaining = Math.max(0, target - current);
-      targetLabel.textContent = '₦' + Math.round(remaining).toLocaleString();
-    }
-
-    const collectBtn = document.getElementById('savings-collect-btn');
-    const premiumNote = document.getElementById('savings-collect-premium-note');
-    const targetReached = target > 0 && current >= target;
-    if (collectBtn) {
-      // Stays tappable once the target is reached, premium or not — a
-      // non-premium tap routes to the premium sheet inside
-      // handleSavingsCollectTap() instead of the button just being dead.
-      collectBtn.style.opacity = targetReached ? '1' : '.4';
-      collectBtn.style.pointerEvents = targetReached ? 'auto' : 'none';
-    }
-    if (premiumNote) premiumNote.style.display = (targetReached && !premiumUnlocked) ? 'block' : 'none';
-  }
-
-  function handleSavingsCollectTap() {
-    const plan = savingsPlans && savingsPlans[savingsCurrentTab];
-    const target = plan ? (plan.target || 0) : 0;
-    const current = (savingsBalance || 0) + (premiumUnlocked ? 0 : 80);
-    const targetReached = target > 0 && current >= target;
-    if (!targetReached) return;
-    if (!premiumUnlocked) {
-      showPremUnlockSheet(false);
-      return;
-    }
-    openSavingsCollect();
-  }
-
-  // ── Emergency Purchase: picks a plan for ALL 4 networks at once ──
-  const SAVINGS_NETWORKS = ['MTN', 'Airtel', 'Glo', '9mobile'];
-
-  async function startAutoSavingsGoal() {
-    const picker = document.getElementById('savings-panel-picker');
-    const progress = document.getElementById('savings-panel-progress');
-    const loading = document.getElementById('savings-picker-loading');
-    const errEl = document.getElementById('savings-picker-err');
-    const retryBtn = document.getElementById('savings-picker-retry-btn');
-    if (picker) picker.style.display = 'block';
-    if (progress) progress.style.display = 'none';
-    if (loading) loading.style.display = 'block';
-    if (errEl) errEl.textContent = '';
-    if (retryBtn) retryBtn.style.display = 'none';
-
-    const picks = {};
-    const missing = [];
-    SAVINGS_NETWORKS.forEach(net => {
-      const p = pickRandomSavingsPlan(net);
-      if (p) picks[net] = p; else missing.push(net);
-    });
-
-    if (missing.length > 0) {
-      if (loading) loading.style.display = 'none';
-      if (errEl) errEl.textContent = 'Nothing available right now for ' + missing.join(', ') + ' — try again shortly.';
-      if (retryBtn) retryBtn.style.display = 'inline-block';
-      return;
-    }
-
-    let data;
-    try {
-      data = await callEdge('savings-start-goal', { userId, plans: picks });
-    } catch (e) {
-      data = { error: 'Something went wrong — try again.' };
-    }
-
-    if (!data || data.error) {
-      if (loading) loading.style.display = 'none';
-      if (errEl) errEl.textContent = (data && data.error) || 'Could not start — try again.';
-      if (retryBtn) retryBtn.style.display = 'inline-block';
-      return;
-    }
-
-    savingsPlans = data.plans;
-    savingsBalance = data.balance ?? 0;
-    savingsCurrentTab = 'MTN';
-    renderSavingsBubble();
-  }
-
-  function switchSavingsTab(network) {
-    if (!savingsPlans || !savingsPlans[network]) return;
-    savingsCurrentTab = network;
-    renderSavingsBubble();
-  }
-
-  // Basic left/right swipe on the plan/progress area — switches tabs in
-  // SAVINGS_NETWORKS order without needing a network round-trip.
-  let savingsSwipeStartX = null;
-  function savingsSwipeDown(e) {
-    savingsSwipeStartX = e.clientX;
-    const el = e.currentTarget;
-    const onMove = (ev) => {};
-    const onUp = (ev) => {
-      if (savingsSwipeStartX === null) return;
-      const dx = ev.clientX - savingsSwipeStartX;
-      savingsSwipeStartX = null;
-      if (Math.abs(dx) < 40) return;
-      const idx = SAVINGS_NETWORKS.indexOf(savingsCurrentTab);
-      if (idx === -1) return;
-      const nextIdx = dx < 0
-        ? Math.min(SAVINGS_NETWORKS.length - 1, idx + 1)
-        : Math.max(0, idx - 1);
-      switchSavingsTab(SAVINGS_NETWORKS[nextIdx]);
-      el.removeEventListener('pointerup', onUp);
-    };
-    el.addEventListener('pointerup', onUp, { once: true });
-  }
-
-  // ── Big-data savings: Add Money (wallet → savings) ──
-  function openSavingsAddMoney() {
-    const form = document.getElementById('savings-add-form');
-    if (form) form.style.display = 'block';
-    const input = document.getElementById('savings-add-input');
-    if (input) { input.value = ''; input.focus(); }
-    const err = document.getElementById('savings-add-err');
-    if (err) err.textContent = '';
-    onSavingsAddInput('');
-  }
-
-  function onSavingsAddInput(value) {
-    const btn = document.getElementById('savings-add-confirm-btn');
-    const amt = parseFloat(value);
-    const valid = amt > 0 && amt <= balance;
-    if (btn) {
-      btn.style.opacity = valid ? '1' : '.4';
-      btn.style.pointerEvents = valid ? 'auto' : 'none';
-    }
-  }
-
-  async function confirmSavingsAddMoney() {
-    const input = document.getElementById('savings-add-input');
-    const err = document.getElementById('savings-add-err');
-    const btn = document.getElementById('savings-add-confirm-btn');
-    const amt = parseFloat(input && input.value);
-    if (!amt || amt <= 0) return;
-    if (err) err.textContent = '';
-    const originalText = btn ? btn.textContent : '';
-    if (btn) { btn.textContent = 'Adding...'; btn.style.pointerEvents = 'none'; }
-
-    let data;
-    try {
-      data = await callEdge('savings-add-money', { userId, amount: amt });
-    } catch (e) {
-      data = { error: 'Something went wrong' };
-    }
-
-    if (!data || data.error) {
-      if (btn) { btn.textContent = originalText; btn.style.pointerEvents = 'auto'; }
-      if (err) err.textContent = (data && data.error) || 'Could not add money right now.';
-      return;
-    }
-
-    const balanceBefore = balance;
-    const savingsBefore = savingsBalance;
-    if (typeof animateBalanceNumber === 'function') {
-      await animateBalanceNumber(balanceBefore, data.newDashboardBalance, 700, (v) => {
-        balance = v;
-        if (typeof _paintMainBalance === 'function') _paintMainBalance(v);
-      });
-      await animateBalanceNumber(savingsBefore, data.newSavingsBalance, 700, (v) => {
-        savingsBalance = v;
-        renderSavingsBubble();
-      });
-    } else {
-      balance = data.newDashboardBalance;
-      savingsBalance = data.newSavingsBalance;
-      renderSavingsBubble();
-    }
-
-    const form = document.getElementById('savings-add-form');
-    if (form) form.style.display = 'none';
-    if (btn) { btn.textContent = originalText; btn.style.pointerEvents = 'auto'; }
-    fetchUserData();
-  }
-
-  // ── Big-data savings: Collect (deliver the plan, reset for next goal) ──
-  function openSavingsCollect() {
-    const form = document.getElementById('savings-collect-form');
-    if (form) form.style.display = 'block';
-    const err = document.getElementById('savings-collect-err');
-    if (err) err.textContent = '';
-  }
-
-  // Which flow the shared pin-buy-ov sheet is currently gating —
-  // 'buy' (default, normal purchase) or 'savings-collect' (Emergency
-  // Purchase). checkBuyPin() branches on this after a valid PIN.
-  let pinFlowMode = 'buy';
-  let pendingSavingsCollectPhone = null;
-
-  function confirmSavingsCollect() {
-    const phoneInput = document.getElementById('savings-collect-phone');
-    const err = document.getElementById('savings-collect-err');
-    const phone = phoneInput && phoneInput.value.trim();
-    if (!phone) {
-      if (err) err.textContent = 'Enter a phone number.';
-      return;
-    }
-    if (!/^\d{11}$/.test(phone)) {
-      if (err) err.textContent = 'Enter a valid 11-digit phone number.';
-      if (phoneInput) {
-        phoneInput.style.outline = '2px solid var(--red)';
-        setTimeout(() => { phoneInput.style.outline = ''; }, 1500);
-      }
-      return;
-    }
-    if (err) err.textContent = '';
-
-    // Phone number is valid — confirm identity with the PIN sheet before
-    // touching the wallet or calling the delivery API, same checkpoint the
-    // normal buy flow uses.
-    pendingSavingsCollectPhone = phone;
-    pinFlowMode = 'savings-collect';
-    buyPinEntry = '';
-    updateBuyPinDots('');
-    const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
-    if (sub) sub.textContent = 'Confirm your identity to collect your data';
-    openPinBuyOv();
-  }
-
-  // Opens the shared PIN sheet. classList.add('open') alone isn't enough on
-  // a REopen: closing (checkBuyPin success or closePinBuy cancel) sets an
-  // inline style.display='none' after its fade-out timeout for the closing
-  // animation, and that inline style outranks the .overlay.open CSS rule on
-  // every subsequent open — the sheet silently stays invisible even though
-  // 'open' is applied and the tap registered. Clearing the inline style here
-  // avoids the dead-sheet trap on any second use in a session.
-  function openPinBuyOv() {
-    const el = document.getElementById('pin-buy-ov');
-    if (el) { el.style.display = ''; el.classList.add('open'); }
-  }
-
-  async function performSavingsCollect(phone) {
-    const err = document.getElementById('savings-collect-err');
-    const btn = document.getElementById('savings-collect-confirm-btn');
-    const originalText = btn ? btn.textContent : '';
-    if (btn) { btn.textContent = 'Collecting...'; btn.style.pointerEvents = 'none'; }
-    if (err) err.textContent = '';
-
-    let data;
-    try {
-      data = await callEdge('emergency-deliver', { userId, phoneNumber: phone, network: savingsCurrentTab });
-    } catch (e) {
-      data = { error: 'Something went wrong' };
-    }
-
-    if (!data || data.error) {
-      if (btn) { btn.textContent = originalText; btn.style.pointerEvents = 'auto'; }
-      if (err) err.textContent = (data && data.error) || 'Could not collect right now.';
-      return;
-    }
-
-    const deliveredLabel = savingsPlans && savingsPlans[savingsCurrentTab] ? savingsPlans[savingsCurrentTab].planLabel : '';
-    const deliveredAmount = savingsPlans && savingsPlans[savingsCurrentTab] ? savingsPlans[savingsCurrentTab].target : null;
-    closeSavingsOv();
-    savingsPlans = null;
-    savingsBalance = data.newSavingsBalance ?? 0;
-    if (btn) { btn.textContent = originalText; btn.style.pointerEvents = 'auto'; }
-
-    // Same success screen the normal buy flow shows — not a borrowed popup.
-    document.getElementById('sbody').textContent = (deliveredLabel || 'Your plan') + ' has been delivered to ' + phone;
-    document.getElementById('samt').textContent = deliveredAmount != null
-      ? '₦' + deliveredAmount.toLocaleString() + ' deducted'
-      : '';
-    show('success');
-
-    fetchUserData();
-    startAutoSavingsGoal();
-  }
-
   // ── Tab switcher ──
 
 
 
 
   function closeOv(e) {
-    if (e.target === document.getElementById('ov')) document.getElementById('ov').classList.remove('open');
+    if (e.target !== document.getElementById('ov')) return;
+    const ov = document.getElementById('ov');
+    ov.classList.remove('open');
+    setTimeout(() => { if (ov) ov.style.display = 'none'; }, 300);
   }
 
   function confirmBuy() {
@@ -4214,9 +3841,10 @@
     document.getElementById('dep-ov').classList.add('open');
   }
 
-  // Flat ₦70 fee on every deposit, charged on top of the amount credited.
+  // 1% fee on every deposit, charged on top of the amount credited.
+  // Must match DEPOSIT_FEE_RATE in the deposit edge function.
   function getDepositFee(amount) {
-    return 70;
+    return Math.round(amount * 0.01);
   }
 
   function selectDep(el, amt) {
@@ -4277,7 +3905,7 @@
     const handler = PaystackPop.setup({
       key: PAYSTACK_PUBLIC_KEY,
       email: email,
-      amount: chargeAmount * 100, // Paystack expects amount in kobo — includes the ₦70 fee
+      amount: chargeAmount * 100, // Paystack expects amount in kobo — includes the 1% fee
       ref: ref,
       currency: 'NGN',
       metadata: { userId, purpose: 'deposit', amount },
@@ -4339,6 +3967,683 @@
       }
     });
     handler.openIframe();
+  }
+
+  // ── SAVE & EARN: Earn (deposit into Savings) ──
+  // Moves money from the main wallet into Savings — an internal transfer,
+  // not a new Paystack charge. Backend edge function (savings-deposit) not
+  // built yet, so this will fail gracefully until it exists.
+  // Reward comes from data purchases made against the deposit (backend
+  // crediting logic not built yet — that's a separate piece of work). This
+  // function is the shared formula for how big that reward is: the rate
+  // scales with amount at 4% per every ₦1,000, up to ₦10,000 (40% rate) —
+  // above that the rate stops climbing and stays flat at 40%, instead of
+  // continuing to grow the way the raw formula would.
+  //   rate% = amount <= 10,000 ? (amount / 1000) * 4 : 40
+  //   reward = min(amount * rate% / 100, ₦200,000 cap)
+  // e.g. ₦1,000 → 4% → ₦40. ₦5,000 → 20% → ₦1,000. ₦10,000 → 40% → ₦4,000.
+  // ₦20,000 → still 40% → ₦8,000 (not 80%/₦16,000). Uncapped — reward can
+  // push total balance past the ₦500,000 deposit ceiling.
+  function calculateSavingsReward(amount) {
+    const ratePercent = amount <= 10000 ? (amount / 1000) * 4 : 40;
+    return amount * (ratePercent / 100);
+  }
+
+  const EARN_AMOUNTS = [1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000];
+  const EARN_MIN = 1000;
+  let selectedEarnAmt = 0;
+
+  function openEarnOv() {
+    selectedEarnAmt = 0;
+    document.getElementById('earn-hero-amt').textContent = '0';
+    document.getElementById('earn-amt-error').style.display = 'none';
+    const btn = document.getElementById('earn-confirm-btn');
+    if (btn) { btn.style.opacity = '.4'; btn.style.pointerEvents = 'none'; btn.textContent = 'Save to Earn'; }
+    renderEarnAmtCards();
+    document.getElementById('earn-ov').classList.add('open');
+  }
+
+  function closeEarnOv(e) {
+    if (e && e.target !== document.getElementById('earn-ov')) return;
+    document.getElementById('earn-ov').classList.remove('open');
+  }
+
+  // Only cards that actually fit what's left under the ₦500,000 TOTAL
+  // DEPOSITED ceiling are shown — as total principal deposited grows, the
+  // top cards drop off one by one instead of staying selectable and then
+  // erroring on confirm. Balance (which includes uncapped reward) is not
+  // part of this check.
+  function renderEarnAmtCards() {
+    const track = document.getElementById('earn-amt-swipe-track');
+    if (!track) return;
+    const totalDeposited = savingsDeposits.reduce((sum, d) => sum + Number(d.amount), 0);
+    const remaining = Math.max(0, SAVINGS_DEPOSIT_CAP - totalDeposited);
+    const available = EARN_AMOUNTS.filter(a => a <= remaining);
+
+    if (available.length === 0) {
+      track.innerHTML = '';
+      const errEl = document.getElementById('earn-amt-error');
+      errEl.textContent = "You've reached the ₦" + SAVINGS_DEPOSIT_CAP.toLocaleString() + ' deposit limit.';
+      errEl.style.display = 'inline-flex';
+      return;
+    }
+
+    track.innerHTML = available.map(a =>
+      '<div class="earn-amt-card" data-amt="' + a + '" onclick="selectEarnAmt(' + a + ')">₦' + a.toLocaleString() + '</div>'
+    ).join('');
+  }
+
+  function selectEarnAmt(amt) {
+    selectedEarnAmt = amt;
+
+    let selectedEl = null;
+    document.querySelectorAll('#earn-amt-swipe-track .earn-amt-card').forEach(c => {
+      const isSel = parseInt(c.dataset.amt, 10) === amt;
+      c.classList.toggle('sel', isSel);
+      if (isSel) selectedEl = c;
+    });
+    if (selectedEl) {
+      selectedEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+
+    // Estimated Reward hero shows principal + reward (total you'd have).
+    document.getElementById('earn-hero-amt').textContent = Math.round(amt + calculateSavingsReward(amt)).toLocaleString();
+
+    document.getElementById('earn-amt-error').style.display = 'none';
+    const btn = document.getElementById('earn-confirm-btn');
+    btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+  }
+
+  // ── SAVE & EARN card-verification limits (deposit/withdraw only) ──
+  // Without a linked card: ₦10,000 max per transaction, ₦50,000 max combined
+  // deposits+withdrawals per day, and a deposit can't push savings balance
+  // past ₦50,000. Any of these being tripped opens the card-limit sheet.
+  // NOTE: these are front-end checks only, for UX — the savings-deposit and
+  // savings-withdraw edge functions need the same limits enforced server-side,
+  // since a determined user could otherwise call the edge functions directly
+  // and skip this check entirely.
+  // A user who signed up via the no-card flow gets a placeholder cardCode
+  // like "no-card-<uuid>" from the backend instead of null/undefined — that
+  // string is still truthy, so plain `if (registeredCard)` checks were
+  // treating them as card-verified and skipping the limit entirely.
+  function hasRealCard() {
+    return !!registeredCard && !String(registeredCard).startsWith('no-card-');
+  }
+
+  // Deposits: hard cap on total PRINCIPAL deposited (not balance), ₦500,000
+  // — applies to everyone, no card-verification involved at all for
+  // deposits anymore. The deposit card picker only shows amounts that
+  // still fit under this ceiling (see renderEarnAmtCards). Reward accrued
+  // on top of deposits is uncapped, so total balance has no ceiling.
+  // Withdrawals: without a linked card, ₦10,000 per transaction — enter
+  // more than that and the card-verification sheet pops up. Deposits no
+  // longer trigger this check.
+  const SAVINGS_DEPOSIT_CAP = 500000;
+  const CARD_LIMIT_WITHDRAW_PER_TX = 10000;
+  let earnLimitPopped = false;
+  let withdrawLimitPopped = false;
+
+  let pendingCardLimitAction = null; // { amount, kind } — kind: 'deposit' | 'withdraw'
+  // One-shot: a successful scan sets this true, which lets exactly one
+  // withdrawal over the cap through without re-verifying. It's consumed
+  // the moment that withdrawal actually succeeds (not merely attempted —
+  // a failed submission leaves it available to retry). After that it's
+  // false again and the next over-cap withdrawal needs a fresh scan.
+  let cardLimitVerified = false;
+
+  // Deposit cap check — independent of card status, no verification sheet,
+  // just a hard stop with a plain message once the ₦500,000 TOTAL DEPOSITED
+  // (principal, not balance) ceiling is hit. Reward accrued on deposits is
+  // not counted against this and has no cap of its own.
+  function passesSavingsCap(amount) {
+    const totalDeposited = savingsDeposits.reduce((sum, d) => sum + Number(d.amount), 0);
+    if (totalDeposited + amount <= SAVINGS_DEPOSIT_CAP) return true;
+    const errEl = document.getElementById('earn-amt-error');
+    if (errEl) {
+      errEl.textContent = 'Total deposits limit is ₦' + SAVINGS_DEPOSIT_CAP.toLocaleString() + '.';
+      errEl.style.display = 'inline-flex';
+    }
+    return false;
+  }
+
+  // Withdrawal check — every withdrawal over ₦10,000 per transaction is
+  // gated behind the card-verification sheet, EVERY time, even if a card
+  // was linked on a previous withdrawal. A linked card on file doesn't
+  // prove who's holding it right now, so we re-verify (re-scan / re-enter)
+  // on each transaction above the cap rather than remembering past success.
+  function passesCardLimitCheck(amount, kind) {
+    if (kind !== 'withdraw') return true;
+    if (amount <= CARD_LIMIT_WITHDRAW_PER_TX) return true;
+    if (cardLimitVerified) return true;
+    const reason = hasRealCard()
+      ? 'Verify your Subsidi card again to withdraw more than ₦' + CARD_LIMIT_WITHDRAW_PER_TX.toLocaleString() + ' at once.'
+      : 'You need to link your Subsidi card before you can withdraw more than ₦' + CARD_LIMIT_WITHDRAW_PER_TX.toLocaleString() + ' at once.';
+    pendingCardLimitAction = { amount, kind };
+    openCardLimitOv(reason);
+    return false;
+  }
+
+
+  function openCardLimitOv(reason) {
+    document.getElementById('card-limit-reason').textContent = reason;
+    showCardLimitBlocked();
+    document.getElementById('card-limit-ov').classList.add('open');
+  }
+
+  function showCardLimitBlocked() {
+    stopCardLimitScan();
+    document.getElementById('card-limit-blocked-view').style.display = 'block';
+    document.getElementById('card-limit-manual-view').style.display = 'none';
+    document.getElementById('card-limit-scan-view').style.display = 'none';
+    document.getElementById('card-limit-success-view').style.display = 'none';
+    document.getElementById('card-limit-error-view').style.display = 'none';
+  }
+
+  function showCardLimitManualEntry() {
+    document.getElementById('card-limit-blocked-view').style.display = 'none';
+    document.getElementById('card-limit-manual-view').style.display = 'block';
+    document.getElementById('card-limit-manual-err').textContent = '';
+    document.getElementById('card-limit-manual-input').value = '';
+  }
+
+  function submitCardLimitManual() {
+    const raw = document.getElementById('card-limit-manual-input').value.trim();
+    if (!raw) {
+      document.getElementById('card-limit-manual-err').textContent = 'Enter your card number.';
+      return;
+    }
+    // Scans always send the full QR URL as the card code — a manually typed
+    // number is just the short code printed on the card, so build the same
+    // URL shape here to match what's stored in card_code.
+    const cardCode = raw.startsWith('https://subsidi-1.vercel.app/') ? raw : 'https://subsidi-1.vercel.app/' + raw;
+    document.getElementById('card-limit-manual-view').style.display = 'none';
+    document.getElementById('card-limit-status').textContent = 'Verifying card...';
+    document.getElementById('card-limit-scan-view').style.display = 'none';
+    submitCardLimitScan(cardCode);
+  }
+
+  function closeCardLimitOv() {
+    stopCardLimitScan();
+    pendingCardLimitAction = null;
+    document.getElementById('card-limit-ov').classList.remove('open');
+  }
+
+  let cardLimitStream = null;
+  let cardLimitScanLoop = null;
+
+  function startCardLimitScan() {
+    document.getElementById('card-limit-blocked-view').style.display = 'none';
+    document.getElementById('card-limit-error-view').style.display = 'none';
+    document.getElementById('card-limit-scan-view').style.display = 'block';
+    document.getElementById('card-limit-status').textContent = 'Starting camera...';
+    beginCardLimitCamera();
+  }
+
+  async function beginCardLimitCamera() {
+    try {
+      cardLimitStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 }, focusMode: 'continuous' } });
+      const video = document.getElementById('card-limit-video');
+      video.srcObject = cardLimitStream;
+      video.play();
+      document.getElementById('card-limit-status').textContent = 'Camera active — scan your Subsidi card';
+      cardLimitScanFrame();
+    } catch (e) {
+      document.getElementById('card-limit-status').textContent = '⚠️ Camera blocked. Allow camera access and try again.';
+    }
+  }
+
+  function stopCardLimitScan() {
+    clearTimeout(cardLimitScanLoop);
+    cardLimitScanLoop = null;
+    if (cardLimitStream) {
+      cardLimitStream.getTracks().forEach(t => t.stop());
+      cardLimitStream = null;
+    }
+    _resetTorchFor('card-limit');
+  }
+
+  function cardLimitScanFrame() {
+    const video = document.getElementById('card-limit-video');
+    if (video && video.readyState === video.HAVE_ENOUGH_DATA) {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code && code.data) {
+        const raw = code.data.trim();
+        const isValidCard = raw.startsWith('https://subsidi-1.vercel.app/');
+        if (isValidCard) {
+          stopCardLimitScan();
+          playSuccessSound();
+          submitCardLimitScan(raw);
+          return;
+        }
+      }
+    }
+    cardLimitScanLoop = setTimeout(cardLimitScanFrame, 200);
+  }
+
+  // Links the scanned card to this already-logged-in account by calling
+  // check-card with a userId — it does the lookup+link in one step.
+  async function submitCardLimitScan(cardCode) {
+    document.getElementById('card-limit-status').textContent = 'Verifying card...';
+    try {
+      const data = await callEdge('check-card', { userId, cardCode });
+      if (!data || data.error) {
+        document.getElementById('card-limit-scan-view').style.display = 'none';
+        document.getElementById('card-limit-error-msg').textContent = (data && data.error) || 'Could not verify this card. Try again.';
+        document.getElementById('card-limit-error-view').style.display = 'block';
+        return;
+      }
+      registeredCard = cardCode;
+      if (typeof renderMyCard === 'function') renderMyCard();
+      document.getElementById('card-limit-scan-view').style.display = 'none';
+      document.getElementById('card-limit-success-view').style.display = 'block';
+      cardLimitVerified = true;
+      setTimeout(() => {
+        document.getElementById('card-limit-ov').classList.remove('open');
+        retryPendingCardLimitAction();
+      }, 900);
+    } catch (e) {
+      document.getElementById('card-limit-scan-view').style.display = 'none';
+      document.getElementById('card-limit-error-msg').textContent = 'Could not verify this card. Try again.';
+      document.getElementById('card-limit-error-view').style.display = 'block';
+    }
+  }
+
+  function retryPendingCardLimitAction() {
+    const action = pendingCardLimitAction;
+    pendingCardLimitAction = null;
+    if (!action) return;
+    if (action.kind === 'deposit') confirmEarnDeposit();
+    else confirmWithdraw();
+  }
+
+
+  // Save & Earn is a fresh Paystack charge straight into Savings — not an
+  // internal transfer out of the main wallet. Mirrors confirmDep's flow
+  // exactly: open Paystack -> user pays -> verify edge function checks the
+  // payment and credits savings_balance -> show the result.
+  // 1% fee, charged on top (same convention as the ₦70 wallet-deposit fee)
+  // — the full amount typed is what lands in savings, the fee is extra on
+  // what Paystack actually charges.
+  function getSavingsDepositFee(amount) {
+    return Math.round(amount * 0.01);
+  }
+
+  function confirmEarnDeposit() {
+    if (!selectedEarnAmt || selectedEarnAmt < EARN_MIN) return;
+    if (!passesSavingsCap(selectedEarnAmt)) return;
+    showSavingsTermsPopup();
+  }
+
+  function showSavingsTermsPopup() {
+    const popId = 'savings-terms-pop';
+    const existing = document.getElementById(popId);
+    if (existing) existing.remove();
+
+    const pop = document.createElement('div');
+    pop.id = popId;
+    pop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:700;display:flex;align-items:flex-end;justify-content:center;padding:0;';
+    pop.innerHTML = `
+      <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+        <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+        <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:12px;">Before You Continue</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.7;margin-bottom:16px;">
+          By tapping <strong style="color:var(--w70);">I Agree</strong>, you confirm that you have read and understood how Subsidi's savings rewards work.
+        </div>
+
+        <!-- Reward Policy expandable -->
+        <div style="background:var(--dark-3);border:1px solid var(--border);border-radius:14px;margin-bottom:24px;overflow:hidden;">
+          <div onclick="document.getElementById('savings-policy-body').style.display = document.getElementById('savings-policy-body').style.display === 'none' ? 'block' : 'none';" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;">
+            <span style="font-size:13px;font-weight:700;color:#4A9EFF;">📄 Our Reward Policy</span>
+            <span style="font-size:11px;color:var(--w40);">Tap to read</span>
+          </div>
+          <div id="savings-policy-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+            <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
+              <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Savings Reward</strong> — A random, rotational bonus for staying active: spend at least ₦2,000 on data every week and keep at least ₦10,000 saved for 90+ days. Not guaranteed every month — some months a small reward, some months none, and every so often a bigger "Big Win".</p>
+              <p style="margin:0 0 10px;">🏆 <strong style="color:var(--w70);">Leaderboard Reward</strong> — The top 3 most consistent savers each get an extra bonus equal to 40% of their total saved amount.</p>
+              <p style="margin:0;">🏦 <strong style="color:var(--w70);">Where It Goes</strong> — All reward types are added straight to your Savings wallet.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div style="display:flex;gap:12px;">
+          <button onclick="document.getElementById('${popId}').remove();" style="flex:1;padding:15px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w50);font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
+          <button onclick="document.getElementById('${popId}')?.remove(); _proceedEarnDeposit();" style="flex:1;padding:15px;background:linear-gradient(90deg,var(--p-deep),var(--p),var(--p-light));border:none;border-radius:14px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;">I Agree</button>
+        </div>
+      </div>`;
+    document.body.appendChild(pop);
+    pop.addEventListener('click', (e) => { if (e.target === pop) pop.remove(); });
+  }
+
+  async function _proceedEarnDeposit() {
+    if (!selectedEarnAmt || selectedEarnAmt < EARN_MIN) return;
+    if (!passesSavingsCap(selectedEarnAmt)) return;
+
+    const amount = selectedEarnAmt;
+    const fee = getSavingsDepositFee(amount);
+    const chargeAmount = amount + fee;
+    const ref = 'subsidi-savings-' + userId + '-' + Date.now();
+    const email = (username || userId) + '@subsidi.app';
+
+    // Same single-slot recovery net as the main wallet deposit — covers the
+    // case where the app gets backgrounded mid-charge and Paystack completes
+    // it but our verify call never finishes.
+    localStorage.setItem('subsidi_last_savings_deposit', JSON.stringify({ ref, userId, amount }));
+
+    const btn = document.getElementById('earn-confirm-btn');
+    if (btn) { btn.style.opacity = '.6'; btn.style.pointerEvents = 'none'; }
+
+    const handler = PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: email,
+      amount: chargeAmount * 100, // kobo — includes the 1% fee, on top of what's credited
+      ref: ref,
+      currency: 'NGN',
+      metadata: { userId, purpose: 'savings', amount },
+      callback: function(response) {
+        (async () => {
+          showSpinner('Confirming payment...');
+          try {
+            let result = null;
+            let attempts = 0;
+            while (attempts < 6) {
+              try {
+                result = await callEdge('savings-verify', { reference: response.reference, userId, amount });
+              } catch (e) {
+                result = null;
+                console.error('[savings] attempt', attempts + 1, 'failed:', e.message);
+              }
+              if (result && result.success) break;
+              attempts++;
+              if (attempts < 6) await new Promise(r => setTimeout(r, 6000));
+            }
+            hideSpinner();
+            if (result && result.success) {
+              localStorage.removeItem('subsidi_last_savings_deposit');
+              saveLocalTxn({ type: 'deposit', data_plan: 'savings', amount, status: 'success' });
+              closeEarnOv();
+              await fetchUserData();
+              alert('₦' + amount.toLocaleString() + ' moved into savings.');
+            } else {
+              // Still unresolved after ~30s — leave the recovery slot in
+              // place so the on-load check keeps retrying and credits it
+              // (silently, next load) the moment it clears.
+              console.error('[savings] gave up after', attempts, 'attempts, result:', result);
+              closeEarnOv();
+              alert('Still confirming your payment — this can take a moment on some banks. Reference: ' + response.reference);
+            }
+          } catch (e) {
+            hideSpinner();
+            console.error('Savings verify error:', e);
+            closeEarnOv();
+          } finally {
+            if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+          }
+        })();
+      },
+      onClose: function() {
+        if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
+      }
+    });
+    handler.openIframe();
+  }
+
+  // ── SAVE & EARN: Withdraw (to Main Wallet or Bank Account) ──
+  let selectedWithdrawDest = null;
+
+  // Bank withdrawals only go out on the 30th of the month. Deposits no
+  // longer track a 90-day maturity date — whether a deposit's "expected
+  // reward" has been reached is decided server-side per deposit and comes
+  // back as d.matured; the client just reads that flag.
+  function isBankWithdrawDay() {
+    return new Date().getDate() === 30;
+  }
+
+  // Total reward sitting on deposits that haven't reached their expected
+  // reward yet — this is what gets forfeited if you withdraw capital to
+  // your bank without moving it to your main wallet first.
+  function getAtRiskReward() {
+    return savingsDeposits.reduce((sum, d) => sum + (!d.matured ? (d.rewardEarned || 0) : 0), 0);
+  }
+
+  let pendingWithdraw = null; // { amount, bankDetails } stashed while the forfeit-warning sheet is open
+  let pendingWithdrawConsistencyAck = false; // true once the user has clicked through the consistency-reset warning for the current pendingWithdraw
+
+  function openWithdrawOv() {
+    selectedWithdrawDest = null;
+    withdrawLimitPopped = false;
+    document.getElementById('withdraw-avail').textContent = '₦' + Math.round(savingsBalance).toLocaleString();
+    document.getElementById('withdraw-dest-main').classList.remove('sel');
+    document.getElementById('withdraw-dest-bank').classList.remove('sel');
+    document.getElementById('withdraw-bank-form').style.display = 'none';
+    document.getElementById('withdraw-amt-input').value = '';
+    document.getElementById('withdraw-err').textContent = '';
+
+    const bankTile = document.getElementById('withdraw-dest-bank');
+    const bankSub = document.getElementById('withdraw-bank-sub');
+    if (isBankWithdrawDay()) {
+      bankTile.style.opacity = '1'; bankTile.style.pointerEvents = 'auto';
+      bankSub.textContent = 'Free · Only on the 30th';
+    } else {
+      bankTile.style.opacity = '.4'; bankTile.style.pointerEvents = 'none';
+      bankSub.textContent = 'Opens on the 30th';
+    }
+
+    const btn = document.getElementById('withdraw-confirm-btn');
+    btn.style.opacity = '.4'; btn.style.pointerEvents = 'none'; btn.textContent = 'Withdraw';
+    document.getElementById('withdraw-ov').classList.add('open');
+    updateWithdrawBtnText();
+    refreshMyConsistencyScore(); // so the reset-warning can show "Current: X%" even if they've never opened the leaderboard tab
+  }
+
+  function closeWithdrawOv(e) {
+    if (e && e.target !== document.getElementById('withdraw-ov')) return;
+    document.getElementById('withdraw-ov').classList.remove('open');
+  }
+
+  function updateWithdrawBtnText() {
+    const input = document.getElementById('withdraw-amt-input');
+    let amount = parseInt(input.value, 10);
+
+    // Live clamp: the field snaps back down as soon as you cross the
+    // ₦10,000 per-transaction cap, and the card-verification sheet pops
+    // up right then — every time, unless a scan was just completed and
+    // hasn't been consumed by a successful withdrawal yet. Runs
+    // regardless of whether a destination is picked yet — the cap
+    // applies to the amount typed, not to the confirm step.
+    const hintEl = document.getElementById('withdraw-card-limit-hint');
+    if (amount > CARD_LIMIT_WITHDRAW_PER_TX && !cardLimitVerified) {
+      const justCrossed = !withdrawLimitPopped;
+      amount = CARD_LIMIT_WITHDRAW_PER_TX;
+      input.value = amount;
+      hintEl.style.display = 'block';
+      withdrawLimitPopped = true;
+      if (justCrossed) {
+        const reason = hasRealCard()
+          ? 'Verify your Subsidi card again to withdraw more than ₦' + CARD_LIMIT_WITHDRAW_PER_TX.toLocaleString() + ' at once.'
+          : 'You need to link your Subsidi card before you can withdraw more than ₦' + CARD_LIMIT_WITHDRAW_PER_TX.toLocaleString() + ' at once.';
+        openCardLimitOv(reason);
+      }
+    } else {
+      hintEl.style.display = 'none';
+      withdrawLimitPopped = false;
+    }
+
+    if (!selectedWithdrawDest) return;
+
+    const btn = document.getElementById('withdraw-confirm-btn');
+    btn.textContent = selectedWithdrawDest === 'bank' ? 'Withdraw to Bank' : 'Withdraw to Wallet';
+  }
+
+  function selectWithdrawDest(dest) {
+    const errEl = document.getElementById('withdraw-err');
+    if (dest === 'bank' && !isBankWithdrawDay()) {
+      errEl.textContent = 'Bank withdrawals only go out on the 30th of each month.';
+      return;
+    }
+    errEl.textContent = '';
+    selectedWithdrawDest = dest;
+    document.getElementById('withdraw-dest-main').classList.toggle('sel', dest === 'main');
+    document.getElementById('withdraw-dest-bank').classList.toggle('sel', dest === 'bank');
+    document.getElementById('withdraw-bank-form').style.display = dest === 'bank' ? 'block' : 'none';
+    const btn = document.getElementById('withdraw-confirm-btn');
+    btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+    updateWithdrawBtnText();
+  }
+
+  async function confirmWithdraw() {
+    const errEl = document.getElementById('withdraw-err');
+    errEl.textContent = '';
+    const amount = parseInt(document.getElementById('withdraw-amt-input').value, 10);
+    if (!selectedWithdrawDest) { errEl.textContent = 'Choose where to withdraw to.'; return; }
+    if (!amount || amount < 1) { errEl.textContent = 'Enter an amount.'; return; }
+    if (amount > savingsBalance) { errEl.textContent = 'More than you have saved.'; return; }
+    if (!passesCardLimitCheck(amount, 'withdraw')) return;
+    if (selectedWithdrawDest === 'bank' && !isBankWithdrawDay()) {
+      errEl.textContent = 'Bank withdrawals only go out on the 30th of each month.';
+      return;
+    }
+
+    let bankDetails = null;
+    if (selectedWithdrawDest === 'bank') {
+      const bankName = document.getElementById('withdraw-bank-name').value.trim();
+      const acctNumber = document.getElementById('withdraw-acct-number').value.trim();
+      const acctName = document.getElementById('withdraw-acct-name').value.trim();
+      if (!bankName || !acctNumber || !acctName) { errEl.textContent = 'Fill in all your bank details.'; return; }
+      bankDetails = { bankName, acctNumber, acctName };
+    }
+
+    // Any withdrawal resets the leaderboard consistency streak — warn before
+    // submitting so the user can back out if they don't want that.
+    if (!pendingWithdrawConsistencyAck) {
+      if (myConsistencyScore === null) await refreshMyConsistencyScore(); // background fetch from openWithdrawOv() may not have finished yet
+      pendingWithdraw = { amount, bankDetails };
+      const scoreEl = document.getElementById('consistency-warn-current-score');
+      if (scoreEl) scoreEl.textContent = Math.floor(myConsistencyScore || 0) + '%';
+      // Withdrawing wipes the accrued bonus and resets the % to match
+      // whatever balance is left — not to a flat 0% — capped the same way
+      // the backend caps it (₦500,000 base).
+      const balanceAfter = Math.max(0, savingsBalance - amount);
+      const resetToPct = Math.floor(Math.min(balanceAfter, 500000) / 1000);
+      document.getElementById('consistency-warn-text').textContent =
+        'Withdrawing ₦' + amount.toLocaleString() + ' resets it to ' + resetToPct + '%. Deposit ₦' + amount.toLocaleString() + '+ to start it climbing again.';
+      document.getElementById('consistency-warn-ov').classList.add('open');
+      return;
+    }
+
+    // Bank withdrawals only take capital out — if there's reward sitting on
+    // deposits that haven't reached their expected reward yet, warn before
+    // submitting so it can be moved to the wallet instead of lost.
+    if (selectedWithdrawDest === 'bank' && getAtRiskReward() > 0) {
+      pendingWithdraw = { amount, bankDetails };
+      const at = Math.round(getAtRiskReward()).toLocaleString();
+      document.getElementById('forfeit-warn-text').textContent =
+        'You have ₦' + at + ' in reward on deposits that haven\'t reached their expected reward yet. Withdrawing your capital to your bank now forfeits all of it. Move it to your main wallet first to keep it.';
+      document.getElementById('forfeit-warn-ov').classList.add('open');
+      return;
+    }
+
+    await submitWithdraw(amount, bankDetails, false);
+    pendingWithdraw = null;
+    pendingWithdrawConsistencyAck = false;
+  }
+
+  function closeConsistencyWarnOv() {
+    document.getElementById('consistency-warn-ov').classList.remove('open');
+    pendingWithdraw = null;
+    pendingWithdrawConsistencyAck = false;
+  }
+
+  async function proceedPastConsistencyWarn() {
+    document.getElementById('consistency-warn-ov').classList.remove('open');
+    pendingWithdrawConsistencyAck = true;
+    if (!pendingWithdraw) return;
+    const { amount, bankDetails } = pendingWithdraw;
+    document.getElementById('withdraw-amt-input').value = amount;
+    await confirmWithdraw();
+  }
+
+  function closeForfeitWarnOv() {
+    document.getElementById('forfeit-warn-ov').classList.remove('open');
+    pendingWithdraw = null;
+    pendingWithdrawConsistencyAck = false;
+  }
+
+  async function acceptForfeitAndWithdraw() {
+    if (!pendingWithdraw) { closeForfeitWarnOv(); return; }
+    const { amount, bankDetails } = pendingWithdraw;
+    document.getElementById('forfeit-warn-ov').classList.remove('open');
+    await submitWithdraw(amount, bankDetails, true);
+    pendingWithdraw = null;
+    pendingWithdrawConsistencyAck = false;
+  }
+
+  async function moveRewardToWalletThenClose() {
+    document.getElementById('forfeit-warn-ov').classList.remove('open');
+    pendingWithdraw = null;
+    pendingWithdrawConsistencyAck = false;
+    await moveRewardToWallet();
+  }
+
+  // Moves all currently-earned reward on not-yet-matured deposits into the
+  // main wallet, securing it before a capital withdrawal.
+  async function moveRewardToWallet() {
+    showSpinner('Moving reward...');
+    try {
+      const result = await callEdge('move-savings-reward', { userId });
+      hideSpinner();
+      if (result && result.success) {
+        await fetchUserData();
+        alert('Reward moved to your main wallet.');
+      } else {
+        alert((result && result.error) || 'Could not move your reward right now.');
+      }
+    } catch (e) {
+      hideSpinner();
+      alert('Could not move your reward right now.');
+    }
+  }
+
+  async function submitWithdraw(amount, bankDetails, forfeitReward) {
+    const errEl = document.getElementById('withdraw-err');
+    const btn = document.getElementById('withdraw-confirm-btn');
+    btn.style.opacity = '.6'; btn.style.pointerEvents = 'none';
+    showSpinner('Submitting...');
+    try {
+      const result = await callEdge('savings-withdraw', { userId, amount, fee: 0, destination: selectedWithdrawDest, bankDetails, forfeitReward });
+      hideSpinner();
+      if (result && result.success) {
+        cardLimitVerified = false; // consumed — next over-cap withdrawal needs a fresh scan
+        closeWithdrawOv();
+        if (typeof animateSavingsWithdrawal === 'function') await animateSavingsWithdrawal(amount, selectedWithdrawDest);
+        // Let the settled number sit for a beat so it's actually visible
+        // before the result card covers it.
+        await new Promise(r => setTimeout(r, 500));
+        if (typeof showWithdrawStatusPopup === 'function') {
+          showWithdrawStatusPopup(selectedWithdrawDest, amount);
+        } else {
+          alert(selectedWithdrawDest === 'bank'
+            ? 'Withdrawal request submitted — it will be sent to your bank shortly.'
+            : '₦' + amount.toLocaleString() + ' moved to your main wallet.');
+        }
+        // Reconcile with the server quietly in the background — not
+        // awaited, so its own spinner doesn't flash over the result card.
+        fetchUserData();
+      } else {
+        errEl.textContent = (result && result.error) || 'Could not process this withdrawal right now.';
+      }
+    } catch (e) {
+      hideSpinner();
+      errEl.textContent = 'Could not process this withdrawal right now.';
+    } finally {
+      btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+    }
   }
 
   // ── Bank Transfer (Dedicated Account) ──
@@ -4628,6 +4933,20 @@
     }
   }
 
+  // Quietly refreshes myConsistencyScore without touching the leaderboard
+  // screen's DOM — used so the withdraw reset-warning can show a current
+  // score even if the user has never opened the Leaderboard tab this session.
+  async function refreshMyConsistencyScore() {
+    try {
+      const data = await callEdge('get-leaderboard', { userId });
+      if (data && data.you && typeof data.you.consistency_score === 'number') {
+        myConsistencyScore = data.you.consistency_score;
+      }
+    } catch (e) {
+      console.error('Consistency score refresh error:', e);
+    }
+  }
+
   // ── Gold nav badge: total number of people on this month's leaderboard ──
   function updateLeaderboardBadge(count) {
     const n = Number(count) || 0;
@@ -4649,7 +4968,7 @@
     }
   }
 
-  // Special gold titles for the top 3 spenders each month — purely cosmetic,
+  // Special gold titles for the top 3 savers each month — purely cosmetic,
   // shown alongside the masked phone number, not instead of it.
   const TOP_RANK_NAMES = { 1: 'Elon Musk', 2: 'Pablo', 3: 'Hustler' };
 
@@ -4679,22 +4998,40 @@
     const youEl = document.getElementById('leaderboard-you');
     if (!listEl) return;
 
+    if (you && typeof you.consistency_score === 'number') myConsistencyScore = you.consistency_score;
+
+    // Ranking is now by consistency_score (never-withdrawn, months-held streak),
+    // NOT by raw savings_balance — a smaller balance held consistently can
+    // outrank a bigger balance that's ever been withdrawn from, even partially.
+    // total_saved (savings_balance, principal + reward) is still shown, just
+    // secondary now — consistency is the number that decides rank.
+
     // Your position — pinned in its own section above the top 20, so the list
     // never pushes it down. Always shown whenever you have a rank this month.
     if (youEl) {
       if (you && you.rank) {
-        const amount = '₦' + Math.floor(you.total_spent || 0).toLocaleString();
+        const amount = '₦' + Math.floor(you.total_saved || 0).toLocaleString();
+        const consistency = Math.floor(you.consistency_score || 0) + '%';
+        const rewardLine = you.rank <= 3
+          ? '<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:2px;white-space:nowrap">₦' + Math.floor((you.total_saved || 0) * 0.4).toLocaleString() + ' reward</div>'
+          : '';
         const youBadge = premiumBadge(you.premium_plan);
         const youTitle = TOP_RANK_NAMES[you.rank]
-          ? '<div style="font-size:12px;font-weight:800;color:#F5A623;margin-top:6px">' + TOP_RANK_NAMES[you.rank] + '</div>'
+          ? '<div style="display:inline-block;font-size:11px;font-weight:800;color:#F5A623;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.4);border-radius:20px;padding:4px 12px;margin-bottom:12px;">🏆 ' + TOP_RANK_NAMES[you.rank] + '</div>'
           : '';
-        youEl.innerHTML = '<div style="background:var(--dark-3);border:1.5px solid var(--p-light);border-radius:16px;padding:14px 16px">'
-          + '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">'
-          + '<div style="font-size:14px;font-weight:700;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + youBadge + 'You <span style="color:var(--p-light);font-weight:800">(' + ordinal(you.rank) + ')</span></div>'
-          + '<div style="font-size:14px;color:var(--w40);font-weight:600;white-space:nowrap">' + amount + ' spent</div>'
-          + '</div>'
-          + '<div style="font-size:12px;color:var(--p-light);margin-top:6px">Your position</div>'
+        youEl.innerHTML = '<div style="background:var(--dark-3);border:1.5px solid var(--p-light);border-radius:16px;padding:18px 18px 16px">'
           + youTitle
+          + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
+          + '<div style="min-width:0">'
+          + '<div style="font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + youBadge + 'You <span style="color:var(--p-light);font-weight:800">(' + ordinal(you.rank) + ')</span></div>'
+          + '<div style="font-size:12px;color:var(--p-light);margin-top:8px">Your position</div>'
+          + '</div>'
+          + '<div style="text-align:right;flex-shrink:0">'
+          + '<div style="font-size:18px;font-weight:800;color:var(--green);line-height:1.2">' + consistency + '</div>'
+          + rewardLine
+          + '<div style="font-size:12px;color:#fff;font-weight:600;margin-top:4px;white-space:nowrap">' + amount + ' saved</div>'
+          + '</div>'
+          + '</div>'
           + '</div>';
       } else {
         youEl.innerHTML = '';
@@ -4702,7 +5039,7 @@
     }
 
     if (!rows || rows.length === 0) {
-      listEl.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--w40);font-size:13px">No spending yet this month. Be the first!</div>';
+      listEl.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--w40);font-size:13px">No savings yet. Be the first!</div>';
       return;
     }
     // You're already pinned above in your own card — don't also show yourself
@@ -4710,20 +5047,30 @@
     // your masked phone number sitting right below your own "You" card).
     const yourRank = you && you.rank;
     listEl.innerHTML = rows.map((row, i) => ({ row, rank: i + 1 })).filter(({ rank }) => rank !== yourRank).map(({ row, rank }) => {
-      const amount = '₦' + Math.floor(row.total_spent || 0).toLocaleString();
+      const amount = '₦' + Math.floor(row.total_saved || 0).toLocaleString();
+      const consistency = Math.floor(row.consistency_score || 0) + '%';
+      const rewardLine = rank <= 3
+        ? '<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:2px;white-space:nowrap">₦' + Math.floor((row.total_saved || 0) * 0.4).toLocaleString() + ' reward</div>'
+        : '';
       const phone = maskPhone(row.phone || '');
       const uname = row.username ? ('@' + row.username) : '—';
       const badge = premiumBadge(row.premium_plan);
       const goldTitle = TOP_RANK_NAMES[rank]
-        ? '<div style="font-size:12px;font-weight:800;color:#F5A623;margin-top:6px">' + TOP_RANK_NAMES[rank] + '</div>'
+        ? '<div style="display:inline-block;font-size:11px;font-weight:800;color:#F5A623;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.4);border-radius:20px;padding:4px 12px;margin-bottom:12px;">🏆 ' + TOP_RANK_NAMES[rank] + '</div>'
         : '';
-      return '<div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px">'
-        + '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">'
-        + '<div style="font-size:14px;font-weight:700;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + badge + phone + ' <span style="color:var(--p-light);font-weight:800">(' + ordinal(rank) + ')</span></div>'
-        + '<div style="font-size:14px;color:var(--w40);font-weight:600;white-space:nowrap">' + amount + ' spent</div>'
-        + '</div>'
-        + '<div style="font-size:12px;color:var(--w40);margin-top:6px">' + uname + '</div>'
+      return '<div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:18px 18px 16px;margin-bottom:14px">'
         + goldTitle
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
+        + '<div style="min-width:0">'
+        + '<div style="font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + badge + phone + ' <span style="color:var(--p-light);font-weight:800">(' + ordinal(rank) + ')</span></div>'
+        + '<div style="font-size:12px;color:var(--w40);margin-top:8px">' + uname + '</div>'
+        + '</div>'
+        + '<div style="text-align:right;flex-shrink:0">'
+        + '<div style="font-size:18px;font-weight:800;color:var(--green);line-height:1.2">' + consistency + '</div>'
+        + rewardLine
+        + '<div style="font-size:12px;color:#fff;font-weight:600;margin-top:4px;white-space:nowrap">' + amount + ' saved</div>'
+        + '</div>'
+        + '</div>'
         + '</div>';
     }).join('');
   }
@@ -5074,11 +5421,11 @@
   const FAQ_ITEMS = [
     {
       q: "What is Subsidi?",
-      a: "Subsidi is a membership that gets you mobile data cheaper than market price. Everyone can borrow ₦100 free, no payment required. Premium is ₦870 and gets you a higher borrow limit and your Emergency Box."
+      a: "Subsidi gets you mobile data cheaper than market price and lets you save money while earning rewards on it — a random, rotational Savings Reward (with occasional bigger Big Wins), plus a Leaderboard Reward for the most consistent savers."
     },
     {
-      q: "How do I keep Premium active?",
-      a: "Just renew every 7 days — your higher borrow limit and Emergency Box top-up apply automatically as soon as you pay. Nothing is auto-charged; you subscribe and pay whenever you're ready."
+      q: "How do I earn rewards?",
+      a: "Stay active — spend at least ₦2,000 on data every week and keep at least ₦10,000 saved for 90+ days. That makes you eligible for the Savings Reward, but it's random and rotates between users, so it isn't guaranteed every month. The top 3 most consistent savers also get a separate Leaderboard Reward."
     },
     {
       q: "Is my money safe?",
@@ -5305,16 +5652,6 @@
   // Load persisted premium state from localStorage
   // Premium state is loaded from the database via fetchUserData — not localStorage
 
-  function onPremToggleClick() {
-    if (gateCheck('Emergency Box', 'Create a free account to use your Emergency Box.')) return;
-    if (emergencyToggleOn) {
-      closeSavingsOv();
-    } else {
-      openSavingsOv();
-    }
-  }
-
-  
   // Lightweight pre-check against the toggle pool, called the instant the
   // toggle is tapped ON — before the camera ever opens.
   async function checkToggleAvailable() {
@@ -5524,7 +5861,7 @@
     if (premiumUnlocked && PREMIUM_PLANS[premiumPlan]) {
       el.textContent = '₦' + PREMIUM_PLANS[premiumPlan].price.toLocaleString() + '/week — active';
     } else {
-      el.textContent = 'Higher borrow limit + Emergency Box';
+      el.textContent = 'Discounted data + Community Bonus';
     }
   }
 
@@ -5615,13 +5952,12 @@
     pop.innerHTML = `
       <div style="background:var(--dark-2);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
         <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
-        <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:16px;">Premium Policy</div>
+        <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:16px;">Reward Policy</div>
         <div style="font-size:12px;color:var(--w50);line-height:1.8;">
-          <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Weekly Subscription</strong> — Premium is ₦870/week, billed each time you renew.</p>
-          <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Fixed Cycle</strong> — Premium runs for 7 days from the day you pay, then expires — no grace period. Subscribe again for a fresh cycle.</p>
-          <p style="margin:0 0 10px;">📦 <strong style="color:var(--w70);">Emergency Box</strong> — Premium unlocks it, and boosts your balance every renewal.</p>
-          <p style="margin:0 0 10px;">🔓 <strong style="color:var(--w70);">Borrow</strong> — Everyone can borrow ₦100 free. Premium lets you borrow more, and your limit grows with each renewal.</p>
-          <p style="margin:0;">❓ Questions about your plan or billing? Reach out via <strong style="color:var(--w70);">Report Issue</strong> in Support.</p>
+          <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Savings Reward</strong> — A random, rotational bonus for staying active: spend at least ₦2,000 on data every week and keep at least ₦10,000 saved for 90+ days. It's not guaranteed every month — some months you get a small reward, some months none, and every so often a bigger "Big Win".</p>
+          <p style="margin:0 0 10px;">🏆 <strong style="color:var(--w70);">Leaderboard Reward</strong> — The top 3 most consistent savers each get an extra bonus equal to 40% of their total saved amount.</p>
+          <p style="margin:0 0 10px;">🏦 <strong style="color:var(--w70);">Where It Goes</strong> — All reward types are added straight to your Savings wallet.</p>
+          <p style="margin:0;">❓ Questions about your rewards? Reach out via <strong style="color:var(--w70);">Report Issue</strong> in Support.</p>
         </div>
         <button onclick="document.getElementById('${popId}').remove();" style="width:100%;margin-top:24px;padding:15px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">Close</button>
       </div>`;
@@ -5655,8 +5991,8 @@
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
               <p style="margin:0 0 10px;">⚡ <strong style="color:var(--w70);">Weekly Subscription</strong> — Premium is ₦870/week, billed each time you renew.</p>
               <p style="margin:0 0 10px;">⏳ <strong style="color:var(--w70);">Fixed Cycle</strong> — Runs 7 days from payment, then expires — no grace period, nothing carries over. Subscribe again for a fresh cycle.</p>
-              <p style="margin:0 0 10px;">📦 <strong style="color:var(--w70);">Emergency Box</strong> — Premium unlocks it, and boosts your balance every renewal.</p>
-              <p style="margin:0 0 10px;">🔓 <strong style="color:var(--w70);">Borrow</strong> — Everyone can borrow ₦100 free. Premium lets you borrow more, and your limit grows with each renewal.</p>
+              <p style="margin:0 0 10px;">🏷️ <strong style="color:var(--w70);">Discounted Purchases</strong> — 4 discounted data buys per weekly cycle.</p>
+              <p style="margin:0 0 10px;">🎁 <strong style="color:var(--w70);">Community Bonus</strong> — Scan your card for guaranteed cashback, resets daily.</p>
             </div>
           </div>
         </div>
@@ -5717,7 +6053,7 @@
               setPremToggleUI(true);
               renderBundles();
               updateCurrentPlanBadge();
-              alert('Premium activated! Your higher borrow limit and Emergency Box are ready.');
+              alert('Premium activated! Your discounted purchases and Community Bonus are ready.');
             } else {
               alert('Payment verification failed. Contact support with ref: ' + response.reference);
             }
@@ -6087,16 +6423,23 @@
     return 'on ' + WEEKDAY_NAMES[resetDate.getDay()];
   }
 
+  // This slide used to show the cashback pool balance — now shows savings
+  // balance instead. Kept the function name (renderCashbackBalance) since
+  // it's called from many places already tied to when data refreshes.
+  // Includes reward earned across all deposits, not just capital — a
+  // ₦10,000 capital + ₦60 reward shows as ₦10,060 here, so this number
+  // actually moves as reward accrues from data purchases instead of
+  // looking frozen until you withdraw.
   function renderCashbackBalance() {
-    const whole = Math.floor(poolBalance).toLocaleString();
-    const dec = (poolBalance % 1).toFixed(2).slice(1);
+    const totalRewardEarned = savingsDeposits.reduce((sum, d) => sum + Number(d.rewardEarned || 0), 0);
+    const displayTotal = savingsBalance + totalRewardEarned;
+    const whole = Math.floor(displayTotal).toLocaleString();
+    const dec = (displayTotal % 1).toFixed(2).slice(1);
     const el = document.getElementById('cashback-bal-display');
     if (el) {
       el.innerHTML = '<span class="bal-cur" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">₦</span>' +
         whole + '<span class="bal-dec" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">' + dec + '</span>';
     }
-    // Collect button retired (was id=cashback-collect-btn) — that slot is now
-    // the static "Borrow" button, so no more cooldown/pool-empty label logic here.
   }
   renderCashbackBalance();
 
@@ -6120,451 +6463,6 @@
       return;
     }
     openCashbackScan();
-  }
-
-  // ── BORROW — spec: min ₦100 for everyone, no Premium needed. Borrowing
-  // more than ₦100 requires active Premium (else a popup explains the ₦100
-  // cap). Confirmed by a physical-card QR scan (same camera flow the old
-  // Community Bonus "Collect" used) instead of a plain confirm button, so
-  // it keeps that same tactile feel. Can't draw again until borrowOwed is
-  // fully repaid. borrowCeiling has no upper limit and grows passively for
-  // everyone from the deposit fee — it is never reduced by a draw, it's a
-  // limit, not a pool. ──
-  const BORROW_BASE = 100; // always available, no Premium required
-  const BORROW_FEE_RATE = 0.10; // repay = amount * 1.10
-
-  let selectedBorrowAmt = 0;
-  let selectedRepayAmt = 0;
-
-  function handleBorrowTap() {
-    if (borrowOwed > 0) {
-      showBorrowLockPopup('Repay First', 'Pay back ₦' + Math.round(borrowOwed).toLocaleString() + ' to borrow again.', 'Repay Now');
-      return;
-    }
-    openBorrowAmtSheet();
-  }
-
-  function showBorrowLockPopup(title, sub, ctaLabel) {
-    const titleEl = document.querySelector('#borrow-lock-ov .gate-title');
-    const subEl = document.querySelector('#borrow-lock-ov .gate-sub');
-    const ctaEl = document.getElementById('borrow-lock-cta');
-    if (titleEl) titleEl.innerHTML = title;
-    if (subEl) subEl.textContent = sub || '';
-    if (ctaEl) ctaEl.textContent = ctaLabel || 'See Premium Plans';
-    document.getElementById('borrow-lock-ov').classList.add('open');
-  }
-
-  function borrowLockCtaTap() {
-    closeBorrowLockOv();
-    if (borrowOwed > 0) { openRepaySheet(); return; }
-    showPremUnlockSheet(false);
-  }
-
-  let currentBorrowAvailable = 0;
-
-  function openBorrowAmtSheet() {
-    selectedBorrowAmt = BORROW_BASE;
-    const input = document.getElementById('borrow-amt-input');
-    if (input) input.value = BORROW_BASE;
-    document.getElementById('borrow-amt-err').textContent = '';
-    currentBorrowAvailable = BORROW_BASE + borrowCeiling;
-    document.getElementById('borrow-available-display').textContent = '₦' + currentBorrowAvailable.toLocaleString();
-    const sub = document.getElementById('borrow-max-sub');
-    if (sub) sub.textContent = premiumUnlocked ? 'Spendable on data only' : 'Get Premium to borrow more';
-    const btn = document.getElementById('borrow-confirm-btn');
-    btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
-    btn.textContent = 'Continue — Borrow ₦' + BORROW_BASE;
-
-    const ov = document.getElementById('borrow-amt-ov');
-    ov.style.display = 'flex';
-    setTimeout(() => ov.classList.add('open'), 10);
-  }
-
-  function closeBorrowAmtOv(e) {
-    if (e && e.target !== document.getElementById('borrow-amt-ov')) return;
-    const ov = document.getElementById('borrow-amt-ov');
-    ov.classList.remove('open');
-    setTimeout(() => { ov.style.display = 'none'; }, 300);
-  }
-
-  function closeBorrowLockOv() {
-    document.getElementById('borrow-lock-ov').classList.remove('open');
-  }
-
-  function onBorrowAmtInput(value) {
-    const amt = parseInt(value, 10);
-    const btn = document.getElementById('borrow-confirm-btn');
-    const err = document.getElementById('borrow-amt-err');
-
-    if (!value || !amt || amt < BORROW_BASE) {
-      err.textContent = 'Minimum you can borrow is ₦' + BORROW_BASE + '.';
-      selectedBorrowAmt = 0;
-      btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
-      btn.textContent = 'Continue';
-      return;
-    }
-    if (amt > BORROW_BASE && !premiumUnlocked) {
-      err.textContent = '';
-      selectedBorrowAmt = 0;
-      btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
-      btn.textContent = 'Continue';
-      showBorrowLockPopup('Get Premium', 'to borrow more than ₦100.', 'See Premium Plans');
-      return;
-    }
-    if (amt > currentBorrowAvailable) {
-      err.textContent = 'That\'s more than you can currently borrow (₦' + currentBorrowAvailable.toLocaleString() + ').';
-      selectedBorrowAmt = 0;
-      btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
-      btn.textContent = 'Continue';
-      return;
-    }
-    err.textContent = '';
-    selectedBorrowAmt = amt;
-    btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
-    btn.textContent = 'Continue — Borrow ₦' + amt.toLocaleString();
-  }
-
-  // Step 2: hand off from the amount sheet into the card-scan sheet — the
-  // scan is what actually confirms the draw (see submitBorrowScan below).
-  function proceedToBorrowScan() {
-    if (!selectedBorrowAmt) return;
-    closeBorrowAmtOv();
-    setTimeout(openBorrowScan, 250);
-  }
-
-  // Same visual beats as collectCashbackIntoMain (drain the Community Bonus
-  // card, swipe to Main, balance overshoots, pause, settles, reveal) but
-  // never touches the real poolBalance variable — only paints the DOM
-  // element directly and restores the true value at the end via
-  // renderCashbackBalance(). A borrow amount is unrelated to the real pool
-  // and can exceed it, which broke collectCashbackIntoMain's refill math
-  // (drove poolBalance negative / stuck at a wrong number) — this avoids
-  // that class of bug entirely, since nothing borrowed ever actually comes
-  // out of the real Community Bonus pool.
-  async function borrowIntoMain(amount, actualNewBalance) {
-    const balanceBefore = balance;
-    const cbEl = document.getElementById('cashback-bal-display');
-    const truePool = poolBalance; // real, untouched — used only as the cosmetic starting point
-
-    function paintCB(v) {
-      if (!cbEl) return;
-      const whole = Math.floor(Math.max(0, v)).toLocaleString();
-      const dec = (Math.max(0, v) % 1).toFixed(2).slice(1);
-      cbEl.innerHTML = '<span class="bal-cur" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">₦</span>' +
-        whole + '<span class="bal-dec" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">' + dec + '</span>';
-    }
-
-    // 1. Community Bonus card cosmetically drains to 0
-    await animateBalanceNumber(truePool, 0, 1400, paintCB);
-
-    // 2. Swipe to Main (no-op if already there)
-    if (window._walletSwipeToMain) window._walletSwipeToMain();
-    await new Promise(r => setTimeout(r, 400));
-
-    // 3. Main balance overshoots up by the borrowed amount
-    await animateBalanceNumber(balanceBefore, balanceBefore + amount, 1100, (v) => {
-      balance = v;
-      _paintMainBalance(v);
-    });
-
-    // 4. Pause
-    await new Promise(r => setTimeout(r, 950));
-
-    // 5. Settle to the real confirmed balance (should already match, but
-    // this snaps to the DB's number in case of any rounding drift)
-    await animateBalanceNumber(balanceBefore + amount, actualNewBalance, 500, (v) => {
-      balance = v;
-      _paintMainBalance(v);
-    });
-
-    // Restore the Community Bonus card to its true, untouched value —
-    // nothing about it was ever really changed.
-    if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
-
-    // 6. "You got ₦x" popup
-    if (typeof showGiftPopup === 'function') showGiftPopup(amount);
-    else alert('You got ₦' + Math.round(amount).toLocaleString());
-  }
-
-  // Same visual beats as collectCashbackIntoMain (drain the Community Bonus
-  // card, swipe to Main, balance overshoots, pause, settles, reveal) but
-  // never touches the real poolBalance variable — only paints the DOM
-  // element directly and restores the true value at the end via
-  // renderCashbackBalance(). A borrow amount is unrelated to the real pool
-  // and can exceed it, which broke collectCashbackIntoMain's refill math
-  // (drove poolBalance negative / stuck at a wrong number) — this avoids
-  // that class of bug entirely, since nothing borrowed ever actually comes
-  // out of the real Community Bonus pool.
-  async function borrowIntoMain(amount, actualNewBalance) {
-    const balanceBefore = balance;
-    const cbEl = document.getElementById('cashback-bal-display');
-    const truePool = poolBalance; // real, untouched — used only as the cosmetic starting point
-
-    function paintCB(v) {
-      if (!cbEl) return;
-      const whole = Math.floor(Math.max(0, v)).toLocaleString();
-      const dec = (Math.max(0, v) % 1).toFixed(2).slice(1);
-      cbEl.innerHTML = '<span class="bal-cur" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">₦</span>' +
-        whole + '<span class="bal-dec" style="-webkit-text-fill-color:transparent;background:linear-gradient(90deg,#b87010,#F5A623);-webkit-background-clip:text;background-clip:text;">' + dec + '</span>';
-    }
-
-    // 1. Community Bonus card cosmetically drains to 0
-    await animateBalanceNumber(truePool, 0, 1400, paintCB);
-
-    // 2. Swipe to Main (no-op if already there)
-    if (window._walletSwipeToMain) window._walletSwipeToMain();
-    await new Promise(r => setTimeout(r, 400));
-
-    // 3. Main balance overshoots up by the borrowed amount
-    await animateBalanceNumber(balanceBefore, balanceBefore + amount, 1100, (v) => {
-      balance = v;
-      _paintMainBalance(v);
-    });
-
-    // 4. Pause
-    await new Promise(r => setTimeout(r, 950));
-
-    // 5. Settle to the real confirmed balance (should already match, but
-    // this snaps to the DB's number in case of any rounding drift)
-    await animateBalanceNumber(balanceBefore + amount, actualNewBalance, 500, (v) => {
-      balance = v;
-      _paintMainBalance(v);
-    });
-
-    // Restore the Community Bonus card to its true, untouched value —
-    // nothing about it was ever really changed.
-    if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
-
-    // 6. "You got ₦x" popup
-    if (typeof showGiftPopup === 'function') showGiftPopup(amount);
-    else alert('You got ₦' + Math.round(amount).toLocaleString());
-  }
-
-  function handleRepayTap() {
-    openRepaySheet();
-  }
-
-  function openRepaySheet() {
-    selectedRepayAmt = 0;
-    const input = document.getElementById('repay-amt-input');
-    if (input) input.value = '';
-    document.getElementById('repay-amt-err').textContent = '';
-    document.getElementById('repay-owed-label').textContent = '₦' + Math.round(borrowOwed).toLocaleString();
-
-    const dueLabel = document.getElementById('repay-due-label');
-    if (dueLabel) {
-      if (borrowOwed > 0 && borrowDueAt) {
-        const due = new Date(borrowDueAt);
-        const msLeft = due.getTime() - Date.now();
-        const daysLeft = Math.ceil(msLeft / (24 * 60 * 60 * 1000));
-        if (msLeft <= 0) {
-          dueLabel.style.color = '#ff6b6b';
-          dueLabel.textContent = 'Overdue — your borrowable amount has stopped growing until you repay.';
-        } else {
-          dueLabel.style.color = 'var(--w40)';
-          dueLabel.textContent = 'Due in ' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + ' — after that, your borrowable amount stops growing.';
-        }
-      } else {
-        dueLabel.textContent = '';
-      }
-    }
-
-    const btn = document.getElementById('repay-confirm-btn');
-    btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
-    btn.textContent = 'Repay';
-    const fullBtn = document.getElementById('repay-full-btn');
-    fullBtn.style.display = borrowOwed > 0 ? 'block' : 'none';
-    fullBtn.textContent = 'Pay In Full (₦' + Math.round(borrowOwed).toLocaleString() + ')';
-
-    const ov = document.getElementById('repay-ov');
-    ov.style.display = 'flex';
-    setTimeout(() => ov.classList.add('open'), 10);
-  }
-
-  function closeRepayOv(e) {
-    if (e && e.target !== document.getElementById('repay-ov')) return;
-    const ov = document.getElementById('repay-ov');
-    ov.classList.remove('open');
-    setTimeout(() => { ov.style.display = 'none'; }, 300);
-  }
-
-  function onRepayAmtInput(value) {
-    const amt = parseInt(value, 10);
-    const btn = document.getElementById('repay-confirm-btn');
-    const err = document.getElementById('repay-amt-err');
-
-    if (!value || !amt || amt < 1) {
-      err.textContent = '';
-      selectedRepayAmt = 0;
-      btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
-      btn.textContent = 'Repay';
-      return;
-    }
-    if (amt > balance) {
-      err.textContent = 'Not enough balance to repay that amount.';
-      selectedRepayAmt = 0;
-      btn.style.opacity = '.4'; btn.style.pointerEvents = 'none';
-      btn.textContent = 'Repay';
-      return;
-    }
-    err.textContent = '';
-    selectedRepayAmt = amt;
-    btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
-    btn.textContent = 'Repay ₦' + amt.toLocaleString();
-  }
-
-  async function confirmRepay() {
-    if (!selectedRepayAmt) return;
-    await doRepay(selectedRepayAmt, 'repay-confirm-btn', 'repay-amt-err');
-  }
-
-  async function confirmRepayFull() {
-    if (!borrowOwed) return;
-    await doRepay(borrowOwed, 'repay-full-btn', 'repay-amt-err');
-  }
-
-  async function doRepay(amount, btnId, errId) {
-    const btn = document.getElementById(btnId);
-    const err = document.getElementById(errId);
-    const originalText = btn.textContent;
-    btn.style.pointerEvents = 'none';
-    btn.textContent = 'Repaying...';
-
-    let data;
-    try {
-      data = await callEdge('borrow-repay', { userId, amount });
-    } catch (e) {
-      data = null;
-    }
-
-    if (!data || data.error) {
-      btn.style.pointerEvents = 'auto';
-      btn.textContent = originalText;
-      err.textContent = (data && data.message) || 'Could not process this right now, try again.';
-      return;
-    }
-
-    if (typeof data.newOwed === 'number') borrowOwed = data.newOwed;
-    if (borrowOwed <= 0) borrowDueAt = null;
-
-    closeRepayOv();
-    if (typeof data.newBalance === 'number') {
-      const balanceBefore = balance;
-      await animateBalanceNumber(balanceBefore, data.newBalance, 900, (v) => {
-        balance = v;
-        _paintMainBalance(v);
-      });
-    }
-    fetchUserData();
-  }
-
-  // ── BORROW: card scan (confirms the draw) ──
-  // Same scan mechanism as the old Community Bonus collect (jsQR + "is this a
-  // real Subsidi card" check) — same physical card, this time confirming a
-  // borrow instead of a cashback claim. Keeps the same tactile feel.
-  let borrowScanStream = null;
-  let borrowScanLoop = null;
-
-  function openBorrowScan() {
-    const ov = document.getElementById('borrow-scan-ov');
-    document.getElementById('borrow-scan-view').style.display = 'block';
-    document.getElementById('borrow-error-view').style.display = 'none';
-    document.getElementById('borrow-scan-status').textContent = 'Starting camera...';
-    const sub = document.getElementById('borrow-scan-sub');
-    if (sub) sub.textContent = 'Hold your Subsidi card up to the camera to borrow ₦' + selectedBorrowAmt.toLocaleString();
-    ov.classList.add('open');
-    startBorrowScan();
-  }
-
-  function closeBorrowScan() {
-    stopBorrowScan();
-    document.getElementById('borrow-scan-ov').classList.remove('open');
-  }
-
-  async function startBorrowScan() {
-    try {
-      borrowScanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 }, focusMode: 'continuous' } });
-      const video = document.getElementById('borrow-scan-video');
-      video.srcObject = borrowScanStream;
-      video.play();
-      document.getElementById('borrow-scan-status').textContent = 'Camera active — scan your Subsidi card';
-      borrowScanFrame();
-    } catch(e) {
-      document.getElementById('borrow-scan-status').textContent = '⚠️ Camera blocked. Allow camera access and try again.';
-    }
-  }
-
-  function stopBorrowScan() {
-    clearTimeout(borrowScanLoop);
-    borrowScanLoop = null;
-    if (borrowScanStream) {
-      borrowScanStream.getTracks().forEach(t => t.stop());
-      borrowScanStream = null;
-    }
-    _resetTorchFor('borrow');
-  }
-
-  function toggleBorrowTorch() { toggleTorchFor('borrow', borrowScanStream); }
-
-  function borrowScanFrame() {
-    const video = document.getElementById('borrow-scan-video');
-    if (video && video.readyState === video.HAVE_ENOUGH_DATA) {
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-      if (code && code.data) {
-        const raw = code.data.trim();
-        const isValidCard = raw.startsWith('https://subsidi-1.vercel.app/');
-        if (isValidCard) {
-          stopBorrowScan();
-          playSuccessSound();
-          submitBorrowScan(raw);
-          return;
-        }
-      }
-    }
-    borrowScanLoop = setTimeout(borrowScanFrame, 200);
-  }
-
-  async function submitBorrowScan(cardCode) {
-    document.getElementById('borrow-scan-view').style.display = 'none';
-    document.getElementById('borrow-scan-status').textContent = 'Confirming...';
-    const amount = selectedBorrowAmt;
-    let data;
-    try {
-      data = await callEdge('borrow-draw', { userId, cardCode, amount });
-    } catch (e) {
-      data = null;
-    }
-
-    if (!data || data.error) {
-      document.getElementById('borrow-error-msg').textContent = (data && data.error) || 'Something went wrong. Please try again.';
-      document.getElementById('borrow-error-view').style.display = 'block';
-      return;
-    }
-
-    if (typeof data.newOwed === 'number') borrowOwed = data.newOwed;
-    if (typeof data.newCeiling === 'number') borrowCeiling = data.newCeiling;
-    if (data.dueAt) borrowDueAt = data.dueAt;
-
-    closeBorrowScan();
-    if (typeof data.newBalance === 'number') {
-      await borrowIntoMain(amount, data.newBalance);
-    } else if (typeof showGiftPopup === 'function') {
-      showGiftPopup(amount);
-    }
-    fetchUserData();
-  }
-
-  function retryBorrowScan() {
-    document.getElementById('borrow-error-view').style.display = 'none';
-    document.getElementById('borrow-scan-view').style.display = 'block';
-    document.getElementById('borrow-scan-status').textContent = 'Starting camera...';
-    startBorrowScan();
   }
 
   // ── COLLECT CASHBACK: card scan ──
@@ -6734,6 +6632,101 @@
   function closeGiftPopup() {
     const ov = document.getElementById('gift-win-ov');
     if (ov) ov.classList.remove('open');
+    if (typeof onRewardPopupClosed === 'function') onRewardPopupClosed();
+  }
+
+  // ── Rewards: activity meter + win popup ──
+  // The server sends only { level: 0-2, unseen: [{kind, amount, at}] }.
+  // The app never sees how rewards are decided.
+  let _rewardQueue = [];
+  let _rewardPopupOpen = false;
+  const _seenRewardKeys = new Set();
+
+  let rewardSpentWeek = 0;
+  const rwNaira = n => '₦' + Math.floor(Number(n) || 0).toLocaleString();
+
+  function applyRewards(r) {
+    if (!r) return;
+    if (typeof r.spent_week !== 'undefined') { rewardSpentWeek = Number(r.spent_week) || 0; updateRewardStrip(); }
+    if (_rewardPopupOpen || !Array.isArray(r.unseen)) return;
+    const fresh = r.unseen.filter(w => !_seenRewardKeys.has(w.kind + w.at));
+    if (!fresh.length) return;
+    _rewardQueue = fresh;
+    showNextReward();
+  }
+
+  function updateRewardStrip() {
+    const el = document.getElementById('rw-slide-spent');
+    if (!el) return;
+    el.textContent = rewardSpentWeek >= 2000
+      ? 'Weekly spend goal reached'
+      : rwNaira(rewardSpentWeek) + ' of ₦2,000 spent this week';
+  }
+
+  // Strip content slides left every 7s. The last slide is a copy of the
+  // first, so the loop always moves left and then snaps back unseen.
+  (function initRewardStrip() {
+    const track = document.getElementById('rw-track');
+    if (!track) return;
+    const total = track.children.length;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let i = 0;
+    function go() {
+      if (document.hidden) return;
+      i++;
+      track.style.transition = reduce ? 'none' : 'transform .5s ease';
+      track.style.transform = 'translateX(-' + (i * 100) + '%)';
+      if (i === total - 1) {
+        setTimeout(() => {
+          track.style.transition = 'none';
+          i = 0;
+          track.style.transform = 'translateX(0)';
+        }, reduce ? 0 : 520);
+      }
+    }
+    setInterval(go, 7000);
+  })();
+
+  function openRewardsHow() {
+    const sp = document.getElementById('rw-spent');
+    const sv = document.getElementById('rw-saved');
+    if (sp) sp.textContent = rwNaira(rewardSpentWeek);
+    if (sv) sv.textContent = rwNaira(savingsBalance);
+    const ov = document.getElementById('rw-ov');
+    if (ov) ov.classList.add('open');
+  }
+  function closeRewardsHow(e) {
+    if (e && e.target !== e.currentTarget) return;
+    const ov = document.getElementById('rw-ov');
+    if (ov) ov.classList.remove('open');
+  }
+
+  function showNextReward() {
+    const w = _rewardQueue[0];
+    if (!w) return;
+    _rewardPopupOpen = true;
+    _seenRewardKeys.add(w.kind + w.at);
+    const big = w.kind === 'bigwin';
+    const label = document.getElementById('gift-win-label');
+    const amtEl = document.getElementById('gift-win-amount');
+    const subEl = document.getElementById('gift-win-sub');
+    if (label) label.textContent = big ? 'Big win' : "You've been rewarded";
+    if (amtEl) amtEl.innerHTML = '<span class="cur">₦</span>' + Math.round(Number(w.amount) || 0).toLocaleString();
+    if (subEl) subEl.textContent = big
+      ? 'A special reward, added to your savings wallet.'
+      : 'Your activity paid off. Added to your savings wallet.';
+    const ov = document.getElementById('gift-win-ov');
+    if (ov) ov.classList.add('open');
+  }
+
+  function onRewardPopupClosed() {
+    if (!_rewardPopupOpen) return;
+    _rewardQueue.shift();
+    if (_rewardQueue.length) { showNextReward(); return; }
+    _rewardPopupOpen = false;
+    const label = document.getElementById('gift-win-label');
+    if (label) label.textContent = 'You Got';
+    if (userId) callEdge('ack-rewards', { userId }).catch(() => {});
   }
 
   // status: 'pending' | 'success'. amount is what was/will be credited.
@@ -6783,6 +6776,38 @@
     if (ov) ov.classList.remove('open');
   }
 
+  // Same card as the deposit-status popup, reused for withdrawals so
+  // there's one consistent "result" UI instead of a plain browser alert().
+  function showWithdrawStatusPopup(destination, amount) {
+    const icon = document.getElementById('dep-status-icon');
+    const iconSvg = document.getElementById('dep-status-icon-svg');
+    const title = document.getElementById('dep-status-title');
+    const amtEl = document.getElementById('dep-status-amount');
+    const sub = document.getElementById('dep-status-sub');
+    const refEl = document.getElementById('dep-status-ref');
+
+    if (destination === 'bank') {
+      if (icon) icon.classList.add('pending');
+      if (iconSvg) { iconSvg.innerHTML = DEP_ICON_CLOCK; iconSvg.setAttribute('stroke', 'var(--p)'); }
+      if (title) title.textContent = 'Withdrawal Submitted';
+      if (amtEl) amtEl.innerHTML = '<span class="cur">₦</span>' + Math.round(amount).toLocaleString();
+      if (sub) sub.textContent = "It'll be sent to your bank account shortly.";
+    } else {
+      if (icon) icon.classList.remove('pending');
+      if (iconSvg) { iconSvg.innerHTML = DEP_ICON_CHECK; iconSvg.setAttribute('stroke', '#4ADE80'); }
+      if (title) title.textContent = 'Moved to Wallet';
+      if (amtEl) amtEl.innerHTML = '<span class="cur">₦</span>' + Math.round(amount).toLocaleString();
+      if (sub) sub.textContent = 'Added straight to your main wallet balance.';
+    }
+    if (refEl) refEl.style.display = 'none';
+
+    const ov = document.getElementById('dep-status-ov');
+    if (ov) ov.classList.add('open');
+
+    clearTimeout(window._depStatusAutoClose);
+    window._depStatusAutoClose = setTimeout(closeDepStatusPopup, 20000);
+  }
+
   function _paintMainBalance(v) {
     const whole = Math.floor(v).toLocaleString();
     const dec = (v % 1).toFixed(2).slice(1);
@@ -6791,6 +6816,30 @@
     const balElR = document.getElementById('bal-display-repeat');
     if (balEl) balEl.innerHTML = balHTML;
     if (balElR) balElR.innerHTML = balHTML;
+  }
+
+  // ── Withdraw flow: same "auto swipe and credit" treatment as the
+  // Community Bonus collect flow — savings counts down, wallet card
+  // swipes back to Main, and (for main-wallet withdrawals only) the
+  // main balance counts up to match. Bank withdrawals don't touch the
+  // wallet balance, so they skip the swipe/credit-up steps. ──
+  async function animateSavingsWithdrawal(amount, destination) {
+    const savingsBefore = savingsBalance;
+    await animateBalanceNumber(savingsBefore, Math.max(0, savingsBefore - amount), 1200, (v) => {
+      savingsBalance = v;
+      renderCashbackBalance();
+    });
+
+    if (destination === 'main') {
+      if (window._walletSwipeToMain) window._walletSwipeToMain();
+      await new Promise(r => setTimeout(r, 400)); // matches the .35s swipe transition
+
+      const balanceBefore = balance;
+      await animateBalanceNumber(balanceBefore, balanceBefore + amount, 1100, (v) => {
+        balance = v;
+        _paintMainBalance(v);
+      });
+    }
   }
 
   async function collectCashbackIntoMain(amount, poolBalanceBefore) {
@@ -6858,12 +6907,12 @@
 
     function applySettledUI(idx) {
       if (idx === 0) {
-        labelEl.textContent = 'Wallet Balance';
+        labelEl.textContent = 'Spending Wallet';
         labelEl.style.color = '';
         actions0.style.display = 'flex';
         actions1.style.display = 'none';
       } else {
-        labelEl.textContent = 'Community Bonus';
+        labelEl.textContent = 'Savings Wallet';
         labelEl.style.color = '#F5A623';
         actions0.style.display = 'none';
         actions1.style.display = 'flex';
@@ -6975,6 +7024,37 @@
   window.addEventListener('appinstalled',()=>{installPrompt=null;const e=document.getElementById('_pwa');if(e)e.remove();});
 })();
 </script>
+  <div class="overlay" id="rw-ov" onclick="closeRewardsHow(event)">
+    <div class="sheet">
+      <div class="sh-bar"></div>
+      <div class="sh-title">How to be an active user</div>
+      <div class="rw-row">
+        <div class="rw-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <div class="rw-t">Spend at least ₦2,000 on data every week</div>
+        </div>
+      </div>
+      <div class="rw-row">
+        <div class="rw-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <div class="rw-t">Keep at least ₦10,000 in your Savings wallet for 90 days or more</div>
+        </div>
+      </div>
+      <div class="rw-foot">All rewards you earn are sent to your savings wallet.</div>
+      <div class="rw-grid">
+        <div class="rw-stat">
+          <div class="rw-stat-l">Spent this month</div>
+          <div class="rw-stat-v purple" id="rw-spent">₦0</div>
+        </div>
+        <div class="rw-stat">
+          <div class="rw-stat-l">Savings wallet</div>
+          <div class="rw-stat-v gold" id="rw-saved">₦0</div>
+        </div>
+      </div>
+      <button class="cbtn" onclick="closeRewardsHow()">Got it</button>
+    </div>
+  </div>
+
   <div class="gift-win-ov" id="gift-win-ov" onclick="if(event.target===this) closeGiftPopup()">
     <div class="gift-win-card">
       <div class="gift-win-icon">
@@ -6983,7 +7063,7 @@
           <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
         </svg>
       </div>
-      <div class="gift-win-label">You Got</div>
+      <div class="gift-win-label" id="gift-win-label">You Got</div>
       <div class="gift-win-amount" id="gift-win-amount"><span class="cur">₦</span>0</div>
       <div class="gift-win-sub" id="gift-win-sub">Added straight to your wallet balance.</div>
       <button class="gift-win-btn" onclick="closeGiftPopup()">Nice!</button>

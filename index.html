@@ -927,7 +927,7 @@
         <div class="rw-slide">
           <div class="rw-strip-l">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>
-            <span id="rw-slide-spent">₦0 of ₦2,000 spent this week</span>
+            <span id="rw-slide-spent">₦0 of ₦3,000 spent this month</span>
           </div>
           <div class="rw-strip-r"><span>See how</span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
@@ -1206,7 +1206,7 @@
 
     <div id="withdraw-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:4px;"></div>
     <button class="cbtn" id="withdraw-confirm-btn" onclick="confirmWithdraw()" style="opacity:.4;pointer-events:none;">Withdraw</button>
-    <div style="font-size:11px;color:var(--w40);line-height:1.6;margin-top:12px;text-align:center;">No withdrawal fee. Only your reward can be withdrawn to your bank.</div>
+    <div style="font-size:11px;color:var(--w40);line-height:1.6;margin-top:12px;text-align:center;">No withdrawal fee. Withdrawals open on the 30th of every month. Only your reward can be withdrawn to your bank.</div>
   </div>
 </div>
 
@@ -1874,6 +1874,8 @@
   let bizCapital = 0, bizReward = 0, bizPending = 0, bizPendingList = [];
   function loadBizWallet(data) {
     bizPending = Number(data.business?.pending || 0);
+    rewardSpentMonth = Number(data.spentMonth || 0);
+    if (typeof updateRewardStrip === 'function') updateRewardStrip();
     bizPendingList = Array.isArray(data.business?.pendingList) ? data.business.pendingList : [];
     bizReward = Number(data.business?.reward || 0);
     bizCapital = typeof data.business?.capital === 'number' ? data.business.capital : Math.max(0, savingsBalance - bizReward);
@@ -4336,8 +4338,9 @@
   function renderPortfolio() {
     const body = document.getElementById('portfolio-body');
     if (!body) return;
-    const fmt = n => '₦' + Math.round(n).toLocaleString();
-    const kindLabel = k => k === 'markup' ? 'Data cashback' : 'Bonus reward';
+    // Rewards can have one decimal (₦3.6), so show it instead of rounding up
+    const fmt = n => '₦' + (Math.floor(n * 10 + 1e-6) / 10).toLocaleString('en-NG', { maximumFractionDigits: 1 });
+    const kindLabel = () => 'Sales reward';
     const head = '<div style="font-size:17px;font-weight:800;color:#fff;margin:6px 0 4px">Pending rewards</div>';
 
     if (!bizPending || bizPending <= 0) {
@@ -4670,7 +4673,7 @@
           </div>
           <div id="savings-policy-body" style="display:none;padding:0 16px 16px;border-top:1px solid var(--border);max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
-              <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Savings Reward</strong> — A random, rotational bonus for staying active: spend at least ₦2,000 on data every week and keep at least ₦10,000 saved for 90+ days. Not guaranteed every month — some months a small reward, some months none, and every so often a bigger "Big Win".</p>
+              <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Savings Reward</strong> — A random, rotational bonus for staying active: spend more than ₦3,000 on data every month and keep at least ₦500 in your Business Wallet for 90+ days. Not guaranteed every month — some months a small reward, some months none, and every so often a bigger "Big Win".</p>
               <p style="margin:0 0 10px;">🏆 <strong style="color:var(--w70);">Leaderboard Reward</strong> — The top 3 most consistent savers each get an extra bonus equal to 40% of their total saved amount.</p>
               <p style="margin:0;">🏦 <strong style="color:var(--w70);">Where It Goes</strong> — All reward types are added straight to your Business Wallet.</p>
             </div>
@@ -4769,9 +4772,20 @@
   // reward" has been reached is decided server-side per deposit and comes
   // back as d.matured; the client just reads that flag.
   const BANK_WITHDRAW_EPOCH = Date.UTC(2026, 0, 1); // adjust if you want the cycle to land on a different date
-  function isBankWithdrawDay() {
-    const daysSinceEpoch = Math.floor((Date.now() - BANK_WITHDRAW_EPOCH) / 86400000);
-    return daysSinceEpoch >= 0 && daysSinceEpoch % 95 === 0;
+  // Withdrawals open once a month: the 30th (Lagos time), or the last day of a shorter month (February)
+  function withdrawDayOfMonth(y, m) {
+    return Math.min(30, new Date(Date.UTC(y, m + 1, 0)).getUTCDate());
+  }
+  function lagosNow() { return new Date(Date.now() + 3600000); }
+  function isWithdrawDay() {
+    const n = lagosNow();
+    return n.getUTCDate() === withdrawDayOfMonth(n.getUTCFullYear(), n.getUTCMonth());
+  }
+  function nextWithdrawLabel() {
+    const n = lagosNow();
+    let y = n.getUTCFullYear(), m = n.getUTCMonth();
+    if (n.getUTCDate() >= withdrawDayOfMonth(y, m)) { m += 1; if (m > 11) { m = 0; y += 1; } }
+    return withdrawDayOfMonth(y, m) + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m];
   }
 
   // Total reward sitting on deposits that haven't reached their expected
@@ -4857,6 +4871,7 @@
     errEl.textContent = '';
     const amount = parseInt(document.getElementById('withdraw-amt-input').value, 10);
     if (!selectedWithdrawDest) { errEl.textContent = 'Choose where to withdraw to.'; return; }
+    if (!isWithdrawDay()) { errEl.textContent = 'Withdrawals are only open on the 30th of each month. Next: ' + nextWithdrawLabel() + '.'; return; }
     if (!amount || amount < 1) { errEl.textContent = 'Enter an amount.'; return; }
     if (selectedWithdrawDest === 'bank' && amount > bizReward) { errEl.textContent = 'Only your reward (₦' + Math.round(bizReward).toLocaleString() + ') can go to your bank.'; return; }
     if (amount > bizCapital + bizReward) { errEl.textContent = 'More than you have.'; return; }
@@ -5333,10 +5348,10 @@
       if (you && you.rank) {
         youEl.innerHTML = '<div style="background:var(--dark-3);border:1.5px solid var(--p-light);border-radius:16px;padding:18px 18px 16px">'
           + goldTitle(you.rank)
-          + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px">'
           + '<div style="min-width:0">'
-          + '<div style="font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + premiumBadge(you.premium_plan) + 'You <span style="color:var(--p-light);font-weight:800">(' + ordinal(you.rank) + ')</span></div>'
-          + '<div style="font-size:12px;color:var(--p-light);margin-top:8px">Your position</div>'
+          + '<div style="font-size:16px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + premiumBadge(you.premium_plan) + 'You</div>'
+          + '<div style="font-size:12px;font-weight:700;color:var(--p-light);margin-top:6px">' + ordinal(you.rank) + ' place · Your position</div>'
           + '</div>'
           + earnedBox(you)
           + '</div>'
@@ -5356,9 +5371,10 @@
       const uname = row.username ? ('@' + row.username) : 'Subsidi user';
       return '<div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:18px 18px 16px;margin-bottom:14px">'
         + goldTitle(row.rank)
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px">'
         + '<div style="min-width:0">'
-        + '<div style="font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + premiumBadge(row.premium_plan) + uname + ' <span style="color:var(--p-light);font-weight:800">(' + ordinal(row.rank) + ')</span></div>'
+        + '<div style="font-size:16px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + premiumBadge(row.premium_plan) + uname + '</div>'
+        + '<div style="font-size:12px;font-weight:700;color:var(--p-light);margin-top:6px">' + ordinal(row.rank) + ' place</div>'
         + '</div>'
         + earnedBox(row)
         + '</div>'
@@ -5716,7 +5732,7 @@
     },
     {
       q: "How do I earn rewards?",
-      a: "Stay active — spend at least ₦2,000 on data every week and keep at least ₦10,000 saved for 90+ days. That makes you eligible for the Savings Reward, but it's random and rotates between users, so it isn't guaranteed every month. The top 3 most consistent savers also get a separate Leaderboard Reward."
+      a: "Stay active — spend more than ₦3,000 on data every month and keep at least ₦500 in your Business Wallet for 90+ days. That makes you eligible for the Savings Reward, but it's random and rotates between users, so it isn't guaranteed every month. The top 3 most consistent savers also get a separate Leaderboard Reward."
     },
     {
       q: "Is my money safe?",
@@ -6245,7 +6261,7 @@
         <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
         <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:16px;">Reward Policy</div>
         <div style="font-size:12px;color:var(--w50);line-height:1.8;">
-          <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Savings Reward</strong> — A random, rotational bonus for staying active: spend at least ₦2,000 on data every week and keep at least ₦10,000 saved for 90+ days. It's not guaranteed every month — some months you get a small reward, some months none, and every so often a bigger "Big Win".</p>
+          <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Savings Reward</strong> — A random, rotational bonus for staying active: spend more than ₦3,000 on data every month and keep at least ₦500 in your Business Wallet for 90+ days. It's not guaranteed every month — some months you get a small reward, some months none, and every so often a bigger "Big Win".</p>
           <p style="margin:0 0 10px;">🏆 <strong style="color:var(--w70);">Leaderboard Reward</strong> — The top 3 most consistent savers each get an extra bonus equal to 40% of their total saved amount.</p>
           <p style="margin:0 0 10px;">🏦 <strong style="color:var(--w70);">Where It Goes</strong> — All reward types are added straight to your Business Wallet.</p>
           <p style="margin:0;">❓ Questions about your rewards? Reach out via <strong style="color:var(--w70);">Report Issue</strong> in Support.</p>
@@ -6934,6 +6950,7 @@
   const _seenRewardKeys = new Set();
 
   let rewardSpentWeek = 0;
+  let rewardSpentMonth = 0;   // spent on data this calendar month, from get-user
   const rwNaira = n => '₦' + Math.floor(Number(n) || 0).toLocaleString();
 
   function applyRewards(r) {
@@ -6949,9 +6966,9 @@
   function updateRewardStrip() {
     const el = document.getElementById('rw-slide-spent');
     if (!el) return;
-    el.textContent = rewardSpentWeek >= 2000
-      ? 'Weekly spend goal reached'
-      : rwNaira(rewardSpentWeek) + ' of ₦2,000 spent this week';
+    el.textContent = rewardSpentMonth > 3000
+      ? 'Monthly spend goal reached'
+      : rwNaira(rewardSpentMonth) + ' of ₦3,000 spent this month';
   }
 
   // Strip content slides left every 7s. The last slide is a copy of the
@@ -6981,7 +6998,7 @@
   function openRewardsHow() {
     const sp = document.getElementById('rw-spent');
     const sv = document.getElementById('rw-saved');
-    if (sp) sp.textContent = rwNaira(rewardSpentWeek);
+    if (sp) sp.textContent = rwNaira(rewardSpentMonth);
     if (sv) sv.textContent = rwNaira(savingsBalance);
     const ov = document.getElementById('rw-ov');
     if (ov) ov.classList.add('open');
@@ -7322,13 +7339,13 @@
       <div class="rw-row">
         <div class="rw-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div>
-          <div class="rw-t">Spend at least ₦2,000 on data every week</div>
+          <div class="rw-t">Spend more than ₦3,000 on data every month</div>
         </div>
       </div>
       <div class="rw-row">
         <div class="rw-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div>
-          <div class="rw-t">Keep at least ₦10,000 in your Business Wallet for 90 days or more</div>
+          <div class="rw-t">Keep at least ₦500 in your Business Wallet for 90 days or more</div>
         </div>
       </div>
       <div class="rw-foot">All rewards you earn are sent to your Business Wallet.</div>

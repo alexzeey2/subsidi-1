@@ -313,9 +313,19 @@
   .earn-amt-card{flex-shrink:0;width:124px;height:64px;border-radius:16px;background:var(--dark-3);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:var(--w70);scroll-snap-align:center;transition:border-color .2s,color .2s,opacity .2s;}
   .earn-amt-card.sel{border-color:#F5A623;color:#F5A623;}
   .earn-amt-card.disabled{opacity:.35;}
+  #earn-cards > div:nth-child(2){position:relative;z-index:2;transform:scale(var(--pop,1));transform-origin:center;box-shadow:0 0 calc((var(--pop,1) - 1) * 200px) rgba(245,166,35,.85), 0 0 0 calc((var(--pop,1) - 1) * 16px) rgba(245,166,35,.7);filter:brightness(calc(1 + (var(--pop,1) - 1) * 2));}
+  .earn-tier-row{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:16px calc(50% - 65px) 18px;margin:-6px 0 0;}
+  .earn-tier-row::-webkit-scrollbar{display:none;}
+  .earn-tier-chip{white-space:nowrap;flex:0 0 130px;scroll-snap-align:center;padding:16px 0;border-radius:16px;background:var(--dark-3);border:1.5px solid var(--border);color:var(--w70);font-size:20px;font-weight:800;text-align:center;cursor:pointer;opacity:.55;transform:scale(.92);transition:border-color .2s,color .2s,background .2s,opacity .2s,transform .2s;}
+  .earn-tier-chip.sel{border-color:#F5A623;color:#F5A623;background:rgba(245,166,35,.1);opacity:1;position:relative;z-index:2;transform:scale(var(--pop,1));box-shadow:0 0 calc((var(--pop,1) - 1) * 160px) rgba(245,166,35,.85), 0 0 0 calc((var(--pop,1) - 1) * 14px) rgba(245,166,35,.7);filter:brightness(calc(1 + (var(--pop,1) - 1) * 2));}
+  .earn-tier-chip.disabled{opacity:.3;pointer-events:none;}
   .qa{flex:1;background:var(--dark-4);border:1px solid var(--border);border-radius:10px;padding:9px 4px;text-align:center;font-size:12px;font-weight:600;color:var(--w70);cursor:pointer;}
   .qa.sel{background:var(--p-subtle);border-color:var(--p);color:var(--p-light);}
   .sheet-actions{display:flex;flex-direction:column;gap:10px;}
+  .earn-sheet{display:flex;flex-direction:column;max-height:94vh;max-height:94dvh;overflow:hidden;padding-bottom:0;}
+  .earn-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:12px;}
+  .earn-cta{flex:0 0 auto;margin:0 -24px;padding:12px 24px calc(16px + env(safe-area-inset-bottom));background:var(--dark-2);border-top:1px solid var(--border);}
+  #earn-sales-slider{touch-action:none;height:32px;}
   .btn-primary{background:var(--p);color:var(--w);border:none;padding:16px;border-radius:16px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;width:100%;}
 
   .spc{height:28px}
@@ -871,27 +881,32 @@
           </svg>
           <span>Add Money</span>
         </div>
-        <div class="act-rect" onclick="event.stopPropagation();if(gateCheck('Save & Earn','Create a free account to start saving.'))return;openEarnOv()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
+        <div class="act-rect" onclick="event.stopPropagation();if(gateCheck('Business','Create a free account to start saving.'))return;openEarnOv()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
           </svg>
-          <span>Save & Earn</span>
+          <span>Business</span>
         </div>
       </div>
 
       <!-- Actions for Save & Earn slide -->
       <div class="wallet-card-actions" id="actions-card-1" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0 4px;opacity:0;pointer-events:none;transition:opacity .25s ease;">
-        <div class="act-rect" onclick="event.stopPropagation();if(gateCheck('Save & Earn','Create a free account to start saving.'))return;openEarnOv()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
+        <div class="act-rect" onclick="event.stopPropagation();if(gateCheck('Business','Create a free account to start saving.'))return;openEarnOv()" style="flex:1;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.35);color:#F5A623;">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
           </svg>
-          <span>Save & Earn</span>
+          <span>Business</span>
         </div>
-        <div class="act-rect" onclick="event.stopPropagation();if(gateCheck('Withdraw','Create a free account to withdraw your savings.'))return;openWithdrawOv()" style="flex:1;">
+        <div class="act-rect" onclick="event.stopPropagation();if(gateCheck('Withdraw','Create a free account to withdraw from your Business Wallet.'))return;openWithdrawOv()" style="flex:1;">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
           </svg>
           <span>Withdraw</span>
+        </div>
+        <div class="act-rect" onclick="event.stopPropagation();if(gateCheck('Pending rewards','Create a free account to see your pending rewards.'))return;openPortfolio()" style="flex:0 0 52px;padding-left:0;padding-right:0;justify-content:center;" aria-label="Pending rewards">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
         </div>
       </div>
 
@@ -1099,28 +1114,72 @@
   </div>
 </div>
 
-<!-- ── EARN SHEET (deposit into Savings) ── -->
+<!-- ── EARN SHEET (Partner with Subsidi) ── -->
 <div class="overlay" id="earn-ov" onclick="closeEarnOv(event)">
-  <div class="sheet">
+  <div class="sheet earn-sheet">
     <div class="sh-bar"></div>
-
-    <div class="inv-hero">
-      <div class="inv-hero-amt"><span style="font-size:20px;color:var(--w40);">₦</span><span id="earn-hero-amt">0</span></div>
-      <div class="inv-hero-lbl">Estimated Reward</div>
+    <div class="earn-scroll">
+    <div class="sh-title" style="text-align:center;font-size:30px;line-height:1.15;margin:6px 0 2px;color:#F5A623;">Grow your money</div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;text-align:center;margin:2px 0 8px;">
+      <div style="font-size:18px;font-weight:900;color:var(--w);line-height:1.25;letter-spacing:-.3px;">Get paid every time we sell <span style="font-size:23px;">data</span></div>
+      <div style="display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:6px 14px;border-radius:999px;background:linear-gradient(135deg,#F5A623,#FF7A18);color:#1a1200;font-weight:900;font-size:14px;box-shadow:0 4px 18px rgba(245,166,35,.35);">Pick your amount <span style="font-weight:800;font-size:12px;opacity:.8;">· Refundable</span></div>
     </div>
 
+    <div class="earn-tier-row" id="earn-tier-row"></div>
 
-    <div class="invest-error" id="earn-amt-error" style="display:none;">Minimum deposit is ₦1,000.</div>
+    <svg viewBox="0 0 300 118" style="width:100%;display:block;margin:0;">
+      <defs>
+        <linearGradient id="earn-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#F5A623" stop-opacity=".35"/>
+          <stop offset="1" stop-color="#F5A623" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <line x1="44" y1="110.0" x2="290" y2="110.0" stroke="rgba(255,255,255,.08)" stroke-dasharray="4 4"/>
+      <text id="earn-yl-0" x="38" y="113.0" text-anchor="end" font-size="10" font-weight="700" fill="rgba(255,255,255,.45)">₦100</text>
+      <line x1="44" y1="91.0" x2="290" y2="91.0" stroke="rgba(255,255,255,.08)" stroke-dasharray="4 4"/>
+      <text id="earn-yl-1" x="38" y="94.0" text-anchor="end" font-size="10" font-weight="700" fill="rgba(255,255,255,.45)">₦100</text>
+      <line x1="44" y1="72.0" x2="290" y2="72.0" stroke="rgba(255,255,255,.08)" stroke-dasharray="4 4"/>
+      <text id="earn-yl-2" x="38" y="75.0" text-anchor="end" font-size="10" font-weight="700" fill="rgba(255,255,255,.45)">₦100</text>
+      <line x1="44" y1="53.0" x2="290" y2="53.0" stroke="rgba(255,255,255,.08)" stroke-dasharray="4 4"/>
+      <text id="earn-yl-3" x="38" y="56.0" text-anchor="end" font-size="10" font-weight="700" fill="rgba(255,255,255,.45)">₦100</text>
+      <line x1="44" y1="34.0" x2="290" y2="34.0" stroke="rgba(255,255,255,.08)" stroke-dasharray="4 4"/>
+      <text id="earn-yl-4" x="38" y="37.0" text-anchor="end" font-size="10" font-weight="700" fill="rgba(255,255,255,.45)">₦100</text>
+      <line x1="44" y1="15.0" x2="290" y2="15.0" stroke="rgba(255,255,255,.08)" stroke-dasharray="4 4"/>
+      <text id="earn-yl-5" x="38" y="18.0" text-anchor="end" font-size="10" font-weight="700" fill="rgba(255,255,255,.45)">₦100</text>
+      <line x1="44" y1="15" x2="44" y2="110" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
+      <line x1="44" y1="110" x2="290" y2="110" stroke="rgba(255,255,255,.25)" stroke-width="1.5"/>
+      <path id="earn-area" fill="url(#earn-grad)" d=""/>
+      <line id="earn-guide" x1="44" y1="110" x2="44" y2="110" stroke="rgba(245,166,35,.55)" stroke-width="1" stroke-dasharray="3 3"/>
+      <path id="earn-line" fill="none" stroke="#F5A623" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d=""/>
+      <circle id="earn-dot" cx="44" cy="110" r="5.5" fill="#F5A623" stroke="var(--dark-2)" stroke-width="2"/>
+    </svg>
 
-    <div class="earn-amt-swipe-wrap" id="earn-amt-swipe-wrap">
-      <div class="earn-amt-swipe-track" id="earn-amt-swipe-track"></div>
+    <div style="font-size:11px;color:var(--w40);text-align:center;margin:2px 0 6px;">Reward growth</div>
+    <div id="earn-cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+      <span style="font-size:13px;font-weight:700;color:var(--w70);">Sales per month</span>
+      <span style="font-size:15px;font-weight:800;color:#F5A623;" id="earn-sales-val">0</span>
     </div>
-    <div style="font-size:11px;color:var(--w40);text-align:center;margin:8px 0 22px;">Tap to choose an amount</div>
+    <input id="earn-sales-slider" type="range" min="0" max="300000" step="1000" value="30000"
+           oninput="earnAnimStop();updateEarnChart(+this.value)"
+           style="width:100%;accent-color:#F5A623;margin:0 0 10px;">
 
-    <div class="sheet-actions">
-      <button class="btn-primary" id="earn-confirm-btn" onclick="confirmEarnDeposit()" style="opacity:.4;pointer-events:none;">Save to Earn</button>
+    <div class="invest-error" id="earn-amt-error" style="display:none;"></div>
+
+    <div style="display:flex;gap:10px;align-items:flex-start;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.45);border-radius:12px;padding:10px 12px;margin-bottom:12px;">
+      <div style="font-size:16px;line-height:1.2;">⚠️</div>
+      <div style="font-size:12px;font-weight:600;color:var(--w);line-height:1.5;">
+        Your reward depends on sales. <strong style="color:#F5A623;">The faster the sales, the sooner you get your reward.</strong>
+        <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(245,166,35,.3);">✅ Your <span id="earn-refund-amt">₦10,000</span> is <strong style="color:#F5A623;">refundable</strong> to your main wallet, free.</div>
+      </div>
     </div>
-    <div style="font-size:11px;color:var(--w40);line-height:1.6;margin-top:14px;text-align:center;">You can withdraw your capital anytime, free. If you withdraw before a deposit reaches its expected reward, you'll forfeit that reward unless you move it to your main wallet first.</div>
+
+    </div><!-- /earn-scroll -->
+
+    <div class="sheet-actions earn-cta">
+      <button class="btn-primary" id="earn-confirm-btn" onclick="confirmEarnDeposit()">Partner for ₦10,000</button>
+    </div>
   </div>
 </div>
 
@@ -1132,8 +1191,8 @@
     <div class="sh-sub">Available: <strong id="withdraw-avail" style="color:#F5A623;">₦0</strong></div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-      <div id="withdraw-dest-main" onclick="selectWithdrawDest('main')" class="dep-opt" style="font-size:14px;">To Main Wallet<div style="font-size:11px;color:var(--w40);font-weight:600;margin-top:4px;">Free · Anytime</div></div>
-      <div id="withdraw-dest-bank" onclick="selectWithdrawDest('bank')" class="dep-opt" style="font-size:14px;">To Bank Account<div id="withdraw-bank-sub" style="font-size:11px;color:var(--w40);font-weight:600;margin-top:4px;">Free · Only on the 30th</div></div>
+      <div id="withdraw-dest-main" onclick="selectWithdrawDest('main')" class="dep-opt" style="font-size:14px;">To Spending Account<div style="font-size:11px;color:var(--w40);font-weight:600;margin-top:4px;">Capital + reward · Free</div></div>
+      <div id="withdraw-dest-bank" onclick="selectWithdrawDest('bank')" class="dep-opt" style="font-size:14px;">To Bank Account<div id="withdraw-bank-sub" style="font-size:11px;color:var(--w40);font-weight:600;margin-top:4px;">Reward only · Free</div></div>
     </div>
 
     <input id="withdraw-amt-input" type="number" inputmode="numeric" placeholder="Amount to withdraw" oninput="updateWithdrawBtnText()" style="width:100%;box-sizing:border-box;background:var(--dark-3);border:1.5px solid var(--border);border-radius:14px;padding:16px;font-size:16px;font-weight:700;color:var(--w);margin-bottom:6px;">
@@ -1147,7 +1206,7 @@
 
     <div id="withdraw-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:4px;"></div>
     <button class="cbtn" id="withdraw-confirm-btn" onclick="confirmWithdraw()" style="opacity:.4;pointer-events:none;">Withdraw</button>
-    <div style="font-size:11px;color:var(--w40);line-height:1.6;margin-top:12px;text-align:center;">No withdrawal fee. Bank withdrawals only go out on the 30th of each month.</div>
+    <div style="font-size:11px;color:var(--w40);line-height:1.6;margin-top:12px;text-align:center;">No withdrawal fee. Only your reward can be withdrawn to your bank.</div>
   </div>
 </div>
 
@@ -1166,6 +1225,15 @@
   </div>
 </div>
 
+<!-- ── PENDING REWARDS SHEET (rewards waiting for the weekly payout) ── -->
+<div class="refer-ov" id="portfolio-ov" onclick="if(event.target===this)closePortfolio()">
+  <div class="refer-sheet">
+    <div class="sh-bar"></div>
+    <div id="portfolio-body"></div>
+    <button class="cbtn" onclick="closePortfolio()" style="background:transparent;border:1.5px solid var(--border);color:var(--w70);margin-top:22px;">Close</button>
+  </div>
+</div>
+
 <!-- ── WITHDRAW CONSISTENCY-RESET WARNING (shown before any withdrawal — capital or reward) ── -->
 <div class="refer-ov" id="consistency-warn-ov">
   <div class="refer-sheet">
@@ -1175,11 +1243,11 @@
     </div>
     <div style="text-align:center;margin-bottom:16px;margin-top:4px;">
       <div style="display:inline-block;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;padding:10px 22px;">
-        <div style="font-size:11px;color:#fff;font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;">Current Consistency</div>
+        <div style="font-size:11px;color:#fff;font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;">Current Streak</div>
         <div id="consistency-warn-current-score" style="font-size:22px;font-weight:800;color:var(--green);line-height:1.2;">0%</div>
       </div>
     </div>
-    <div id="consistency-warn-text" style="font-size:13px;color:#fff;line-height:1.6;text-align:center;margin-bottom:20px;">Withdrawing resets it. Deposit that amount back to start it climbing again.</div>
+    <div id="consistency-warn-text" style="font-size:13px;color:#fff;line-height:1.6;text-align:center;margin-bottom:20px;">Withdrawing resets your days to 0. You start counting again from the next day.</div>
     <button class="cbtn" onclick="proceedPastConsistencyWarn()" style="background:transparent;border:1.5px solid rgba(255,80,80,.35);color:#ff6b6b;margin-bottom:10px;">Continue Anyway</button>
     <button class="cbtn" onclick="closeConsistencyWarnOv()" style="background:transparent;border:1.5px solid var(--border);color:var(--w70);">Cancel</button>
   </div>
@@ -1341,7 +1409,7 @@
         </div>
         <div class="prof-row-body">
           <div class="prof-row-title">Reward Policy</div>
-          <div class="prof-row-sub">How your savings rewards work</div>
+          <div class="prof-row-sub">How your Business Wallet rewards work</div>
         </div>
         <svg class="prof-row-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
@@ -1570,7 +1638,7 @@
   <!-- Header -->
   <div style="padding:48px 24px 40px;position:relative;overflow:hidden">
     <div style="position:absolute;top:-80px;right:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(108,43,217,.12) 0%,transparent 65%);pointer-events:none"></div>
-    <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;">Most Consistent Savers</div>
+    <div style="font-size:28px;font-weight:800;letter-spacing:-.5px;">Top Earners</div>
   </div>
 
   <!-- Your position -->
@@ -1579,7 +1647,7 @@
   <!-- List subtitle -->
   <div style="margin:0 20px 16px;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.3);border-radius:14px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start;">
     <div style="font-size:16px;line-height:1.3;flex-shrink:0;">💡</div>
-    <div style="font-size:13px;color:#fff;font-weight:600;line-height:1.55;">₦1,000 saved = 1% consistency. It climbs every 24hrs, and any withdrawal resets it to 0. Stay top 3 for 365 days straight to earn a reward on top of your savings.</div>
+    <div style="font-size:13px;color:#fff;font-weight:600;line-height:1.55;">Ranked by Earns: your Business Wallet balance, capital plus reward.</div>
   </div>
 
   <!-- List -->
@@ -1801,8 +1869,20 @@
   // Backend not built yet — defaults keep the UI safe/empty until
   // data.savings exists.
   let savingsBalance = 0;
-  let myConsistencyScore = null; // last-known % from the leaderboard fetch, used to show "current: X%" in the withdraw warning
+  // Business wallet: capital and reward are tracked separately (server-authoritative, data.business).
+  // Spending account can take capital + reward; bank can only take reward.
+  let bizCapital = 0, bizReward = 0, bizPending = 0, bizPendingList = [];
+  function loadBizWallet(data) {
+    bizPending = Number(data.business?.pending || 0);
+    bizPendingList = Array.isArray(data.business?.pendingList) ? data.business.pendingList : [];
+    bizReward = Number(data.business?.reward || 0);
+    bizCapital = typeof data.business?.capital === 'number' ? data.business.capital : Math.max(0, savingsBalance - bizReward);
+  }
+  let myConsistencyScore = null; // my current streak in DAYS, from the leaderboard fetch — shown in the withdraw warning
+  function fmtDays(n) { n = Math.max(0, Math.floor(Number(n) || 0)); return n + (n === 1 ? ' day' : ' days'); }
   let savingsDeposits = []; // [{id, amount, depositedAt, matured, rewardEarned}, ...]
+  let portfolioBalance = 0; // locked capital still in the portfolio (released daily into savingsBalance)
+  let portfolioDeposits = []; // [{amount, released, rewardEarned}, ...] active only
 
   // Single Premium tier: ₦1,300/week, hard 7-day expiry — no grace, no
   // extension. Two discounted purchases allowed per cycle, any order, any
@@ -2048,7 +2128,10 @@
 
         if (typeof data.savings !== 'undefined') {
           savingsBalance = typeof data.savings?.balance === 'number' ? data.savings.balance : 0;
+          loadBizWallet(data);
           savingsDeposits = Array.isArray(data.savings?.deposits) ? data.savings.deposits : [];
+          portfolioBalance = Number(data.portfolioBalance || 0);
+          if (typeof syncPortfolio === 'function') syncPortfolio();
           if (typeof renderSavingsUI === 'function') renderSavingsUI();
           if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
         }
@@ -2212,7 +2295,10 @@
 
           if (typeof data.savings !== 'undefined') {
             savingsBalance = typeof data.savings?.balance === 'number' ? data.savings.balance : 0;
+          loadBizWallet(data);
             savingsDeposits = Array.isArray(data.savings?.deposits) ? data.savings.deposits : [];
+          portfolioBalance = Number(data.portfolioBalance || 0);
+          if (typeof syncPortfolio === 'function') syncPortfolio();
             if (typeof renderSavingsUI === 'function') renderSavingsUI();
             if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
           }
@@ -3989,18 +4075,298 @@
     return amount * (ratePercent / 100);
   }
 
-  const EARN_AMOUNTS = [1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000];
-  const EARN_MIN = 1000;
+  const EARN_FIXED_AMT = 10000;   // default tier
+  const EARN_MIN = 500;           // smallest tier
   let selectedEarnAmt = 0;
 
-  function openEarnOv() {
-    selectedEarnAmt = 0;
-    document.getElementById('earn-hero-amt').textContent = '0';
+  // Partner tiers. Reward is a share of the stake at max sales (300k/month);
+  // the bigger tiers get a higher share. What's shown is capital + reward.
+  //   ₦500 → +₦200 · ₦1k → +₦400 · ₦5k → +₦2,000 · ₦10k → +₦4,500 · ₦20k → +₦10,000
+  const EARN_TIERS = [
+    { amt: 500,   pct: 0.4 },
+    { amt: 1000,  pct: 0.4 },
+    { amt: 5000,  pct: 0.4 },
+    { amt: 10000, pct: 0.45 },
+    { amt: 20000, pct: 0.5 },
+  ].map(t => ({ amt: t.amt, maxReward: t.amt * t.pct }));
+  let EARN_CAPITAL = 10000;
+
+  // Front-end estimate only. Set by selectEarnTier().
+  let EARN_MAX_REWARD = 4500;
+  const EARN_MAX_SALES = 300000;
+  const EARN_DEFAULT_SALES = 30000;  // 1,000 sales a day
+  const EARN_PROFIT_MIN = 10;
+  const EARN_PROFIT_MAX = 300;
+  // Axis tops as fractions of the tier's max reward (scaled per tier below)
+  const EARN_AXIS_FRACTIONS = [0.25, 0.5, 0.75, 1];
+  const EARN_AXIS_MIN = 0;   // chart always starts at ₦0
+  // Round the axis top up so all 6 gridline labels are clean numbers
+  function earnNiceTop(total) {
+    const mult = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+    const raw = total / 5;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    for (const m of mult) { if (m * mag * 5 >= total) return m * mag * 5; }
+    return 10 * mag * 5;
+  }
+  function earnBuildStops(capital, maxReward) {
+    const stops = EARN_AXIS_FRACTIONS.map(f => earnNiceTop(capital + maxReward * f));
+    return stops.filter((v, i) => stops.indexOf(v) === i);
+  }
+  let EARN_AXIS_STOPS = earnBuildStops(0, 8000);
+
+  // Concave shape: reward builds quickly with the first sales, then flattens
+  // toward the cap (drives both the line and the number)
+  function earnShape(t) { return Math.pow(Math.max(0, Math.min(1, t)), 0.6); }
+
+  // Reward only (starts at ₦0 when sales are 0) — this is what the chart plots
+  function earnReward(sales) {
+    return EARN_MAX_REWARD * earnShape(sales / EARN_MAX_SALES);
+  }
+
+  function earnEstimate(sales) {
+    // capital + reward
+    return EARN_CAPITAL + EARN_MAX_REWARD * earnShape(sales / EARN_MAX_SALES);
+  }
+
+  function earnFmt(n) {
+    if (n >= 1e6) return '₦' + (n / 1e6).toFixed(1).replace('.0', '') + 'M';
+    if (n >= 1000) return '₦' + Math.round(n / 1000).toLocaleString() + 'k';
+    return '₦' + Math.round(n);
+  }
+
+  function earnAxisFmt(v) {
+    if (v >= 1000) return '₦' + (+(v / 1000).toFixed(1)) + 'k';
+    return '₦' + Math.round(v);
+  }
+
+  const EARN_X0 = 44, EARN_X1 = 290, EARN_YT = 15, EARN_YB = 110;
+
+  // The line, drawn against the current axis top
+  function earnCurve(tEnd, top) {
+    const N = 60, pts = [];
+    for (let i = 0; i <= N; i++) {
+      const t = tEnd * i / N;
+      const r = (EARN_CAPITAL + EARN_MAX_REWARD) * earnChartShape(t);
+      pts.push([EARN_X0 + (EARN_X1 - EARN_X0) * t, EARN_YB - (EARN_YB - EARN_YT) * (Math.max(r - EARN_AXIS_MIN, 0) / (top - EARN_AXIS_MIN))]);
+    }
+    return pts;
+  }
+
+  // Chart curve: starts at ₦0, builds slowly, then climbs steeply to capital + reward
+  function earnChartShape(t) { return Math.pow(Math.max(0, Math.min(1, t)), 1.8); }
+
+  function earnPath(pts) {
+    return pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  }
+
+  function updateEarnChart(sales) {
+    const reward = earnEstimate(sales);          // capital + reward (cards)
+    const chartVal = earnReward(sales);          // reward only (chart, from ₦0)
+    // Axis starts small and climbs as the reward grows, up to the tier's max
+    const top = EARN_CAPITAL + EARN_MAX_REWARD;   // exact total, so the top label matches the curve's end
+    for (let i = 0; i <= 5; i++) {
+      document.getElementById('earn-yl-' + i).textContent = earnAxisFmt(EARN_AXIS_MIN + (top - EARN_AXIS_MIN) * i / 5);
+    }
+    const pts = earnCurve(sales / EARN_MAX_SALES, top);
+    const d = earnPath(pts);
+    const last = pts[pts.length - 1];
+    document.getElementById('earn-line').setAttribute('d', d);
+    document.getElementById('earn-area').setAttribute('d', d + ' L' + last[0].toFixed(1) + ',' + EARN_YB + ' L' + EARN_X0 + ',' + EARN_YB + ' Z');
+    const dot = document.getElementById('earn-dot');
+    dot.setAttribute('cx', last[0]); dot.setAttribute('cy', last[1]);
+    const g = document.getElementById('earn-guide');
+    g.setAttribute('x1', EARN_X0); g.setAttribute('x2', last[0]);
+    g.setAttribute('y1', last[1]); g.setAttribute('y2', last[1]);
+    document.getElementById('earn-sales-val').textContent = sales.toLocaleString();
+
+    // The picked amount card reads capital + reward as sales move (₦10,000 → ₦14,500 → back)
+    document.querySelectorAll('#earn-tier-row .earn-tier-chip').forEach(c => {
+      c.textContent = c.classList.contains('sel') ? '₦' + Math.round(reward).toLocaleString() : earnTierFmt(+c.dataset.amt);
+    });
+
+    // Cards move with the slider: sales and estimated reward
+    const card = (label, val, sub, accent) =>
+      '<div style="background:' + (accent ? 'rgba(245,166,35,.1)' : 'var(--dark-3)') + ';border:1px solid ' + (accent ? 'rgba(245,166,35,.45)' : 'var(--border)') + ';border-radius:12px;padding:8px 6px;text-align:center;">'
+      + '<div style="font-size:11px;font-weight:700;color:var(--w70);margin-bottom:2px;">' + label + '</div>'
+      + '<div style="font-size:15px;font-weight:900;color:' + (accent ? '#F5A623' : 'var(--w)') + ';line-height:1.3;">' + val + '</div>'
+      + (sub ? '<div style="font-size:10px;font-weight:600;color:var(--w50);margin-top:1px;">' + sub + '</div>' : '')
+      + '</div>';
+    document.getElementById('earn-cards').innerHTML =
+      card('Sales', sales.toLocaleString())
+      + card('Capital + Reward', '₦' + Math.round(reward).toLocaleString(), '', true);
+  }
+
+  function earnTierFmt(v) {
+    return '₦' + v.toLocaleString();
+  }
+
+  // Tiers that still fit under the total-deposit ceiling stay tappable
+  function earnTierRemaining() {
+    const totalDeposited = (typeof savingsDeposits !== 'undefined' ? savingsDeposits : [])
+      .reduce((sum, d) => sum + Number(d.amount || 0), 0);
+    return Math.max(0, SAVINGS_DEPOSIT_CAP - totalDeposited);
+  }
+
+  let earnTierScrollLock = false, earnTierScrollTimer = null;
+
+  function renderEarnTiers() {
+    const row = document.getElementById('earn-tier-row');
+    if (!row.children.length) {
+      row.innerHTML = EARN_TIERS.map(t =>
+        '<div class="earn-tier-chip" data-amt="' + t.amt + '" onclick="selectEarnTier(' + t.amt + ')">' + earnTierFmt(t.amt) + '</div>'
+      ).join('');
+      row.addEventListener('scroll', function () {
+        if (earnTierScrollLock) return;
+        clearTimeout(earnTierScrollTimer);
+        earnTierScrollTimer = setTimeout(earnPickCentered, 90);
+      });
+    }
+    Array.from(row.children).forEach(c => c.classList.toggle('sel', +c.dataset.amt === selectedEarnAmt));
+  }
+
+  // Swiping selects whichever card is closest to the centre
+  function earnPickCentered() {
+    const row = document.getElementById('earn-tier-row');
+    const mid = row.getBoundingClientRect().left + row.clientWidth / 2;
+    let best = null, bestD = Infinity;
+    Array.from(row.children).forEach(c => {
+      const r = c.getBoundingClientRect();
+      const d = Math.abs(r.left + r.width / 2 - mid);
+      if (d < bestD) { bestD = d; best = c; }
+    });
+    if (best && +best.dataset.amt !== selectedEarnAmt) selectEarnTier(+best.dataset.amt, false, true);
+  }
+
+  function earnCenterTier(smooth) {
+    const row = document.getElementById('earn-tier-row');
+    const chip = row.querySelector('.earn-tier-chip.sel');
+    if (!chip) return;
+    earnTierScrollLock = true;
+    row.scrollTo({ left: chip.offsetLeft - (row.clientWidth - chip.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' });
+    setTimeout(() => { earnTierScrollLock = false; }, smooth ? 450 : 50);
+  }
+
+  function selectEarnTier(amt, skipChart, fromSwipe) {
+    const tier = EARN_TIERS.find(t => t.amt === amt) || EARN_TIERS[EARN_TIERS.length - 1];
+    selectedEarnAmt = tier.amt;
+    EARN_MAX_REWARD = tier.maxReward;
+    // Scale the chart axis so every tier fills the graph the same way
+    EARN_CAPITAL = tier.amt;
+    EARN_AXIS_STOPS = earnBuildStops(0, tier.maxReward);
+
+    const label = '₦' + tier.amt.toLocaleString();
+    document.getElementById('earn-refund-amt').textContent = label;
+    document.getElementById('earn-confirm-btn').textContent = 'Partner for ' + label;
     document.getElementById('earn-amt-error').style.display = 'none';
-    const btn = document.getElementById('earn-confirm-btn');
-    if (btn) { btn.style.opacity = '.4'; btn.style.pointerEvents = 'none'; btn.textContent = 'Save to Earn'; }
-    renderEarnAmtCards();
+    renderEarnTiers();
+    if (!fromSwipe) earnCenterTier(!skipChart);
+    if (!skipChart) updateEarnChart(+document.getElementById('earn-sales-slider').value);
+  }
+
+  function openEarnOv() {
+    selectEarnTier(EARN_FIXED_AMT, true);
     document.getElementById('earn-ov').classList.add('open');
+    requestAnimationFrame(() => earnCenterTier(false));
+    // Intro: chart climbs to the top, the reward card pops, then the chart settles back to ₦0
+    const slider = document.getElementById('earn-sales-slider');
+    const id = ++earnAnimId;
+    const UP = 3200, HOLD = 1800, DOWN = 3200, t0 = performance.now();
+    (function step(now) {
+      if (id !== earnAnimId || !document.getElementById('earn-ov').classList.contains('open')) { earnSetPop(1); earnRestorePick(); return; }
+      const t = now - t0;
+      let frac, pop = 1;
+      if (t < UP) {
+        frac = 1 - Math.pow(1 - t / UP, 3);                       // up, easing out
+      } else if (t < UP + HOLD) {
+        frac = 1;                                                 // pause at the top
+      } else {
+        const q = Math.min(1, (t - UP - HOLD) / DOWN);
+        frac = 1 - (q < .5 ? 2 * q * q : 1 - Math.pow(-2 * q + 2, 2) / 2);   // down, easing in-out
+      }
+      // Card pops up as the chart nears the top, stays big during the pause, then eases back to normal
+      const POP = 0.22, RISE = 700, FALL = 800;
+      if (t > UP - RISE && t < UP) pop = 1 + POP * ((t - (UP - RISE)) / RISE);
+      else if (t >= UP && t < UP + HOLD) pop = 1 + POP;
+      else if (t >= UP + HOLD && t < UP + HOLD + FALL) pop = 1 + POP * (1 - (t - UP - HOLD) / FALL);
+      const v = Math.round(EARN_MAX_SALES * frac / 1000) * 1000;
+      slider.value = v;
+      earnSetPop(pop);
+      updateEarnChart(v);
+      if (t < UP + HOLD + DOWN) requestAnimationFrame(step);
+      else { slider.value = 0; earnSetPop(1); earnRestorePick(); updateEarnChart(0); }
+    })(t0);
+  }
+  let earnAnimId = 0;
+  function earnAnimStop() { earnAnimId++; earnSetPop(1); earnRestorePick(); }
+  function earnRestorePick() {
+    document.querySelectorAll('#earn-tier-row .earn-tier-chip').forEach(c => { c.textContent = earnTierFmt(+c.dataset.amt); });
+  }
+  function earnSetPop(v) {
+    document.getElementById('earn-cards').style.setProperty('--pop', v);
+    document.getElementById('earn-tier-row').style.setProperty('--pop', v);
+  }
+  // ── Portfolio: capital that's released to the wallet 1/365 per day ──
+  // Portfolio data now comes from get-user (same call that loads savings), so
+  // there's one source of truth — this just derives the active portfolio
+  // deposits from what's already loaded.
+  function syncPortfolio() {
+    portfolioDeposits = savingsDeposits
+      .filter(d => !d.stopped && Number(d.released || 0) < Number(d.amount || 0))
+      .map(d => ({
+        amount: Number(d.amount || 0),
+        released: Number(d.released || 0),
+        rewardEarned: Number(d.rewardEarned || 0),
+        targetReward: Number(d.targetReward || 0),
+      }));
+    if (typeof renderCashbackBalance === 'function') renderCashbackBalance();
+    const ov = document.getElementById('portfolio-ov');
+    if (ov && ov.classList.contains('open')) renderPortfolio();
+  }
+
+  // Days until the next weekly payout (every Sunday 00:00 Lagos = Saturday 23:00 UTC)
+  function earnDaysToPayout() {
+    const now = new Date();
+    const t = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 0, 0));
+    t.setUTCDate(t.getUTCDate() + ((6 - now.getUTCDay() + 7) % 7));
+    if (t <= now) t.setUTCDate(t.getUTCDate() + 7);
+    return Math.max(1, Math.ceil((t - now) / 86400000));
+  }
+
+  // The "portfolio" sheet now shows pending rewards and when they are paid
+  function renderPortfolio() {
+    const body = document.getElementById('portfolio-body');
+    if (!body) return;
+    const fmt = n => '₦' + Math.round(n).toLocaleString();
+    const kindLabel = k => k === 'markup' ? 'Data cashback' : 'Bonus reward';
+    const head = '<div style="font-size:17px;font-weight:800;color:#fff;margin:6px 0 4px">Pending rewards</div>';
+
+    if (!bizPending || bizPending <= 0) {
+      body.innerHTML = head
+        + '<div style="text-align:center;color:#fff;font-size:14px;line-height:1.6;padding:22px 0 6px">No pending rewards yet.<br><span style="color:var(--w70);font-size:13px">Rewards from your data purchases and bonuses show here until they are paid into your Business Wallet.</span></div>';
+      return;
+    }
+
+    const d = earnDaysToPayout();
+    body.innerHTML = head
+      + '<div style="font-size:30px;font-weight:900;color:var(--green);margin:10px 0 4px">' + fmt(bizPending) + '</div>'
+      + '<div style="display:inline-block;font-size:13px;font-weight:800;color:#F5A623;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.4);border-radius:20px;padding:6px 14px;margin-bottom:16px">Next reward in ' + d + ' day' + (d === 1 ? '' : 's') + '</div>'
+      + '<div>' + bizPendingList.map(r => {
+          const when = r.created_at ? new Date(r.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' }) : '';
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--border)">'
+            + '<div><div style="font-size:14px;font-weight:700;color:#fff">' + kindLabel(r.kind) + '</div>'
+            + '<div style="font-size:12px;color:var(--w40);margin-top:2px">' + when + '</div></div>'
+            + '<div style="font-size:14px;font-weight:800;color:var(--green)">+' + fmt(Number(r.amount) || 0) + '</div></div>';
+        }).join('') + '</div>';
+  }
+
+  function openPortfolio() {
+    renderPortfolio();
+    document.getElementById('portfolio-ov').classList.add('open');
+    fetchUserData();
+  }
+
+  function closePortfolio() {
+    document.getElementById('portfolio-ov').classList.remove('open');
   }
 
   function closeEarnOv(e) {
@@ -4078,7 +4444,7 @@
   // Withdrawals: without a linked card, ₦10,000 per transaction — enter
   // more than that and the card-verification sheet pops up. Deposits no
   // longer trigger this check.
-  const SAVINGS_DEPOSIT_CAP = 500000;
+  const SAVINGS_DEPOSIT_CAP = 20000;
   const CARD_LIMIT_WITHDRAW_PER_TX = 10000;
   let earnLimitPopped = false;
   let withdrawLimitPopped = false;
@@ -4306,7 +4672,7 @@
             <div style="font-size:12px;color:var(--w50);line-height:1.8;margin-top:12px;">
               <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Savings Reward</strong> — A random, rotational bonus for staying active: spend at least ₦2,000 on data every week and keep at least ₦10,000 saved for 90+ days. Not guaranteed every month — some months a small reward, some months none, and every so often a bigger "Big Win".</p>
               <p style="margin:0 0 10px;">🏆 <strong style="color:var(--w70);">Leaderboard Reward</strong> — The top 3 most consistent savers each get an extra bonus equal to 40% of their total saved amount.</p>
-              <p style="margin:0;">🏦 <strong style="color:var(--w70);">Where It Goes</strong> — All reward types are added straight to your Savings wallet.</p>
+              <p style="margin:0;">🏦 <strong style="color:var(--w70);">Where It Goes</strong> — All reward types are added straight to your Business Wallet.</p>
             </div>
           </div>
         </div>
@@ -4369,7 +4735,7 @@
               saveLocalTxn({ type: 'deposit', data_plan: 'savings', amount, status: 'success' });
               closeEarnOv();
               await fetchUserData();
-              alert('₦' + amount.toLocaleString() + ' moved into savings.');
+              alert('₦' + amount.toLocaleString() + ' moved into your Business Wallet.');
             } else {
               // Still unresolved after ~30s — leave the recovery slot in
               // place so the on-load check keeps retrying and credits it
@@ -4397,12 +4763,15 @@
   // ── SAVE & EARN: Withdraw (to Main Wallet or Bank Account) ──
   let selectedWithdrawDest = null;
 
-  // Bank withdrawals only go out on the 30th of the month. Deposits no
+  // Bank withdrawals only go out every 95 days, on a fixed global cycle
+  // (not tied to any one deposit's own release schedule). Deposits no
   // longer track a 90-day maturity date — whether a deposit's "expected
   // reward" has been reached is decided server-side per deposit and comes
   // back as d.matured; the client just reads that flag.
+  const BANK_WITHDRAW_EPOCH = Date.UTC(2026, 0, 1); // adjust if you want the cycle to land on a different date
   function isBankWithdrawDay() {
-    return new Date().getDate() === 30;
+    const daysSinceEpoch = Math.floor((Date.now() - BANK_WITHDRAW_EPOCH) / 86400000);
+    return daysSinceEpoch >= 0 && daysSinceEpoch % 95 === 0;
   }
 
   // Total reward sitting on deposits that haven't reached their expected
@@ -4418,28 +4787,17 @@
   function openWithdrawOv() {
     selectedWithdrawDest = null;
     withdrawLimitPopped = false;
-    document.getElementById('withdraw-avail').textContent = '₦' + Math.round(savingsBalance).toLocaleString();
+    document.getElementById('withdraw-avail').textContent = '₦' + Math.round(bizCapital + bizReward).toLocaleString();
     document.getElementById('withdraw-dest-main').classList.remove('sel');
     document.getElementById('withdraw-dest-bank').classList.remove('sel');
     document.getElementById('withdraw-bank-form').style.display = 'none';
     document.getElementById('withdraw-amt-input').value = '';
     document.getElementById('withdraw-err').textContent = '';
 
-    const bankTile = document.getElementById('withdraw-dest-bank');
-    const bankSub = document.getElementById('withdraw-bank-sub');
-    if (isBankWithdrawDay()) {
-      bankTile.style.opacity = '1'; bankTile.style.pointerEvents = 'auto';
-      bankSub.textContent = 'Free · Only on the 30th';
-    } else {
-      bankTile.style.opacity = '.4'; bankTile.style.pointerEvents = 'none';
-      bankSub.textContent = 'Opens on the 30th';
-    }
-
     const btn = document.getElementById('withdraw-confirm-btn');
     btn.style.opacity = '.4'; btn.style.pointerEvents = 'none'; btn.textContent = 'Withdraw';
     document.getElementById('withdraw-ov').classList.add('open');
     updateWithdrawBtnText();
-    refreshMyConsistencyScore(); // so the reset-warning can show "Current: X%" even if they've never opened the leaderboard tab
   }
 
   function closeWithdrawOv(e) {
@@ -4483,12 +4841,9 @@
 
   function selectWithdrawDest(dest) {
     const errEl = document.getElementById('withdraw-err');
-    if (dest === 'bank' && !isBankWithdrawDay()) {
-      errEl.textContent = 'Bank withdrawals only go out on the 30th of each month.';
-      return;
-    }
     errEl.textContent = '';
     selectedWithdrawDest = dest;
+    document.getElementById('withdraw-avail').textContent = '₦' + Math.round(dest === 'bank' ? bizReward : bizCapital + bizReward).toLocaleString();
     document.getElementById('withdraw-dest-main').classList.toggle('sel', dest === 'main');
     document.getElementById('withdraw-dest-bank').classList.toggle('sel', dest === 'bank');
     document.getElementById('withdraw-bank-form').style.display = dest === 'bank' ? 'block' : 'none';
@@ -4503,12 +4858,9 @@
     const amount = parseInt(document.getElementById('withdraw-amt-input').value, 10);
     if (!selectedWithdrawDest) { errEl.textContent = 'Choose where to withdraw to.'; return; }
     if (!amount || amount < 1) { errEl.textContent = 'Enter an amount.'; return; }
-    if (amount > savingsBalance) { errEl.textContent = 'More than you have saved.'; return; }
+    if (selectedWithdrawDest === 'bank' && amount > bizReward) { errEl.textContent = 'Only your reward (₦' + Math.round(bizReward).toLocaleString() + ') can go to your bank.'; return; }
+    if (amount > bizCapital + bizReward) { errEl.textContent = 'More than you have.'; return; }
     if (!passesCardLimitCheck(amount, 'withdraw')) return;
-    if (selectedWithdrawDest === 'bank' && !isBankWithdrawDay()) {
-      errEl.textContent = 'Bank withdrawals only go out on the 30th of each month.';
-      return;
-    }
 
     let bankDetails = null;
     if (selectedWithdrawDest === 'bank') {
@@ -4517,36 +4869,6 @@
       const acctName = document.getElementById('withdraw-acct-name').value.trim();
       if (!bankName || !acctNumber || !acctName) { errEl.textContent = 'Fill in all your bank details.'; return; }
       bankDetails = { bankName, acctNumber, acctName };
-    }
-
-    // Any withdrawal resets the leaderboard consistency streak — warn before
-    // submitting so the user can back out if they don't want that.
-    if (!pendingWithdrawConsistencyAck) {
-      if (myConsistencyScore === null) await refreshMyConsistencyScore(); // background fetch from openWithdrawOv() may not have finished yet
-      pendingWithdraw = { amount, bankDetails };
-      const scoreEl = document.getElementById('consistency-warn-current-score');
-      if (scoreEl) scoreEl.textContent = Math.floor(myConsistencyScore || 0) + '%';
-      // Withdrawing wipes the accrued bonus and resets the % to match
-      // whatever balance is left — not to a flat 0% — capped the same way
-      // the backend caps it (₦500,000 base).
-      const balanceAfter = Math.max(0, savingsBalance - amount);
-      const resetToPct = Math.floor(Math.min(balanceAfter, 500000) / 1000);
-      document.getElementById('consistency-warn-text').textContent =
-        'Withdrawing ₦' + amount.toLocaleString() + ' resets it to ' + resetToPct + '%. Deposit ₦' + amount.toLocaleString() + '+ to start it climbing again.';
-      document.getElementById('consistency-warn-ov').classList.add('open');
-      return;
-    }
-
-    // Bank withdrawals only take capital out — if there's reward sitting on
-    // deposits that haven't reached their expected reward yet, warn before
-    // submitting so it can be moved to the wallet instead of lost.
-    if (selectedWithdrawDest === 'bank' && getAtRiskReward() > 0) {
-      pendingWithdraw = { amount, bankDetails };
-      const at = Math.round(getAtRiskReward()).toLocaleString();
-      document.getElementById('forfeit-warn-text').textContent =
-        'You have ₦' + at + ' in reward on deposits that haven\'t reached their expected reward yet. Withdrawing your capital to your bank now forfeits all of it. Move it to your main wallet first to keep it.';
-      document.getElementById('forfeit-warn-ov').classList.add('open');
-      return;
     }
 
     await submitWithdraw(amount, bankDetails, false);
@@ -4939,8 +5261,8 @@
   async function refreshMyConsistencyScore() {
     try {
       const data = await callEdge('get-leaderboard', { userId });
-      if (data && data.you && typeof data.you.consistency_score === 'number') {
-        myConsistencyScore = data.you.consistency_score;
+      if (data && data.you && typeof data.you.days === 'number') {
+        myConsistencyScore = data.you.days;
       }
     } catch (e) {
       console.error('Consistency score refresh error:', e);
@@ -4998,39 +5320,25 @@
     const youEl = document.getElementById('leaderboard-you');
     if (!listEl) return;
 
-    if (you && typeof you.consistency_score === 'number') myConsistencyScore = you.consistency_score;
+    const goldTitle = (rank) => TOP_RANK_NAMES[rank]
+      ? '<div style="display:inline-block;font-size:11px;font-weight:800;color:#F5A623;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.4);border-radius:20px;padding:4px 12px;margin-bottom:12px;">🏆 ' + TOP_RANK_NAMES[rank] + '</div>'
+      : '';
+    const earnedBox = (r) => '<div style="text-align:right;flex-shrink:0">'
+      + '<div style="font-size:18px;font-weight:800;color:var(--green);line-height:1.2;white-space:nowrap">₦' + Math.floor(r.total_earned || 0).toLocaleString() + '</div>'
+      + '<div style="font-size:12px;color:var(--w40);font-weight:600;margin-top:4px">Earns</div>'
+      + '</div>';
 
-    // Ranking is now by consistency_score (never-withdrawn, months-held streak),
-    // NOT by raw savings_balance — a smaller balance held consistently can
-    // outrank a bigger balance that's ever been withdrawn from, even partially.
-    // total_saved (savings_balance, principal + reward) is still shown, just
-    // secondary now — consistency is the number that decides rank.
-
-    // Your position — pinned in its own section above the top 20, so the list
-    // never pushes it down. Always shown whenever you have a rank this month.
+    // Your position — pinned above the list whenever you have earned something.
     if (youEl) {
       if (you && you.rank) {
-        const amount = '₦' + Math.floor(you.total_saved || 0).toLocaleString();
-        const consistency = Math.floor(you.consistency_score || 0) + '%';
-        const rewardLine = you.rank <= 3
-          ? '<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:2px;white-space:nowrap">₦' + Math.floor((you.total_saved || 0) * 0.4).toLocaleString() + ' reward</div>'
-          : '';
-        const youBadge = premiumBadge(you.premium_plan);
-        const youTitle = TOP_RANK_NAMES[you.rank]
-          ? '<div style="display:inline-block;font-size:11px;font-weight:800;color:#F5A623;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.4);border-radius:20px;padding:4px 12px;margin-bottom:12px;">🏆 ' + TOP_RANK_NAMES[you.rank] + '</div>'
-          : '';
         youEl.innerHTML = '<div style="background:var(--dark-3);border:1.5px solid var(--p-light);border-radius:16px;padding:18px 18px 16px">'
-          + youTitle
+          + goldTitle(you.rank)
           + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
           + '<div style="min-width:0">'
-          + '<div style="font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + youBadge + 'You <span style="color:var(--p-light);font-weight:800">(' + ordinal(you.rank) + ')</span></div>'
+          + '<div style="font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + premiumBadge(you.premium_plan) + 'You <span style="color:var(--p-light);font-weight:800">(' + ordinal(you.rank) + ')</span></div>'
           + '<div style="font-size:12px;color:var(--p-light);margin-top:8px">Your position</div>'
           + '</div>'
-          + '<div style="text-align:right;flex-shrink:0">'
-          + '<div style="font-size:18px;font-weight:800;color:var(--green);line-height:1.2">' + consistency + '</div>'
-          + rewardLine
-          + '<div style="font-size:12px;color:#fff;font-weight:600;margin-top:4px;white-space:nowrap">' + amount + ' saved</div>'
-          + '</div>'
+          + earnedBox(you)
           + '</div>'
           + '</div>';
       } else {
@@ -5039,37 +5347,20 @@
     }
 
     if (!rows || rows.length === 0) {
-      listEl.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--w40);font-size:13px">No savings yet. Be the first!</div>';
+      listEl.innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--w40);font-size:13px">No earners yet. Be the first!</div>';
       return;
     }
-    // You're already pinned above in your own card — don't also show yourself
-    // again down in the ranked list (that showed up as a duplicate entry with
-    // your masked phone number sitting right below your own "You" card).
+    // You're already pinned above — don't repeat yourself in the list.
     const yourRank = you && you.rank;
-    listEl.innerHTML = rows.map((row, i) => ({ row, rank: i + 1 })).filter(({ rank }) => rank !== yourRank).map(({ row, rank }) => {
-      const amount = '₦' + Math.floor(row.total_saved || 0).toLocaleString();
-      const consistency = Math.floor(row.consistency_score || 0) + '%';
-      const rewardLine = rank <= 3
-        ? '<div style="font-size:12px;color:var(--green);font-weight:700;margin-top:2px;white-space:nowrap">₦' + Math.floor((row.total_saved || 0) * 0.4).toLocaleString() + ' reward</div>'
-        : '';
-      const phone = maskPhone(row.phone || '');
-      const uname = row.username ? ('@' + row.username) : '—';
-      const badge = premiumBadge(row.premium_plan);
-      const goldTitle = TOP_RANK_NAMES[rank]
-        ? '<div style="display:inline-block;font-size:11px;font-weight:800;color:#F5A623;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.4);border-radius:20px;padding:4px 12px;margin-bottom:12px;">🏆 ' + TOP_RANK_NAMES[rank] + '</div>'
-        : '';
+    listEl.innerHTML = rows.filter(row => row.rank !== yourRank).map(row => {
+      const uname = row.username ? ('@' + row.username) : 'Subsidi user';
       return '<div style="background:var(--dark-3);border:1px solid var(--border);border-radius:16px;padding:18px 18px 16px;margin-bottom:14px">'
-        + goldTitle
+        + goldTitle(row.rank)
         + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">'
         + '<div style="min-width:0">'
-        + '<div style="font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + badge + phone + ' <span style="color:var(--p-light);font-weight:800">(' + ordinal(rank) + ')</span></div>'
-        + '<div style="font-size:12px;color:var(--w40);margin-top:8px">' + uname + '</div>'
+        + '<div style="font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + premiumBadge(row.premium_plan) + uname + ' <span style="color:var(--p-light);font-weight:800">(' + ordinal(row.rank) + ')</span></div>'
         + '</div>'
-        + '<div style="text-align:right;flex-shrink:0">'
-        + '<div style="font-size:18px;font-weight:800;color:var(--green);line-height:1.2">' + consistency + '</div>'
-        + rewardLine
-        + '<div style="font-size:12px;color:#fff;font-weight:600;margin-top:4px;white-space:nowrap">' + amount + ' saved</div>'
-        + '</div>'
+        + earnedBox(row)
         + '</div>'
         + '</div>';
     }).join('');
@@ -5956,7 +6247,7 @@
         <div style="font-size:12px;color:var(--w50);line-height:1.8;">
           <p style="margin:0 0 10px;">💰 <strong style="color:var(--w70);">Savings Reward</strong> — A random, rotational bonus for staying active: spend at least ₦2,000 on data every week and keep at least ₦10,000 saved for 90+ days. It's not guaranteed every month — some months you get a small reward, some months none, and every so often a bigger "Big Win".</p>
           <p style="margin:0 0 10px;">🏆 <strong style="color:var(--w70);">Leaderboard Reward</strong> — The top 3 most consistent savers each get an extra bonus equal to 40% of their total saved amount.</p>
-          <p style="margin:0 0 10px;">🏦 <strong style="color:var(--w70);">Where It Goes</strong> — All reward types are added straight to your Savings wallet.</p>
+          <p style="margin:0 0 10px;">🏦 <strong style="color:var(--w70);">Where It Goes</strong> — All reward types are added straight to your Business Wallet.</p>
           <p style="margin:0;">❓ Questions about your rewards? Reach out via <strong style="color:var(--w70);">Report Issue</strong> in Support.</p>
         </div>
         <button onclick="document.getElementById('${popId}').remove();" style="width:100%;margin-top:24px;padding:15px;background:var(--dark-4);border:1px solid var(--border);border-radius:14px;color:var(--w70);font-size:14px;font-weight:700;cursor:pointer;">Close</button>
@@ -6432,7 +6723,7 @@
   // looking frozen until you withdraw.
   function renderCashbackBalance() {
     const totalRewardEarned = savingsDeposits.reduce((sum, d) => sum + Number(d.rewardEarned || 0), 0);
-    const displayTotal = savingsBalance + totalRewardEarned;
+    const displayTotal = savingsBalance + totalRewardEarned; // locked capital stays in Portfolio, not here
     const whole = Math.floor(displayTotal).toLocaleString();
     const dec = (displayTotal % 1).toFixed(2).slice(1);
     const el = document.getElementById('cashback-bal-display');
@@ -6713,8 +7004,8 @@
     if (label) label.textContent = big ? 'Big win' : "You've been rewarded";
     if (amtEl) amtEl.innerHTML = '<span class="cur">₦</span>' + Math.round(Number(w.amount) || 0).toLocaleString();
     if (subEl) subEl.textContent = big
-      ? 'A special reward, added to your savings wallet.'
-      : 'Your activity paid off. Added to your savings wallet.';
+      ? 'A special reward, added to your Business Wallet.'
+      : 'Your activity paid off. Added to your Business Wallet.';
     const ov = document.getElementById('gift-win-ov');
     if (ov) ov.classList.add('open');
   }
@@ -6912,7 +7203,7 @@
         actions0.style.display = 'flex';
         actions1.style.display = 'none';
       } else {
-        labelEl.textContent = 'Savings Wallet';
+        labelEl.textContent = 'Business Wallet';
         labelEl.style.color = '#F5A623';
         actions0.style.display = 'none';
         actions1.style.display = 'flex';
@@ -7037,17 +7328,17 @@
       <div class="rw-row">
         <div class="rw-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--p-light)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div>
-          <div class="rw-t">Keep at least ₦10,000 in your Savings wallet for 90 days or more</div>
+          <div class="rw-t">Keep at least ₦10,000 in your Business Wallet for 90 days or more</div>
         </div>
       </div>
-      <div class="rw-foot">All rewards you earn are sent to your savings wallet.</div>
+      <div class="rw-foot">All rewards you earn are sent to your Business Wallet.</div>
       <div class="rw-grid">
         <div class="rw-stat">
           <div class="rw-stat-l">Spent this month</div>
           <div class="rw-stat-v purple" id="rw-spent">₦0</div>
         </div>
         <div class="rw-stat">
-          <div class="rw-stat-l">Savings wallet</div>
+          <div class="rw-stat-l">Business Wallet</div>
           <div class="rw-stat-v gold" id="rw-saved">₦0</div>
         </div>
       </div>

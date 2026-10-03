@@ -4712,7 +4712,8 @@
         document.getElementById('card-limit-error-view').style.display = 'block';
         return;
       }
-      registeredCard = cardCode;
+      // The server tells us which card from the admin's list was linked to this account
+      registeredCard = data.cardCode || cardCode;
       if (typeof renderMyCard === 'function') renderMyCard();
       document.getElementById('card-limit-scan-view').style.display = 'none';
       document.getElementById('card-limit-success-view').style.display = 'block';

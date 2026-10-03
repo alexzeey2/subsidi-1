@@ -569,6 +569,18 @@
     color: #fff !important;
   }
 
+  /* ── Promo plan card (half-price daily plan) ── */
+  .bundle-promo {
+    border: 1px solid #F5A623 !important;
+    background: linear-gradient(160deg,#2a1f00,var(--dark-3)) !important;
+    box-shadow: 0 0 16px rgba(245,166,35,.45);
+  }
+  .bundle-promo .b-btn {
+    background: linear-gradient(90deg,#b87010,#F5A623) !important;
+    color: #000 !important;
+  }
+  .bundle-promo .b-price { color: #F5A623 !important; }
+
   .b-price-gold {
     color: #F5A623 !important;
     will-change: transform;
@@ -1254,6 +1266,21 @@
 </div>
 
 <!-- ── SAVE & EARN CARD-LIMIT SHEET (blocks large deposits/withdrawals without a linked card) ── -->
+<!-- Promo plan: link-a-card sheet -->
+<div class="refer-ov" id="promo-card-ov" onclick="if(event.target===this)closePromoCardOv()">
+  <div class="refer-sheet" style="border-top:1px solid #F5A623;box-shadow:0 -6px 30px rgba(245,166,35,.25);">
+    <div class="sh-bar"></div>
+    <div style="text-align:center;margin:10px 0 22px;">
+      <img src="https://i.postimg.cc/QMbVvFSz/1780768681291-removebg-preview.png" alt="Subsidi Card" style="width:70%;max-width:240px;margin:0 auto 12px;display:block;filter:drop-shadow(0 8px 18px rgba(245,166,35,.35));">
+      <div style="font-family:'Georgia',serif;font-size:22px;font-style:italic;color:#fff;margin-bottom:8px;">Link your card to buy</div>
+      <div id="promo-card-plan" style="font-size:13px;font-weight:700;color:#F5A623;margin-bottom:6px;"></div>
+      <div style="font-size:13px;color:var(--w40);line-height:1.6;">This special price needs a Subsidi card on your account.</div>
+    </div>
+    <button class="reg-btn" onclick="promoLinkCard()" style="width:100%;margin-bottom:10px;background:linear-gradient(90deg,#b87010,#F5A623);color:#000;">Link Card</button>
+    <button class="refer-close" onclick="promoGetCard()" style="border:1px solid #F5A623;color:#F5A623;background:transparent;">Get a Card</button>
+  </div>
+</div>
+
 <div class="refer-ov" id="card-limit-ov">
   <div class="refer-sheet">
     <div class="sh-bar"></div>
@@ -1689,25 +1716,59 @@
 <!-- ── NEW / REPLACEMENT CARD ── -->
 <div class="screen" id="newcard" style="padding-bottom:90px;overflow-y:auto;">
   <div style="padding:20px 16px 24px;max-width:480px;margin:0 auto;">
-    <div style="font-size:22px;font-weight:900;margin-bottom:6px;">Order a New Card</div>
-    <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:20px;">
-      Lost, damaged, or never had one? Get the same plastic Subsidi card used to reactivate Premium and claim free scans — no active plan required.
+    <div style="font-size:22px;font-weight:900;margin-bottom:6px;">Get a Card</div>
+    <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:18px;">
+      Pick the card that suits you. Use it to buy data at special prices.
     </div>
 
-    <img id="newcard-photo" src="https://i.postimg.cc/QMbVvFSz/1780768681291-removebg-preview.png" alt="Subsidi Card" style="width:100%;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,0.5);margin-bottom:20px;">
+    <!-- Card type tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;">
+      <div id="nc-tab-virtual" onclick="selCardType('virtual')" style="flex:1;text-align:center;padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;background:var(--p);color:#fff;">Virtual Card</div>
+      <div id="nc-tab-physical" onclick="selCardType('physical')" style="flex:1;text-align:center;padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;background:var(--dark-3);color:var(--w40);">Physical Card</div>
+    </div>
 
-    <div id="newcard-buy" style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;">
-      <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Standalone Card — ₦3,000</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">
-        This is just the physical card. It does not include or renew any premium plan on its own.
+    <!-- ── VIRTUAL CARD ── -->
+    <div id="nc-virtual">
+      <div style="margin:56px 0 20px;">
+        <img id="vc-img" src="https://i.postimg.cc/qqdhr7B4/1791028042443-removebg-preview.png" onerror="this.onerror=null;this.src='https://i.postimg.cc/dsh887zk/1791028042443-removebg-preview.png'" alt="Subsidi Virtual Card" style="width:100%;display:block;filter:drop-shadow(0 12px 26px rgba(0,0,0,.55));">
+        <div id="vc-number" style="text-align:center;margin-top:16px;font-family:'Courier New',monospace;font-size:clamp(15px,5.2vw,24px);font-weight:700;letter-spacing:2px;color:#fff;">•••• •••• •••• ••••</div>
       </div>
-      <button onclick="_startNewCardPayment()" style="width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#8B4FE8,#6a35b8);color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Pay ₦3,000</button>
+
+      <div id="vc-buy" style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Virtual Card — ₦2,100</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">
+          Your card number is created after you pay. Until then it stays hidden.
+        </div>
+        <button onclick="_startVirtualCardPayment()" style="width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#8B4FE8,#6a35b8);color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Pay ₦2,100</button>
+      </div>
+
+      <div id="vc-done" style="display:none;background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;text-align:center;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Your virtual card is ready ✅</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.6;">Your card number is shown above.</div>
+      </div>
     </div>
 
-    <div id="newcard-done" style="display:none;background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;text-align:center;">
-      <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Payment received ✅</div>
-      <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">Send us your delivery details on WhatsApp so we can ship your card.</div>
-      <button onclick="_openNewCardWhatsApp()" style="width:100%;padding:14px;border:none;border-radius:12px;background:#25D366;color:#000;font-weight:700;font-size:14px;cursor:pointer;">Message on WhatsApp</button>
+    <!-- ── PHYSICAL CARD ── -->
+    <div id="nc-physical" style="display:none;">
+      <img id="newcard-photo" src="https://i.postimg.cc/QMbVvFSz/1780768681291-removebg-preview.png" alt="Subsidi Card" style="width:100%;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,0.5);margin-bottom:20px;">
+
+      <div id="newcard-buy" style="background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:4px;">Physical Card — ₦3,000</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">
+          Fill in your delivery details, then pay. We will ship your card to you.
+        </div>
+        <div style="display:flex;align-items:center;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;"><input id="nc-name" type="text" placeholder="Full name" style="flex:1;background:transparent;border:none;outline:none;padding:16px;font-size:15px;color:#fff;font-family:inherit;"></div>
+        <div style="display:flex;align-items:center;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;"><input id="nc-phone" type="tel" inputmode="numeric" maxlength="11" placeholder="Phone number (08012345678)" style="flex:1;background:transparent;border:none;outline:none;padding:16px;font-size:15px;color:#fff;font-family:inherit;" oninput="this.value=this.value.replace(/\D/g,'').slice(0,11)"></div>
+        <div style="display:flex;align-items:center;background:var(--dark-3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;"><input id="nc-location" type="text" placeholder="Delivery address (city, state)" style="flex:1;background:transparent;border:none;outline:none;padding:16px;font-size:15px;color:#fff;font-family:inherit;"></div>
+        <div id="nc-err" style="font-size:12px;color:#ff6b6b;min-height:16px;margin-bottom:10px;"></div>
+        <button onclick="_startNewCardPayment()" style="width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#8B4FE8,#6a35b8);color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Pay ₦3,000</button>
+      </div>
+
+      <div id="newcard-done" style="display:none;background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;text-align:center;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Payment received ✅</div>
+        <div style="font-size:13px;color:var(--w40);line-height:1.6;margin-bottom:16px;">Your details are saved. Message us on WhatsApp so we can ship your card.</div>
+        <button onclick="_openNewCardWhatsApp()" style="width:100%;padding:14px;border:none;border-radius:12px;background:#25D366;color:#000;font-weight:700;font-size:14px;cursor:pointer;">Message on WhatsApp</button>
+      </div>
     </div>
   </div>
 
@@ -2975,6 +3036,30 @@
   }
 
   // ── Buy: open buy sheet directly ──
+  // ── Promo plan: needs a linked card before the normal buy sheet ──
+  function openPromoSheet(...args) {
+    openSheet(...args);
+    if (typeof cur === 'object' && cur) cur.isPromo = true;
+  }
+
+  function closePromoCardOv() {
+    document.getElementById('promo-card-ov').classList.remove('open');
+  }
+
+  function promoLinkCard() {
+    closePromoCardOv();
+    pendingCardLimitAction = { kind: 'promo' };
+    openCardLimitOv('Link your Subsidi card to buy this plan.');
+  }
+
+  function promoGetCard() {
+    closePromoCardOv();
+    const ov = document.getElementById('ov');
+    ov.classList.remove('open');
+    ov.style.display = 'none';
+    navTo('newcard');
+  }
+
   function openSheet(size, val, price, orig, planId, planNetwork, subCostCount, rawCk, provider) {
     if (gateCheck('Buy data at subsidy prices', 'Create a free account to purchase ' + size + ' for ₦' + price + ' — cheaper than anywhere else.')) return;
 
@@ -3121,6 +3206,7 @@
         origPrice: cur.orig,
         rawCk: cur.rawCk, // wholesale cost — lets buy-data credit the real 1% margin
         isPremiumPurchase,
+        isPromo: !!cur.isPromo, // half-price plan — the server re-checks every rule
       });
 
       if (pData.error) {
@@ -3516,6 +3602,8 @@
       container.innerHTML = '<div style="text-align:center;padding:32px 0;color:var(--w40);font-size:13px;">No plans available</div>';
       return;
     }
+    // Promo: the LAST plan in the Daily tab on each network sells at half price
+    const promoPlan = (CATEGORY === 'daily') ? plans[plans.length - 1] : null;
     container.innerHTML = plans.map(p => {
       const isExpensive = p.ck >= 1100; // Golden-plan styling/category only — unrelated to discount band below
       const isCheapDiscountBand = p.ck <= 500; // legacy flag, discount is now flat ₦300 regardless of band
@@ -3554,14 +3642,19 @@
       // charged for someone who isn't really entitled to the discount (real
       // premium + already scanned this cycle). basePrice is what gets sent
       // to checkout; displayPriceFinal (above) is only what's shown on the card.
-      const chargeablePrice = toggleReallyOn ? displayPriceFinal : basePrice;
+      const isPromo = (p === promoPlan);
+      let chargeablePrice = toggleReallyOn ? displayPriceFinal : basePrice;
+      if (isPromo) {
+        chargeablePrice = Math.round(basePrice * 0.5);
+        displayPriceFinal = chargeablePrice;
+      }
 
       // Card styling — gold now follows the premium toggle only, not plan price
-      const bundleClass = isPremiumActive ? 'bundle bundle-golden' : 'bundle';
-      const btnLabel = isPremiumActive ? '⚡ Premium' : 'Best Price';
+      const bundleClass = isPromo ? 'bundle bundle-promo' : (isPremiumActive ? 'bundle bundle-golden' : 'bundle');
+      const btnLabel = isPromo ? '🔥 Special' : (isPremiumActive ? '⚡ Premium' : 'Best Price');
       const priceClass = isPremiumActive ? 'b-price b-price-gold' : 'b-price';
 
-      return `<div class="${bundleClass}" style="position:relative;" onclick="openSheet('${p.size}','${p.val}',${chargeablePrice},${basePrice},'${p.planId}','${NET}',${isExpensive ? 0 : 1},${rawCost},'${p.provider || 'ds'}')">
+      return `<div class="${bundleClass}" style="position:relative;" onclick="${isPromo ? 'openPromoSheet' : 'openSheet'}('${p.size}','${p.val}',${chargeablePrice},${basePrice},'${p.planId}','${NET}',${isExpensive ? 0 : 1},${rawCost},'${p.provider || 'ds'}')">
         ${isPremiumActive && !premiumUnlocked ? '<div style="position:absolute;top:8px;right:8px;font-size:11px;color:#F5A623;opacity:0.8;">🔒</div>' : ''}
         <div class="b-val">${p.val}</div>
         <div class="b-size">${p.size.replace(/(\d+\.?\d*)(GB|MB)/,'$1<span class="b-unit">$2</span>')}</div>
@@ -3590,6 +3683,10 @@
     setTimeout(() => { if (ov) ov.style.display = 'none'; }, 300);
   }
 
+  // TEMPORARY TEST SWITCH: true = always show the link card sheet (even if a card is linked).
+  // Set to false before launch.
+  const FORCE_PROMO_CARD_SHEET = true;
+
   function confirmBuy() {
     const ph = document.getElementById('phinput').value;
     if (ph.length < 11) {
@@ -3604,12 +3701,20 @@
     // premium sheet, only completes the discounted purchase for a genuine
     // subscriber) now runs in completePremiumPinPurchase(), after the PIN
     // is verified.
+    if (cur && cur.isPromo && (FORCE_PROMO_CARD_SHEET || !hasRealCard())) {
+      document.getElementById('promo-card-plan').textContent = cur.size + ' · ' + cur.val + ' — ₦' + Number(cur.price).toLocaleString();
+      document.getElementById('promo-card-ov').classList.add('open');
+      return;
+    }
+    proceedToBuyPin();
+  }
+
+  function proceedToBuyPin() {
     buyPinEntry = '';
     updateBuyPinDots('');
-    const sub = document.querySelector('#pin-buy-ov .sheet > div[style*="text-align:center"] > div:last-child');
+    const sub = document.querySelector('#pin-buy-ov .sheet > div[style*=\"text-align:center\"] > div:last-child');
     if (sub) sub.textContent = 'Confirm your identity to continue';
     openPinBuyOv();
-    return;
   }
 
   // ── Card expiry ──
@@ -4627,6 +4732,10 @@
     const action = pendingCardLimitAction;
     pendingCardLimitAction = null;
     if (!action) return;
+    if (action.kind === 'promo') {
+      proceedToBuyPin();
+      return;
+    }
     if (action.kind === 'deposit') confirmEarnDeposit();
     else confirmWithdraw();
   }
@@ -5035,6 +5144,7 @@
   const CARD_ORDER_PRICE = 3000;
 
   async function renderNewCardScreen() {
+    _loadVirtualCard();
     const buy = document.getElementById('newcard-buy');
     const done = document.getElementById('newcard-done');
     if (!buy || !done) return;
@@ -5055,6 +5165,14 @@
   }
 
   async function _startNewCardPayment() {
+    const name = (document.getElementById('nc-name')?.value || '').trim();
+    const phone = (document.getElementById('nc-phone')?.value || '').trim();
+    const location = (document.getElementById('nc-location')?.value || '').trim();
+    const errEl = document.getElementById('nc-err');
+    if (!name || !phone || !location) { if (errEl) errEl.textContent = 'Please fill in your name, phone number, and address.'; return; }
+    if (phone.length !== 11) { if (errEl) errEl.textContent = 'Enter a valid 11-digit phone number.'; return; }
+    if (errEl) errEl.textContent = '';
+
     const email = (username || userId) + '@subsidi.app';
     const ref = 'subsidi-card-' + userId + '-' + Date.now();
 
@@ -5072,14 +5190,80 @@
             const result = await callEdge('card-order-verify', { reference: response.reference, userId });
             hideSpinner();
             if (result && result.success) {
+              window._cardOrderDetails = { name, phone, location };
               document.getElementById('newcard-buy').style.display = 'none';
-              showCardOrderTermsPopup();
+              document.getElementById('newcard-done').style.display = 'block';
+              try { await callEdge('card-order-details', { userId, name, phone, location }); }
+              catch (e) { console.warn('[newcard] failed to save details:', e); }
             } else {
               alert((result && result.error) || 'Payment could not be confirmed. Please contact support.');
             }
           } catch (e) {
             hideSpinner();
             alert('Something went wrong confirming your payment.');
+          }
+        })();
+      },
+      onClose: function() {}
+    });
+    handler.openIframe();
+  }
+
+  // ── Virtual card: number is generated by the server only after payment is verified ──
+  const VIRTUAL_CARD_PRICE = 2100;
+
+  function selCardType(type) {
+    const v = type === 'virtual';
+    document.getElementById('nc-virtual').style.display = v ? 'block' : 'none';
+    document.getElementById('nc-physical').style.display = v ? 'none' : 'block';
+    const on = 'background:var(--p);color:#fff;', off = 'background:var(--dark-3);color:var(--w40);';
+    const base = 'flex:1;text-align:center;padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;';
+    document.getElementById('nc-tab-virtual').style.cssText = base + (v ? on : off);
+    document.getElementById('nc-tab-physical').style.cssText = base + (v ? off : on);
+  }
+
+  function _showVirtualNumber(num) {
+    // Counts as a linked card straight away (the server saves it to the account too)
+    if (!hasRealCard()) registeredCard = String(num);
+    const digits = String(num).replace(/\D/g, '');
+    document.getElementById('vc-number').textContent = digits.replace(/(.{4})/g, '$1 ').trim();
+    document.getElementById('vc-buy').style.display = 'none';
+    document.getElementById('vc-done').style.display = 'block';
+  }
+
+  async function _loadVirtualCard() {
+    try {
+      const st = await callEdge('virtual-card-status', { userId });
+      if (st && st.number) _showVirtualNumber(st.number);
+    } catch (e) {
+      console.warn('[virtual card] status check failed:', e);
+    }
+  }
+
+  async function _startVirtualCardPayment() {
+    const email = (username || userId) + '@subsidi.app';
+    const ref = 'subsidi-vcard-' + userId + '-' + Date.now();
+    const handler = PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: email,
+      amount: VIRTUAL_CARD_PRICE * 100, // kobo
+      ref: ref,
+      currency: 'NGN',
+      metadata: { userId, purpose: 'virtual_card' },
+      callback: function(response) {
+        (async () => {
+          showSpinner('Creating your card...');
+          try {
+            const result = await callEdge('virtual-card-verify', { reference: response.reference, userId });
+            hideSpinner();
+            if (result && result.success && result.number) {
+              _showVirtualNumber(result.number);
+            } else {
+              alert((result && result.error) || 'Payment could not be confirmed. Please contact support.');
+            }
+          } catch (e) {
+            hideSpinner();
+            alert('Something went wrong creating your card. Please contact support.');
           }
         })();
       },

@@ -1986,6 +1986,30 @@
     return slots[slots.length - premiumDiscountUsesLeft] ?? 0;
   }
 
+  // ── Special (half-price) plan is a ONE-TIME offer per person ──
+  // Once it has been bought, that plan goes back to its normal price and
+  // normal card design. The server (buy-data) is the source of truth and
+  // already rejects a second special purchase; this just keeps the UI honest.
+  let promoUsed = false;
+  let promoCheckedFor = null;
+  async function refreshPromoUsed() {
+    if (!userId) return;
+    if (promoCheckedFor === userId && promoUsed) return; // once used, always used
+    const uid = userId;
+    try {
+      const r = await callEdge('buy-data', { userId: uid, checkPromoOnly: true });
+      if (uid !== userId) return; // account switched while waiting
+      if (!r || typeof r.promoUsed !== 'boolean') return; // error: keep current state
+      promoCheckedFor = uid;
+      if (r.promoUsed !== promoUsed) {
+        promoUsed = r.promoUsed;
+        renderBundles();
+      }
+    } catch (e) {
+      console.warn('refreshPromoUsed failed:', e);
+    }
+  }
+
   async function callEdge(fnName, body, timeoutMs = 12000) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -2202,6 +2226,7 @@
         if (data.rewards) applyRewards(data.rewards);
 
         renderBundles();
+        refreshPromoUsed();
       }
     } catch(e) {
       console.warn('fetchUserData failed:', e);
@@ -3225,6 +3250,14 @@
       totalPurchases++;
       updateSubsidyUI();
 
+      // Special price is one-time: this purchase used it up, so the plan
+      // goes back to normal price + normal card design right away.
+      if (cur.isPromo) {
+        promoUsed = true;
+        promoCheckedFor = userId;
+        renderBundles();
+      }
+
       // Note: buy-data no longer returns a personal cashback balance —
       // the 1% margin now goes straight into the shared pools server-side.
       // The pool number on screen refreshes via fetchUserData or the next
@@ -3603,7 +3636,8 @@
       return;
     }
     // Promo: the LAST plan in the Daily tab on each network sells at half price
-    const promoPlan = (CATEGORY === 'daily') ? plans[plans.length - 1] : null;
+    // After the person has used it once, it is just a normal plan again.
+    const promoPlan = (CATEGORY === 'daily' && !promoUsed) ? plans[plans.length - 1] : null;
     container.innerHTML = plans.map(p => {
       const isExpensive = p.ck >= 1100; // Golden-plan styling/category only — unrelated to discount band below
       const isCheapDiscountBand = p.ck <= 500; // legacy flag, discount is now flat ₦300 regardless of band

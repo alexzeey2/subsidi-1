@@ -1990,23 +1990,27 @@
   // Once it has been bought, that plan goes back to its normal price and
   // normal card design. The server (buy-data) is the source of truth and
   // already rejects a second special purchase; this just keeps the UI honest.
-  let promoUsed = false;
+  // promoUsedUserId = the account we know has used it (so switching accounts
+  // can never carry the "used" state over to someone else).
+  let promoUsedUserId = null;
   let promoCheckedFor = null;
+  let promoCheckInFlight = false;
+  function isPromoUsed() { return !!userId && promoUsedUserId === userId; }
   async function refreshPromoUsed() {
-    if (!userId) return;
-    if (promoCheckedFor === userId && promoUsed) return; // once used, always used
+    if (!userId || promoCheckInFlight) return;
+    if (promoCheckedFor === userId) return; // already know the answer for this account
     const uid = userId;
+    promoCheckInFlight = true;
     try {
       const r = await callEdge('buy-data', { userId: uid, checkPromoOnly: true });
-      if (uid !== userId) return; // account switched while waiting
-      if (!r || typeof r.promoUsed !== 'boolean') return; // error: keep current state
+      if (!r || typeof r.promoUsed !== 'boolean') return; // error: try again on a later render
       promoCheckedFor = uid;
-      if (r.promoUsed !== promoUsed) {
-        promoUsed = r.promoUsed;
-        renderBundles();
-      }
+      if (r.promoUsed) promoUsedUserId = uid;
+      if (uid === userId && r.promoUsed) renderBundles();
     } catch (e) {
       console.warn('refreshPromoUsed failed:', e);
+    } finally {
+      promoCheckInFlight = false;
     }
   }
 
@@ -2226,7 +2230,6 @@
         if (data.rewards) applyRewards(data.rewards);
 
         renderBundles();
-        refreshPromoUsed();
       }
     } catch(e) {
       console.warn('fetchUserData failed:', e);
@@ -3253,7 +3256,7 @@
       // Special price is one-time: this purchase used it up, so the plan
       // goes back to normal price + normal card design right away.
       if (cur.isPromo) {
-        promoUsed = true;
+        promoUsedUserId = userId;
         promoCheckedFor = userId;
         renderBundles();
       }
@@ -3635,9 +3638,12 @@
       container.innerHTML = '<div style="text-align:center;padding:32px 0;color:var(--w40);font-size:13px;">No plans available</div>';
       return;
     }
+    // Make sure we know whether this account already used the special price
+    // (no-op once answered; re-renders by itself if the answer is "used").
+    refreshPromoUsed();
     // Promo: the LAST plan in the Daily tab on each network sells at half price
     // After the person has used it once, it is just a normal plan again.
-    const promoPlan = (CATEGORY === 'daily' && !promoUsed) ? plans[plans.length - 1] : null;
+    const promoPlan = (CATEGORY === 'daily' && !isPromoUsed()) ? plans[plans.length - 1] : null;
     container.innerHTML = plans.map(p => {
       const isExpensive = p.ck >= 1100; // Golden-plan styling/category only — unrelated to discount band below
       const isCheapDiscountBand = p.ck <= 500; // legacy flag, discount is now flat ₦300 regardless of band
